@@ -1,24 +1,18 @@
 use std::borrow::BorrowMut;
-use std::io;
+use std::{io, vec};
 use std::{borrow::Borrow, fmt::Result};
+
 
 #[derive(Debug, Clone, Copy)]
 enum ChessPiece {
     WhitePawn,
-    WhiteRook,
-    WhiteKing,
-
-    BlackPawn,
-    BlackRook,
-    BlackKing
+    WhiteKing
 }
-
 
 #[derive(Debug, Clone, Copy)]
 struct Cell{
     space: Option<ChessPiece>
 }
-
 #[derive(Debug)]
 struct Board {
     // squares: [[Cell;8 ]; 8]
@@ -43,40 +37,19 @@ impl Board {
     }
 
     fn set_board(&mut self)  -> io::Result<()>{
-        let x: &Vec<Cell> = self.squares[0].borrow();
-        println!("{:?}", x);
-
         for i in 0..self.board_size {
             for j in 0..self.board_size {
-                // let idx:usize = usize::try_from(i);
-                let mut x: Cell = self.squares[i as usize][j as usize];
-                // let x: & Cell = self.squares[i as usize][j as usize].borrow();
-                
-                // let y = match x.space.borrow_mut() {
-                //     Some(cp) => {cp}
-                //     None => {panic!("idk really what to do rn")}
-                // };
+                let cell: &mut Cell = self.squares[i as usize][j as usize].borrow_mut();
 
-                if let Some(mut y) = x.space.as_mut() {
-                    y = ChessPiece::BlackKing
-                }
-
-                // let z: &mut Option<ChessPiece> = x.space.borrow_mut();
-                // *z = Option::from(ChessPiece::BlackKing);
-
+                cell.space = Option::from(ChessPiece::WhiteKing);
             }
         }
-
-        println!("==================================");
-        println!("{:?}", x);
 
         Ok(())
     }
 }
 
 fn main() {
-    println!("Hello, world!");
-
-    let mut x = Board::new(8);
-    x.set_board();
+    let mut board = Board::new(2);
+    let _ = board.set_board();
 }
