@@ -1,5 +1,7 @@
-#### CHRUST - Chess + Rust
+## CHRUST - Chess + Rust
 
-- Simple terminal emultator Chess Simulation Game
+- Simple terminal program 
 
-- Uses Min/Max algorithm to beat you
+- Chess simulation game
+
+- AI uses Min/Max algorithm

@@ -1,11 +1,9 @@
 use std::borrow::BorrowMut;
-use std::{io, vec};
-use std::{borrow::Borrow, fmt::Result};
+use std::{io};
 
 
 #[derive(Debug, Clone, Copy)]
 enum ChessPiece {
-    WhitePawn,
     WhiteKing
 }
 
