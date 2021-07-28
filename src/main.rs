@@ -13,5 +13,6 @@ fn main() {
         Err(error)  => panic!("error! {}", error)
     };
     println!("{:?} ", board1);
+    //added this line
 }
 
