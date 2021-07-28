@@ -1,17 +1,13 @@
-extern crate json;
+extern crate serde_derive;
+extern crate serde_json;
 
 pub mod cell;
-use cell::chesspiece::ChessPiece;
 use cell::Cell;
-use std::borrow::BorrowMut;
-
-use std::char::from_u32_unchecked;
 use std::fs::File;
-use std::io::{self, BufReader, Read};
+use std::io::{BufReader};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Board {
-    // squares: [[Cell;8 ]; 8]
     squares: Vec<Vec<Cell>>,
     board_size: i32,
 }
@@ -36,33 +32,25 @@ impl Board {
             board_size,
         }
     }
-
-    pub fn set_board(&mut self) {
-        for i in 0..self.board_size {
-            for j in 0..self.board_size {
-                let cell: &mut Cell = self.squares[i as usize][j as usize].borrow_mut();
-
-                cell.space = Option::from(ChessPiece::WhitePawn);
-            }
-        }
-    }
-
-    pub fn load_board(&mut self) {
-        let mut current_dir = std::env::current_dir().expect("Cant find the path to the current directorey!");
+ 
+    pub fn load_from_file(board_name: &str) -> Result<Board, Box<dyn std::error::Error>> {
+        let mut current_dir =
+            std::env::current_dir().expect("Cant find the path to the current directory!");
 
         current_dir.push("src");
         current_dir.push("boards");
-        current_dir.push("board1.json");
+        current_dir.push(format!("{}.json", board_name));
 
-        let mut file = File::open(current_dir.to_str().expect("cant convert to string :(")).expect("could not open board");
+        if ! current_dir.is_file() {
+            return Err(Box::from("Not a valid file path to board!"));
+        }
 
-        let mut buffer = String::new();
+        let file = File::open(current_dir)?;
 
-        file.read_to_string(&mut buffer)
-            .expect("unable to read into the buffer!");
+        let reader = BufReader::new(file);
 
-        let doc = json::parse(buffer.as_str()).expect("Parse failed");
+        let board: Board = serde_json::from_reader(reader)?;
 
-        println!("{:?}", doc);
+        Ok(board)
     }
 }

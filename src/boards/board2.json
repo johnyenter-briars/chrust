@@ -1,0 +1,13 @@
+{
+	"squares": [
+		[{"space": null},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"}],
+		[{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"}],
+		[{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"}],
+		[{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"}],
+		[{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"}],
+		[{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"}],
+		[{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"}],
+		[{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": "BlackKing"},{"space": null},{"space": null}]
+	],
+	"board_size": 8
+}

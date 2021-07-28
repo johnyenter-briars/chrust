@@ -1,12 +1,13 @@
 {
-	"board": [
-		["1", "1", "1", "1", "1", "1", "1", "1"],
-		["1", "1", "1", "1", "1", "1", "1", "1"],
-		["1", "1", "1", "1", "1", "1", "1", "1"],
-		["1", "1", "1", "1", "1", "1", "1", "1"],
-		["1", "1", "1", "1", "1", "1", "1", "1"],
-		["1", "1", "1", "1", "1", "1", "1", "1"],
-		["1", "1", "1", "1", "1", "1", "1", "1"],
-		["1", "1", "1", "1", "1", "1", "1", "1"]
-	]
+	"squares": [
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}],
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}],
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}],
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}],
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}],
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}],
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}],
+		[{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"},{"space": "WhitePawn"}]
+	],
+	"board_size": 8
 }
