@@ -13,26 +13,6 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(board_size: i32) -> Board {
-        let mut squares: Vec<Vec<Cell>> = Vec::new();
-
-        for _ in 0..board_size {
-            let mut sub_squares: Vec<Cell> = Vec::new();
-            for _ in 0..board_size {
-                sub_squares.push(Cell {
-                    space: Option::None,
-                });
-            }
-
-            squares.push(sub_squares);
-        }
-
-        Board {
-            squares,
-            board_size,
-        }
-    }
- 
     pub fn load_from_file(board_name: &str) -> Result<Board, Box<dyn std::error::Error>> {
         let mut current_dir =
             std::env::current_dir().expect("Cant find the path to the current directory!");
@@ -50,6 +30,14 @@ impl Board {
         let reader = BufReader::new(file);
 
         let board: Board = serde_json::from_reader(reader)?;
+
+        if board.squares.len() as i32 != board.board_size {
+            return Err(Box::from(format!(
+                "The json board is formated incorectly! The expected board_size: {} does not match the actual board size: {}",
+                board.board_size, 
+                board.squares.len()
+            )));
+        }
 
         Ok(board)
     }
