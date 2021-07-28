@@ -14,5 +14,6 @@ fn main() {
     };
     println!("{:?} ", board1);
     //added this line
+    //new line 
 }
 
