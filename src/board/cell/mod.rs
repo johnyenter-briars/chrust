@@ -9,4 +9,6 @@ use color::Color;
 pub struct Cell{
     pub space: Option<ChessPiece>,
     pub color: Color,
+    pub x: char,
+    pub y: i32,
 }
