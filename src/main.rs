@@ -1,5 +1,6 @@
 mod board;
 use board::*;
+use board::{Board, cell::color::Color};
 
 mod player;
 use player::humanplayer::HumanPlayer;
@@ -23,8 +24,8 @@ fn main() {
         Err(error)  => panic!("error in creating the board: {}", error)
     };
 
-    let human = HumanPlayer::new("kasparov");
-    let ai = AIPlayer::new("rusty");
+    let human = HumanPlayer::new("kasparov", Color::White);
+    let ai = AIPlayer::new("rusty", Color::Black);
 
 
     let mut game = ChessGame::new(human, ai, board); //values are MOVED

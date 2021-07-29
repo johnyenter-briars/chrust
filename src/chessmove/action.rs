@@ -3,10 +3,10 @@ use super::piecemove::*;
 
 pub struct HumanAction<'a> {
     piece_move: PieceMove<'a>,
-    player: HumanPlayer,
+    player: &'a HumanPlayer,
 }
 
 pub struct AiAction<'a> {
     piece_move: PieceMove<'a>,
-    player: AIPlayer,
+    player: &'a AIPlayer,
 }
