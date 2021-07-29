@@ -27,29 +27,9 @@ impl<'a> ChessGame {
     pub fn start_game(&mut self) -> Result<&str, Box<Error>> {
 
         //know a white pawn is at a,2
-        let foreverpiece = self.board.get_piece('a', -1);
-    
+        let target_piece = self.board.get_piece('a', 2);
 
-        println!("get piece: {:?}", foreverpiece);
-
-
-        //human player moves white pawn up by one
-
-        // let piece_move = PieceMove::new(, chess_move)
-
-        // let action = HumanAction
-        // {
-        //     human_player = &self.human_player,
-
-        // }
-
-        // println!("board? :{:?}", self.board);
-
-
-
-
-
-
+        println!("get piece: {:?}", target_piece);
 
 
         Ok(&self.human_player.name)

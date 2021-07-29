@@ -21,7 +21,7 @@ impl Board {
     pub fn get_piece(&self, x: char, y: i32) -> &ChessPiece {
         for row in  &self.squares {
             for cell in row {
-                if cell.x == x && cell.y == 7 {
+                if cell.x == x && cell.y == y {
                     if let Some(piece_ref) = &cell.space {
                         return piece_ref;
                     }
