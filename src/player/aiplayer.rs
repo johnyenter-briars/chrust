@@ -1,5 +1,5 @@
 use super::chessplayer::ChessPlayer;
-use crate::board::{Board, cell::color::Color};
+use crate::board::{chessboard::Board, cell::color::Color};
 
 #[derive(Debug)]
 pub struct AIPlayer {

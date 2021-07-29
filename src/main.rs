@@ -1,6 +1,6 @@
 mod board;
 use board::*;
-use board::{Board, cell::color::Color};
+use board::{chessboard::Board, cell::color::Color};
 
 mod player;
 use player::humanplayer::HumanPlayer;

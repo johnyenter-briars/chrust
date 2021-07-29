@@ -1,4 +1,4 @@
-use crate::board::Board;
+use crate::board::chessboard::Board;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum PieceType {
