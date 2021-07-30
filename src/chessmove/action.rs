@@ -11,8 +11,8 @@ pub trait Action<'a> {
 
 
 pub struct HumanAction<'a> {
-    piece_move: PieceMove<'a>,
-    player: &'a HumanPlayer,
+    pub piece_move: PieceMove<'a>,
+    pub player: &'a HumanPlayer,
 }
 
 impl<'a> HumanAction<'a> {

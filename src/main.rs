@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 mod board;
 use board::*;
 use board::{chessboard::Board, cell::color::Color};
