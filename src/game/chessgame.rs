@@ -14,7 +14,7 @@ use std::error::Error;
 pub struct ChessGame<'a> {
     human_player: HumanPlayer,
     ai_player: AIPlayer,
-    board: Board,
+    pub board: Board,
     history: Vec<&'a dyn Action<'a>>,
 }
 

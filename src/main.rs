@@ -1,19 +1,42 @@
 #![allow(unused)]
+use chrono::prelude::*;
+use crossterm::{
+    event::{self, Event as CEvent, KeyCode},
+    terminal::{disable_raw_mode, enable_raw_mode},
+};
+use rand::{distributions::Alphanumeric, prelude::*};
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io;
+use std::sync::mpsc;
+use std::thread;
+use std::time::{Duration, Instant};
+use thiserror::Error;
+use tui::{
+    backend::CrosstermBackend,
+    layout::{Alignment, Constraint, Direction, Layout},
+    style::{Color as TUIColor, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{
+        Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table,
+        TableState, Tabs,
+    },
+    Terminal,
+};
 
 mod board;
 use board::*;
-use board::{chessboard::Board, cell::color::Color};
+use board::{cell::color::Color, chessboard::Board};
 
 mod player;
-use player::humanplayer::HumanPlayer;
 use player::aiplayer::AIPlayer;
 use player::chessplayer::ChessPlayer;
+use player::humanplayer::HumanPlayer;
 
 mod game;
 use game::chessgame::ChessGame;
-use tui::layout::Direction;
-use tui::text::Span;
-use tui::widgets::BorderType;
+
+use crate::board::cell::chesspiece::ChessPiece;
 
 mod chessmove;
 
@@ -21,173 +44,277 @@ mod chessmove;
 extern crate serde_derive;
 extern crate serde_json;
 
-use std::{error::Error, io};
-// use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tui::{
-    backend::TermionBackend,
-    layout::{Constraint, Layout},
-    style::{Color as TUIColor, Modifier, Style},
-    widgets::{Block, Borders, Cell, Row, Table, TableState},
-    Terminal,
-};
-
-use termion::raw::IntoRawMode;
-
-
-pub struct StatefulTable<'a> {
-    state: TableState,
-    items: Vec<Vec<&'a str>>,
+enum Event<I> {
+    Input(I),
+    Tick,
 }
 
-impl<'a> StatefulTable<'a> {
-    fn new() -> StatefulTable<'a> {
-        StatefulTable {
-            state: TableState::default(),
-            items: vec![
-                vec!["Row11", "Row12", "Row13"],
-                vec!["Row21", "Row22", "Row23"],
-                vec!["Row31", "Row32", "Row33"],
-                vec!["Row41", "Row42", "Row43"],
-                vec!["Row51", "Row52", "Row53"],
-                vec!["Row61", "Row62\nTest", "Row63"],
-                vec!["Row71", "Row72", "Row73"],
-                vec!["Row81", "Row82", "Row83"],
-                vec!["Row91", "Row92", "Row93"],
-                vec!["Row101", "Row102", "Row103"],
-                vec!["Row111", "Row112", "Row113"],
-                vec!["Row121", "Row122", "Row123"],
-                vec!["Row131", "Row132", "Row133"],
-                vec!["Row141", "Row142", "Row143"],
-                vec!["Row151", "Row152", "Row153"],
-                vec!["Row161", "Row162", "Row163"],
-                vec!["Row171", "Row172", "Row173"],
-                vec!["Row181", "Row182", "Row183"],
-                vec!["Row191", "Row192", "Row193"],
-            ],
+#[derive(Copy, Clone, Debug)]
+enum MenuItem {
+    Home,
+    Game,
+    Settings,
+}
+
+impl From<MenuItem> for usize {
+    fn from(input: MenuItem) -> usize {
+        match input {
+            MenuItem::Home => 0,
+            MenuItem::Game => 1,
+            MenuItem::Settings => 2,
         }
     }
-    pub fn next(&mut self) {
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i >= self.items.len() - 1 {
-                    0
-                } else {
-                    i + 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i));
-    }
-
-    pub fn previous(&mut self) {
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    self.items.len() - 1
-                } else {
-                    i - 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i));
-    }
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
-    // let board_result = Board::load_from_file("game_start_better");
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let board_result = Board::load_from_file("game_start_better");
 
-    // let board  = match board_result {
-    //     Ok(brd) => {brd}
-    //     Err(error)  => panic!("error in creating the board: {}", error)
-    // };
+    let board = match board_result {
+        Ok(brd) => brd,
+        Err(error) => panic!("error in creating the board: {}", error),
+    };
 
-    // let human = HumanPlayer::new("kasparov", Color::White);
-    // let ai = AIPlayer::new("rusty", Color::Black);
+    let human = HumanPlayer::new("kasparov", Color::White);
+    let ai = AIPlayer::new("rusty", Color::Black);
 
+    let mut game = ChessGame::new(human, ai, board); //values are MOVED
 
-    // let mut game = ChessGame::new(human, ai, board); //values are MOVED
+    let winner = match game.start_game() {
+        Ok(wnnr) => wnnr,
+        Err(err) => {
+            panic!("Error in game!: {:?}", err)
+        }
+    };
 
+    enable_raw_mode().expect("can run in raw mode");
 
-    // let winner = match game.start_game() {
-    //     Ok(wnnr) => wnnr,
-    //     Err(err) => {panic!("Error in game!: {:?}", err)}
-    // };
+    let (tx, rx) = mpsc::channel();
+    let tick_rate = Duration::from_millis(200);
+    thread::spawn(move || {
+        let mut last_tick = Instant::now();
+        loop {
+            let timeout = tick_rate
+                .checked_sub(last_tick.elapsed())
+                .unwrap_or_else(|| Duration::from_secs(0));
 
+            if event::poll(timeout).expect("poll works") {
+                if let CEvent::Key(key) = event::read().expect("can read events") {
+                    tx.send(Event::Input(key)).expect("can send events");
+                }
+            }
 
-    // println!("Winer is: {}", winner);
+            if last_tick.elapsed() >= tick_rate {
+                if let Ok(_) = tx.send(Event::Tick) {
+                    last_tick = Instant::now();
+                }
+            }
+        }
+    });
 
-
-
-     // Terminal initialization
-    let stdout = io::stdout().into_raw_mode()?;
-    // let stdout = MouseTerminal::from(stdout);
-    // let stdout = AlternateScreen::from(stdout);
-    let backend = TermionBackend::new(stdout);
+    let stdout = io::stdout();
+    let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
+    terminal.clear()?;
 
-    // Setup event handlers
-    // let events = Events::new();
+    let menu_titles = vec!["Home", "Game", "Settings", "Quit"];
+    let mut active_menu_item = MenuItem::Home;
+    let mut table_state = TableState::default();
 
     loop {
-        terminal.draw(|f| {
-            // Wrapping block for a group
-            // Just draw the block and the group on the same area and build the group
-            // with at least a margin of 1
-            let size = f.size();
-            let block = Block::default()
-                .borders(Borders::ALL)
-                .title("Main block with round corners")
-                .border_type(BorderType::Rounded);
-            f.render_widget(block, size);
+        terminal.draw(|rect| {
+            let size = rect.size();
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
-                .margin(4)
-                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-                .split(f.size());
+                .margin(2)
+                .constraints(
+                    [
+                        Constraint::Length(3),
+                        Constraint::Min(2),
+                        Constraint::Length(3),
+                    ]
+                    .as_ref(),
+                )
+                .split(size);
 
-            let top_chunks = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-                .split(chunks[0]);
-            let block = Block::default()
-                .title(vec![
-                    Span::styled("With", Style::default().fg(TUIColor::Yellow)),
-                    Span::from(" background"),
-                ])
-                .style(Style::default().bg(TUIColor::Green));
-            f.render_widget(block, top_chunks[0]);
+            let menu = menu_titles
+                .iter()
+                .map(|t| {
+                    let (first, rest) = t.split_at(1);
+                    Spans::from(vec![
+                        Span::styled(
+                            first,
+                            Style::default()
+                                .fg(TUIColor::Yellow)
+                                .add_modifier(Modifier::UNDERLINED),
+                        ),
+                        Span::styled(rest, Style::default().fg(TUIColor::White)),
+                    ])
+                })
+                .collect();
 
-            let block = Block::default().title(Span::styled(
-                "Styled title",
-                Style::default()
-                    .fg(TUIColor::White)
-                    .bg(TUIColor::Red)
-                    .add_modifier(Modifier::BOLD),
-            ));
-            f.render_widget(block, top_chunks[1]);
+            let tabs = Tabs::new(menu)
+                .select(active_menu_item.into())
+                .block(Block::default().title("Menu").borders(Borders::ALL))
+                .style(Style::default().fg(TUIColor::White))
+                .highlight_style(Style::default().fg(TUIColor::Yellow))
+                .divider(Span::raw("|"));
 
-            let bottom_chunks = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-                .split(chunks[1]);
-            let block = Block::default().title("With borders").borders(Borders::ALL);
-            f.render_widget(block, bottom_chunks[0]);
-            let block = Block::default()
-                .title("With styled borders and doubled borders")
-                .border_style(Style::default().fg(TUIColor::Cyan))
-                .borders(Borders::LEFT | Borders::RIGHT)
-                .border_type(BorderType::Double);
-            f.render_widget(block, bottom_chunks[1]);
+            rect.render_widget(tabs, chunks[0]);
+
+            match active_menu_item {
+                MenuItem::Home => rect.render_widget(render_home(), chunks[1]),
+                MenuItem::Game => {
+                    rect.render_widget(render_board(&game.board), chunks[1]);
+                }
+                MenuItem::Settings => {
+                    let settings_chunks = Layout::default()
+                        .direction(Direction::Horizontal)
+                        .constraints(
+                            [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
+                        )
+                        .split(chunks[1]);
+                    let right = render_settings();
+                    rect.render_widget(right, settings_chunks[1]);
+                }
+            }
         })?;
 
-        // if let Event::Input(key) = events.next()? {
-        //     if key == Key::Char('q') {
-        //         break;
-        //     }
-        // }
+        match rx.recv()? {
+            Event::Input(event) => match event.code {
+                KeyCode::Char('q') => {
+                    disable_raw_mode()?;
+                    terminal.show_cursor()?;
+                    break;
+                }
+                KeyCode::Char('h') => active_menu_item = MenuItem::Home,
+                KeyCode::Char('g') => active_menu_item = MenuItem::Game,
+                KeyCode::Char('s') => active_menu_item = MenuItem::Settings,
+                _ => {}
+            },
+            Event::Tick => {}
+        }
     }
+
     Ok(())
 }
 
+fn render_board<'a>(board: &'a Board) -> Table<'a> {
+ 	let mut board_cells: Vec<Row> = Vec::new();
+
+	for row in &board.squares {
+		let mut new_row: Vec<Cell> = Vec::new();
+		for boardcell in row {
+			if let Some(piece) = &boardcell.space {
+				new_row.push(Cell::from(piece.get_str())
+						.style(Style::default().bg(translate_color(boardcell.color))));
+			} else {
+				new_row.push(Cell::from("  ")
+						.style(Style::default().bg(translate_color(boardcell.color))));
+
+			}
+
+		}
+		board_cells.push(Row::new(new_row));
+	}
+
+    let board_detail = Table::new( board_cells)
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().fg(TUIColor::White))
+            .title("Board")
+            .border_type(BorderType::Thick),
+    )
+    .column_spacing(1)
+    .widths(&[
+        Constraint::Length(3),
+        Constraint::Length(3),
+        Constraint::Length(3),
+        Constraint::Length(3),
+        Constraint::Length(3),
+        Constraint::Length(3),
+        Constraint::Length(3),
+        Constraint::Length(3),
+    ]);
+    board_detail
+}
+
+fn translate_color(color: Color) -> TUIColor {
+    match color {
+        Color::White => TUIColor::LightBlue,
+        Color::Black => TUIColor::Gray,
+    }
+}
+
+fn render_home<'a>() -> Paragraph<'a> {
+    let home = Paragraph::new(vec![
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("Welcome")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("to")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::styled(
+            "CHRUST",
+            Style::default().fg(TUIColor::LightBlue),
+        )]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("Press 'p' to access pets, 'a' to add random new pets and 'd' to delete the currently selected pet.")]),
+    ])
+    .alignment(Alignment::Center)
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().fg(TUIColor::White))
+            .title("Home")
+            .border_type(BorderType::Plain),
+    );
+    home
+}
+
+fn render_settings<'a>() -> Table<'a> {
+    let settings_detail = Table::new(vec![Row::new(vec![
+        Cell::from(Span::raw("test".to_string())),
+        Cell::from(Span::raw("test".to_string())),
+        Cell::from(Span::raw("test".to_string())),
+        Cell::from(Span::raw("test".to_string())),
+        Cell::from(Span::raw("test".to_string())),
+    ])])
+    .header(Row::new(vec![
+        Cell::from(Span::styled(
+            "ID",
+            Style::default().add_modifier(Modifier::BOLD),
+        )),
+        Cell::from(Span::styled(
+            "Name",
+            Style::default().add_modifier(Modifier::BOLD),
+        )),
+        Cell::from(Span::styled(
+            "Category",
+            Style::default().add_modifier(Modifier::BOLD),
+        )),
+        Cell::from(Span::styled(
+            "Age",
+            Style::default().add_modifier(Modifier::BOLD),
+        )),
+        Cell::from(Span::styled(
+            "Created At",
+            Style::default().add_modifier(Modifier::BOLD),
+        )),
+    ]))
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().fg(TUIColor::White))
+            .title("Detail")
+            .border_type(BorderType::Plain),
+    )
+    .widths(&[
+        Constraint::Percentage(5),
+        Constraint::Percentage(20),
+        Constraint::Percentage(20),
+        Constraint::Percentage(5),
+        Constraint::Percentage(20),
+    ]);
+
+    settings_detail
+}
