@@ -152,7 +152,6 @@ impl Board {
         let mut current_dir =
             std::env::current_dir().expect("Cant find the path to the current directory!");
 
-        current_dir.push("src");
         current_dir.push("boards");
         current_dir.push(format!("{}.json", board_name));
 
