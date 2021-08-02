@@ -44,8 +44,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
     println!("Winner: {}", winner);
-	// let mut viz = Visualizer::new(game);
-
+	
+    // let mut viz = Visualizer::new(game);
 	// viz.start_viz();
 
 	Ok(())

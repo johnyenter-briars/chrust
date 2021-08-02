@@ -171,7 +171,7 @@ impl<'a> Visualizer<'a> {
                     KeyCode::Char('g') => active_menu_item = MenuItem::Game,
                     KeyCode::Char('s') => active_menu_item = MenuItem::Settings,
                     KeyCode::Char('x') => {
-                        self.game.board.test_move_piece('a', 2, &self.game.human_player);
+                        // self.game.board.test_move_piece('a', 2, &self.game.human_player);
                     }
                     _ => {}
                 },

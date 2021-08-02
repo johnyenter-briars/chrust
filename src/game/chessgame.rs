@@ -50,7 +50,22 @@ impl<'a> ChessGame<'a> {
             println!("Your choice: x: {} y: {}", x, y);
             let current_position = Coordinate::new(x, y);
 
-            let coord_choices = self.board.get_possible_moves(current_position, turn_num);
+            //this is syntax is really cool
+            let coord_choices = match self.board.get_possible_moves(current_position, turn_num, &self.human_player) {
+                Ok(choices) => {
+                    if choices.len() < 1 {
+                        println!("That piece can't go anywhere!");
+                        continue;
+                    }
+                    choices
+                },
+                Err(reason) => {
+                    println!("Not valid move : {:?}", reason);
+                    continue;
+                },
+                _ => {continue;}
+            };
+
 
             println!("{:?}", coord_choices);
             for (index, c) in coord_choices.iter().enumerate() {

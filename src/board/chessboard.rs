@@ -7,8 +7,10 @@ use crate::chessmove::piecemove::{Move, PieceMove};
 use crate::player::humanplayer::HumanPlayer;
 use core::panic;
 use std::borrow::Borrow;
+use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader};
+use core::result::Result;
 
 use crate::chessmove::action::{Action, HumanAction};
 
@@ -59,72 +61,31 @@ impl Board {
         println!("");
     }
 
-    pub fn get_piece(&self, x: char, y: i32) -> &ChessPiece {
-        for row in  &self.squares {
-            for cell in row {
-                if cell.x == x && cell.y == y {
-                    if let Some(piece_ref) = &cell.space {
-                        return piece_ref;
-                    }
-                    else {
-                        panic!("You tried to get a piece at a space that didnt have one - did you mean to do that? x:{},y:{}", x, y);
-                    }
+    pub fn get_piece(&self, x: char, y: i32) -> core::result::Result<&ChessPiece, Box<dyn Error>> {
+        for cell in self.get_all_cells() {
+            if cell.x == x && cell.y == y {
+                if let Some(piece_ref) = &cell.space {
+                    return Ok(piece_ref);
+                }
+                else {
+                    return Err(Box::from(format!("You tried to get a piece at a space that didnt have one - did you mean to do that? x:{},y:{}", x, y)));
                 }
             }
         }
-        panic!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x,y)
-    }
-
-    pub fn get_possible_moves(&self, current_position: Coordinate, turn_num: i32) -> Vec<Coordinate>  {
-        let target_piece = self.get_piece(current_position.x, current_position.y);
-         
-        target_piece.piece_type.available_moves(current_position, self, turn_num)
-    }
-
-    pub fn test_move_piece(&mut self, x: char, y: i32, human_player: &HumanPlayer) {
-
-        let target_piece = self.get_piece(x, y);
         
-        let valid_piece = self.is_valid_piece(x, y);
-         
-        if ! valid_piece { return; }
-
-        let first_move = Move{
-            x: 'a',
-            y: 3,
-        };
-
-        let piece_move = PieceMove::new(target_piece, first_move);
-        let human_action = HumanAction::new(piece_move, human_player);
-        
-        let from = Coordinate{
-            x: 'a',
-            y: 2,
-        };
-
-        let to = Coordinate{
-            x: 'a',
-            y: 3,
-        };
-
-        self.move_piece(from, to);       
+        Err(Box::from(format!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x, y)))
     }
 
-    pub fn is_valid_piece(&self, x: char, y: i32) -> bool{
-        for row in  &self.squares {
-            for cell in row {
-                if cell.x == x && cell.y == y {
-                    if let Some(piece_ref) = &cell.space {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-            }
+    pub fn get_possible_moves(&self, current_position: Coordinate, turn_num: i32, human_player: &HumanPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+        let target_piece = self.get_piece(current_position.x, current_position.y)?;
+
+        if target_piece.color != human_player.color {
+            return Err(Box::from("Thats not your piece!"));
         }
-        panic!("That coordinate pair doesnt exist on the board! x:{},y:{}", x, y);
+         
+        Ok(target_piece.piece_type.available_moves(current_position, self, turn_num))
     }
+
 
     pub fn apply_action(&mut self, action: &dyn Action) {
     //    self.move_piece(action.get_x(), action.get_y(), action.get_piece_()) 
