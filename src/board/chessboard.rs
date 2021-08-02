@@ -25,21 +25,38 @@ pub struct Board {
 
 impl Board {
 
-    //TODO - figure out a way to do this
+    // TODO - figure out a way to do this
     // fn get_all_pieces(&self) -> Vec<&Cell> {
     //     self.squares.into_iter().flatten().map(|cell| &cell ).collect()
     // }
+
+    fn get_all_cells(&self) -> Vec<&Cell> {
+        self.squares.iter().flatten().collect()
+    }
+
+    pub fn get_empty_spaces(&self) -> Vec<Coordinate>{
+        self.get_all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
+    }
     
     pub fn print_to_screen(&self) {
-        // let 
+        println!("-----------------------------");
         for row in  &self.squares {
+            if let Some(first_cell) = row.into_iter().next() {
+                print!("{}", first_cell.y);
+            }
             for cell in row {
                 if let Some(piece_ref) = &cell.space {
-                    print!("{}", piece_ref.get_str());
+                    print!(" {} ", piece_ref.get_str());
+                } else {
+                    print!("   ");
                 }
             }
+            println!("");
+            println!("");
         }
-
+        print!(" ");
+        "abcdefgh".to_string().chars().into_iter().for_each(|int| print!(" {} ", int));
+        println!("");
     }
 
     pub fn get_piece(&self, x: char, y: i32) -> &ChessPiece {
@@ -56,6 +73,12 @@ impl Board {
             }
         }
         panic!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x,y)
+    }
+
+    pub fn get_possible_moves(&self, current_position: Coordinate, turn_num: i32) -> Vec<Coordinate>  {
+        let target_piece = self.get_piece(current_position.x, current_position.y);
+         
+        target_piece.piece_type.available_moves(current_position, self, turn_num)
     }
 
     pub fn test_move_piece(&mut self, x: char, y: i32, human_player: &HumanPlayer) {
@@ -118,10 +141,6 @@ impl Board {
     }
 
     pub fn move_piece(&mut self, from: Coordinate, to: Coordinate) {
-        println!("{:?}", self.squares);
-
-        //two step process: 
-        
         //1: get the reference to the piece we're going to move
         let mut target_piece: ChessPiece = ChessPiece {
             color: Color::Black,
@@ -155,12 +174,9 @@ impl Board {
             }
         }
 
-        println!("-------------------------------------");
-
         // //3: set the current cell to nothing
         self.set_space_to_empty(from.x, from.y);
 
-        println!("{:?}", self.squares);
     }
 
     pub fn load_from_file(board_name: &str) -> Result<Board, Box<dyn std::error::Error>> {

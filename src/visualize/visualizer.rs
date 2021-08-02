@@ -59,7 +59,7 @@ impl<'a> Visualizer<'a> {
         Visualizer { game }
     }
 
-    pub fn start_viz(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn start_viz(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         enable_raw_mode().expect("can run in raw mode");
 
         let (tx, rx) = mpsc::channel();
@@ -93,6 +93,8 @@ impl<'a> Visualizer<'a> {
         let menu_titles = vec!["Home", "Game", "Settings", "Quit"];
         let mut active_menu_item = MenuItem::Home;
         let mut table_state = TableState::default();
+        // table_state.select(Some(0));
+        table_state.select(Some(0));
 
         loop {
             terminal.draw(|rect| {
@@ -138,7 +140,11 @@ impl<'a> Visualizer<'a> {
                 match active_menu_item {
                     MenuItem::Home => rect.render_widget(render_home(), chunks[1]),
                     MenuItem::Game => {
-                        rect.render_widget(render_board(&self.game.board), chunks[1]);
+                        rect.render_stateful_widget(
+                            render_board(&self.game.board),
+                            chunks[1],
+                            &mut table_state,
+                        );
                     }
                     MenuItem::Settings => {
                         let settings_chunks = Layout::default()
@@ -157,12 +163,16 @@ impl<'a> Visualizer<'a> {
                 Event::Input(event) => match event.code {
                     KeyCode::Char('q') => {
                         disable_raw_mode()?;
+                        terminal.clear();
                         terminal.show_cursor()?;
                         break;
                     }
                     KeyCode::Char('h') => active_menu_item = MenuItem::Home,
                     KeyCode::Char('g') => active_menu_item = MenuItem::Game,
                     KeyCode::Char('s') => active_menu_item = MenuItem::Settings,
+                    KeyCode::Char('x') => {
+                        self.game.board.test_move_piece('a', 2, &self.game.human_player);
+                    }
                     _ => {}
                 },
                 Event::Tick => {}
@@ -200,6 +210,7 @@ fn render_board<'a>(board: &'a Board) -> Table<'a> {
                 .title("Board")
                 .border_type(BorderType::Thick),
         )
+        .highlight_style(Style::default().fg(TUIColor::Black))
         .column_spacing(1)
         .widths(&[
             Constraint::Length(3),
