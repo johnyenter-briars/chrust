@@ -19,8 +19,8 @@ use super::coordinate::Coordinate;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Board {
-    squares: Vec<Vec<Cell>>,
-    board_size: i32,
+    pub squares: Vec<Vec<Cell>>,
+    pub board_size: i32,
 }
 
 impl Board {
@@ -29,7 +29,18 @@ impl Board {
     // fn get_all_pieces(&self) -> Vec<&Cell> {
     //     self.squares.into_iter().flatten().map(|cell| &cell ).collect()
     // }
+    
+    pub fn print_to_screen(&self) {
+        // let 
+        for row in  &self.squares {
+            for cell in row {
+                if let Some(piece_ref) = &cell.space {
+                    print!("{}", piece_ref.get_str());
+                }
+            }
+        }
 
+    }
 
     pub fn get_piece(&self, x: char, y: i32) -> &ChessPiece {
         for row in  &self.squares {
