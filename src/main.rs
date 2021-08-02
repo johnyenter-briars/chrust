@@ -13,7 +13,6 @@ mod game;
 use game::chessgame::ChessGame;
 
 use crate::board::cell::chesspiece::ChessPiece;
-use crate::board::coordinate::{inc_x, inc_x_by};
 
 mod chessmove;
 

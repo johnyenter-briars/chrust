@@ -32,33 +32,3 @@ impl Coordinate {
         Coordinate::new((self.x as u8 - ammount as u8) as char, self.y + ammount)
     }
 }
-
-// increments x up 1 in ascii value 
-pub fn inc_x(x: char) -> char {
-    (match x as u8 {
-        // val if val == 104 => 97, //not sure if i need this or not?
-        val if val < 97 => panic!("You have an invalid x value: {}", x),
-        val if val >= 105 => panic!("You have an invalid x value: {}", x),
-        val => val + 1,
-        _ => panic!("You have an invalid x value: {}", x)
-    }) as char
-}
-
-
-pub fn inc_x_by(x: char, ammount: i32) -> char {
-    (match x as u8 + ammount as u8 {
-        val if val < 97 => panic!("You have an invalid ammount value: x: {}, ammount: {}", x, ammount),
-        val if val > 104 => panic!("You have an invalid x value: {}", x),
-        val => val,
-        _ => panic!("You have an invalid x value: {}", x)
-    }) as char
-}
-
-pub fn dec_x_by(x: char, ammount: i32) -> char {
-    (match x as u8 - ammount as u8 {
-        val if val < 97 => panic!("You have an invalid ammount value: x: {}, ammount: {}", x, ammount),
-        val if val > 104 => panic!("You have an invalid x value: {}", x),
-        val => val,
-        _ => panic!("You have an invalid x value: {}", x)
-    }) as char
-}
