@@ -32,6 +32,13 @@ impl Board {
     //     self.squares.into_iter().flatten().map(|cell| &cell ).collect()
     // }
 
+    pub fn get_cell_at(&self, coordinate: Coordinate) -> &Cell {
+        match self.get_all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).next() {
+            Some(cell) => cell,
+            None => panic!("No cell found at: {:?}", coordinate),
+        }
+    }
+
     fn get_all_cells(&self) -> Vec<&Cell> {
         self.squares.iter().flatten().collect()
     }
@@ -83,7 +90,7 @@ impl Board {
             return Err(Box::from("Thats not your piece!"));
         }
          
-        Ok(target_piece.piece_type.available_moves(current_position, self, turn_num))
+        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
     }
 
 
@@ -107,12 +114,10 @@ impl Board {
             color: Color::Black,
             piece_type: PieceType::Bishop
         };
-        for row in  &self.squares {
-            for cell in row {
-                if cell.x == from.x && cell.y == from.y {
-                    if let Some(piece_ref) = cell.space {
-                        target_piece = piece_ref; //should be moving the value i hope
-                    }
+        for cell in self.get_all_cells(){
+            if cell.x == from.x && cell.y == from.y {
+                if let Some(piece_ref) = cell.space {
+                    target_piece = piece_ref; //should be moving the value i hope
                 }
             }
         }
@@ -126,7 +131,10 @@ impl Board {
                     //calculated ahead of time
 
                     match cell.space {
-                        Some(_) => panic!("There should not be a piece already at this location! Something is wrong with the possible move algorythm"),
+                        Some(captured_piece) => {
+                            //TODO - handle the piece being captured
+                            cell.space = Option::from(target_piece);
+                        }
                         None => {
                             cell.space = Option::from(target_piece);
                         }

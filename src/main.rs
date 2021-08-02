@@ -13,6 +13,7 @@ mod game;
 use game::chessgame::ChessGame;
 
 use crate::board::cell::chesspiece::ChessPiece;
+use crate::board::coordinate::{inc_x, inc_x_by};
 
 mod chessmove;
 
@@ -25,7 +26,7 @@ extern crate serde_json;
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let board_result = Board::load_from_file("game_start_better");
+    let board_result = Board::load_from_file("game_start_pawn_close");
 
     let board = match board_result {
         Ok(brd) => brd,
