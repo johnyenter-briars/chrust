@@ -62,8 +62,7 @@ impl<'a> ChessGame<'a> {
                 Err(reason) => {
                     println!("Not valid move : {:?}", reason);
                     continue;
-                },
-                _ => {continue;}
+                }
             };
 
 

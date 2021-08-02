@@ -25,14 +25,14 @@
 
 
 		[
-			{"space": null, "color": "White", "x": "a", "y": 6},
+			{"space": {"piece_type": "Pawn", "color": "White"}, "color": "White", "x": "a", "y": 6},
 				{"space": null, "color": "Black", "x": "b", "y": 6},
 					{"space": null, "color": "White", "x": "c", "y": 6},
 						{"space": null, "color": "Black", "x": "d", "y": 6},
 							{"space": null, "color": "White", "x": "e", "y": 6},
 								{"space": null, "color": "Black", "x": "f", "y": 6},
 									{"space": null, "color": "White", "x": "g", "y": 6},
-										{"space": null, "color": "Black", "x": "h", "y": 6}
+										{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "h", "y": 6}
 		],
 
 
@@ -73,14 +73,14 @@
 
 
 		[
-			{"space": {"piece_type": "Pawn", "color": "White"}, "color": "White", "x": "a", "y": 2},
+			{"space": null, "color": "White", "x": "a", "y": 2},
 				{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "b", "y": 2},
 					{"space": {"piece_type": "Pawn", "color": "White"}, "color": "White", "x": "c", "y": 2},
 						{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "d", "y": 2},
 							{"space": {"piece_type": "Pawn", "color": "White"}, "color": "White", "x": "e", "y": 2},
 								{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "f", "y": 2},
 									{"space": {"piece_type": "Pawn", "color": "White"}, "color": "White", "x": "g", "y": 2},
-										{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "h", "y": 2}
+										{"space": null, "color": "Black", "x": "h", "y": 2}
 		],
 
 
