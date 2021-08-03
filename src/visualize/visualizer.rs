@@ -244,7 +244,7 @@ fn render_home<'a>() -> Paragraph<'a> {
             Style::default().fg(TUIColor::LightBlue),
         )]),
         Spans::from(vec![Span::raw("")]),
-        Spans::from(vec![Span::raw("Press 'p' to access pets, 'a' to add random new pets and 'd' to delete the currently selected pet.")]),
+        Spans::from(vec![Span::raw("Press 'g' to access the game, 's' to access settings, and 'h' to return home")]),
     ])
     .alignment(Alignment::Center)
     .block(
