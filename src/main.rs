@@ -25,7 +25,7 @@ extern crate serde_json;
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let board_result = Board::load_from_file("game_start_pawn_close");
+    let board_result = Board::load_from_file("game_start_bishop_close");
 
     let board = match board_result {
         Ok(brd) => brd,
@@ -37,16 +37,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut game = ChessGame::new(human, ai, board); //values are MOVED
 
-    // let winner = match game.start_game() {
-    //     Ok(wnnr) => wnnr,
-    //     Err(err) => {
-    //         panic!("Error in game!: {:?}", err)
-    //     }
-    // };
-    // println!("Winner: {}", winner);
+    let winner = match game.start_game() {
+        Ok(wnnr) => wnnr,
+        Err(err) => {
+            panic!("Error in game!: {:?}", err)
+        }
+    };
+    println!("Winner: {}", winner);
 	
-    let mut viz = Visualizer::new(game);
-	viz.start_viz();
+    // let mut viz = Visualizer::new(game);
+	// viz.start_viz();
 
 	Ok(())
 }

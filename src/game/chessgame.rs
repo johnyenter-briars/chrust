@@ -66,15 +66,12 @@ impl<'a> ChessGame<'a> {
                     }
                 };
 
-            println!("{:?}", coord_choices);
             for (index, c) in coord_choices.iter().enumerate() {
                 println!("choice: {}, coord: {:?}", index, c);
             }
 
             //take in choice
-            let mut line = String::new();
-            let size = std::io::stdin().read_line(&mut line).unwrap();
-            let choice: i32 = line.trim().parse()?;
+            let choice: i32 = get_input::<i32>()?;
 
             let coord_choice = coord_choices[choice as usize];
 

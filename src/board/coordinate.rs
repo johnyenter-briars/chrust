@@ -31,4 +31,12 @@ impl Coordinate {
     pub fn diagonal_up_left_by(&self, ammount: i32) -> Self {
         Coordinate::new((self.x as u8 - ammount as u8) as char, self.y + ammount)
     }
+    
+    pub fn diagonal_down_right_by(&self, ammount: i32) -> Self {
+        Coordinate::new((self.x as u8 + ammount as u8) as char, self.y - ammount)
+    }
+
+    pub fn diagonal_down_left_by(&self, ammount: i32) -> Self {
+        Coordinate::new((self.x as u8 - ammount as u8) as char, self.y - ammount)
+    }
 }
