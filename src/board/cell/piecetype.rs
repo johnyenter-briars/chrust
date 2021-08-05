@@ -62,11 +62,40 @@ impl PieceType {
                     .filter(|coord| coord.is_valid())
                     .collect()
             }
-            PieceType::Rook => todo!(),
+            PieceType::Rook => {
+                /*Algorithm:
+                    For each direction a rook can move in:
+                        iterate up starting at the target piece in a diagonal line, if we hit an enemy, add that position, but dont go any further. If we hit a friendly piece, stop - dont add that position
+                */
+                let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+
+                let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![up_by, down_by, left_by, right_by];
+
+                for direction_func in possible_directions {
+                    for position in (1..9).into_iter() {
+                        let possible_position = direction_func(current_position, position);
+
+                        if !possible_position.is_valid() {
+                            continue;
+                        };
+
+                        if friendly_occupied(possible_position, target_piece.color, board) {
+                            break;
+                        } else if enemy_occupied(possible_position, target_piece.color, board) {
+                            possible_coordinates.push(possible_position);
+                            break;
+                        } else {
+                            possible_coordinates.push(possible_position);
+                        }
+                    }
+                }
+
+                possible_coordinates
+            }
             PieceType::Knight => todo!(),
             PieceType::Bishop => {
                 /*Algorithm:
-                    For each direction a bishop can move in: 
+                    For each direction a bishop can move in:
                         iterate up starting at the target piece in a diagonal line, if we hit an enemy, add that position, but dont go any further. If we hit a friendly piece, stop - dont add that position
                 */
                 let mut possible_coordinates: Vec<Coordinate> = Vec::new();
@@ -185,4 +214,20 @@ fn friendly_occupied(coordinate: Coordinate, current_piece_color: Color, board: 
         Some(piece) => piece.color == current_piece_color,
         None => false,
     }
+}
+
+fn up_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    Coordinate::new(coordinate.x, coordinate.y + ammount)
+}
+
+fn down_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    Coordinate::new(coordinate.x, coordinate.y - ammount)
+}
+
+fn left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    Coordinate::new((coordinate.x as u8 - ammount as u8) as char, coordinate.y)
+}
+
+fn right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    Coordinate::new((coordinate.x as u8 + ammount as u8) as char, coordinate.y + ammount)
 }

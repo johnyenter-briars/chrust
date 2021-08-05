@@ -23,6 +23,14 @@ impl Coordinate {
     pub fn down_by(&self, ammount: i32) -> Self {
         Coordinate::new(self.x, self.y - ammount)
     }
+
+    pub fn left_by(&self, ammount: i32) -> Self {
+        Coordinate::new((self.x as u8 - ammount as u8) as char, self.y)
+    }
+
+    pub fn right_by(&self, ammount: i32) -> Self {
+        Coordinate::new((self.x as u8 + ammount as u8) as char, self.y)
+    }
     
     pub fn diagonal_up_right_by(&self, ammount: i32) -> Self {
         Coordinate::new((self.x as u8 + ammount as u8) as char, self.y + ammount)
