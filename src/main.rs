@@ -25,7 +25,7 @@ extern crate serde_json;
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let board_result = Board::load_from_file("game_start_king_close");
+    let board_result = Board::load_from_file("game_start_queen_close");
 
     let board = match board_result {
         Ok(brd) => brd,
