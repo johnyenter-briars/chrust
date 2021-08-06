@@ -69,7 +69,8 @@ impl PieceType {
                 */
                 let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
-                let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![up_by, down_by, left_by, right_by];
+                let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> =
+                    vec![up_by, down_by, left_by, right_by];
 
                 for direction_func in possible_directions {
                     for position in (1..9).into_iter() {
@@ -100,71 +101,29 @@ impl PieceType {
                 */
                 let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
-                for position in (1..9).into_iter() {
-                    let possible_position = current_position.diagonal_up_left_by(position);
+                let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![
+                    diagonal_up_left_by,
+                    diagonal_up_right_by,
+                    diagonal_down_right_by,
+                    diagonal_down_left_by,
+                ];
 
-                    if !possible_position.is_valid() {
-                        continue;
-                    };
+                for direction_func in possible_directions {
+                    for position in (1..9).into_iter() {
+                        let possible_position = direction_func(current_position, position);
 
-                    if friendly_occupied(possible_position, target_piece.color, board) {
-                        break;
-                    } else if enemy_occupied(possible_position, target_piece.color, board) {
-                        possible_coordinates.push(possible_position);
-                        break;
-                    } else {
-                        possible_coordinates.push(possible_position);
-                    }
-                }
+                        if !possible_position.is_valid() {
+                            continue;
+                        };
 
-                for position in (1..9).into_iter() {
-                    let possible_position = current_position.diagonal_up_right_by(position);
-
-                    if !possible_position.is_valid() {
-                        continue;
-                    };
-
-                    if friendly_occupied(possible_position, target_piece.color, board) {
-                        break;
-                    } else if enemy_occupied(possible_position, target_piece.color, board) {
-                        possible_coordinates.push(possible_position);
-                        break;
-                    } else {
-                        possible_coordinates.push(possible_position);
-                    }
-                }
-
-                for position in (1..9).into_iter() {
-                    let possible_position = current_position.diagonal_down_left_by(position);
-
-                    if !possible_position.is_valid() {
-                        continue;
-                    };
-
-                    if friendly_occupied(possible_position, target_piece.color, board) {
-                        break;
-                    } else if enemy_occupied(possible_position, target_piece.color, board) {
-                        possible_coordinates.push(possible_position);
-                        break;
-                    } else {
-                        possible_coordinates.push(possible_position);
-                    }
-                }
-
-                for position in (1..9).into_iter() {
-                    let possible_position = current_position.diagonal_down_right_by(position);
-
-                    if !possible_position.is_valid() {
-                        continue;
-                    };
-
-                    if friendly_occupied(possible_position, target_piece.color, board) {
-                        break;
-                    } else if enemy_occupied(possible_position, target_piece.color, board) {
-                        possible_coordinates.push(possible_position);
-                        break;
-                    } else {
-                        possible_coordinates.push(possible_position);
+                        if friendly_occupied(possible_position, target_piece.color, board) {
+                            break;
+                        } else if enemy_occupied(possible_position, target_piece.color, board) {
+                            possible_coordinates.push(possible_position);
+                            break;
+                        } else {
+                            possible_coordinates.push(possible_position);
+                        }
                     }
                 }
 
@@ -217,17 +176,33 @@ fn friendly_occupied(coordinate: Coordinate, current_piece_color: Color, board: 
 }
 
 fn up_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
-    Coordinate::new(coordinate.x, coordinate.y + ammount)
+    coordinate.up_by(ammount)
 }
 
 fn down_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
-    Coordinate::new(coordinate.x, coordinate.y - ammount)
+    coordinate.down_by(ammount)
 }
 
 fn left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
-    Coordinate::new((coordinate.x as u8 - ammount as u8) as char, coordinate.y)
+    coordinate.left_by(ammount)
 }
 
 fn right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
-    Coordinate::new((coordinate.x as u8 + ammount as u8) as char, coordinate.y)
+    coordinate.right_by(ammount)
+}
+
+fn diagonal_up_left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    coordinate.diagonal_up_left_by(ammount)
+}
+
+fn diagonal_up_right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    coordinate.diagonal_up_right_by(ammount)
+}
+
+fn diagonal_down_left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    coordinate.diagonal_down_left_by(ammount)
+}
+
+fn diagonal_down_right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+    coordinate.diagonal_down_right_by(ammount)
 }
