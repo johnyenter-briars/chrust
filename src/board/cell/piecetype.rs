@@ -94,7 +94,37 @@ impl PieceType {
 
                 possible_coordinates
             }
-            PieceType::Knight => todo!(),
+            PieceType::Knight => {
+                let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+
+                let possible_directions = vec![
+                    current_position.up_by(1).left_by(2),
+                    current_position.up_by(2).left_by(1),
+                    current_position.up_by(2).right_by(1),
+                    current_position.up_by(1).right_by(2),
+                    current_position.down_by(1).right_by(2),
+                    current_position.down_by(2).right_by(1),
+                    current_position.down_by(2).left_by(1),
+                    current_position.down_by(1).left_by(2),
+                ];
+
+                for possible_position in possible_directions {
+                    if !possible_position.is_valid() {
+                        continue;
+                    };
+
+                    if friendly_occupied(possible_position, target_piece.color, board) {
+                        break;
+                    } else if enemy_occupied(possible_position, target_piece.color, board) {
+                        possible_coordinates.push(possible_position);
+                        break;
+                    } else {
+                        possible_coordinates.push(possible_position);
+                    }
+                }
+
+                possible_coordinates
+            }
             PieceType::Bishop => {
                 /*Algorithm:
                     For each direction a bishop can move in:
@@ -167,8 +197,7 @@ impl PieceType {
                 }
 
                 possible_coordinates
-
-            },
+            }
             PieceType::King => {
                 let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
@@ -203,7 +232,7 @@ impl PieceType {
                 }
 
                 possible_coordinates
-            },
+            }
         };
 
         valid_moves
