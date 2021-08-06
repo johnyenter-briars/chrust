@@ -133,7 +133,41 @@ impl PieceType {
                     .collect()
             }
             PieceType::Queen => todo!(),
-            PieceType::King => todo!(),
+            PieceType::King => {
+                let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+
+                let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![
+                    up_by,
+                    down_by,
+                    left_by,
+                    right_by,
+                    diagonal_up_left_by,
+                    diagonal_up_right_by,
+                    diagonal_down_right_by,
+                    diagonal_down_left_by,
+                ];
+
+                for direction_func in possible_directions {
+                    for position in (1..2).into_iter() {
+                        let possible_position = direction_func(current_position, position);
+
+                        if !possible_position.is_valid() {
+                            continue;
+                        };
+
+                        if friendly_occupied(possible_position, target_piece.color, board) {
+                            break;
+                        } else if enemy_occupied(possible_position, target_piece.color, board) {
+                            possible_coordinates.push(possible_position);
+                            break;
+                        } else {
+                            possible_coordinates.push(possible_position);
+                        }
+                    }
+                }
+
+                possible_coordinates
+            },
         };
 
         valid_moves
