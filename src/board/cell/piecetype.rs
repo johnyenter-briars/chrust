@@ -229,5 +229,5 @@ fn left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
 }
 
 fn right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
-    Coordinate::new((coordinate.x as u8 + ammount as u8) as char, coordinate.y + ammount)
+    Coordinate::new((coordinate.x as u8 + ammount as u8) as char, coordinate.y)
 }
