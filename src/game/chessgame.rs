@@ -72,9 +72,6 @@ impl<'a> ChessGame<'a> {
 
         loop {
             let choice = possible_cells.choose(&mut rand::thread_rng()).unwrap();
-            // println!("cell {:?}", choice);
-            // let x = choice.x;
-            // let y = choice.y;
 
             let current_position = Coordinate::new(choice.x, choice.y);
 
