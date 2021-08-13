@@ -4,6 +4,7 @@ extern crate serde_json;
 use crate::board::cell::Cell;
 use crate::board::cell::piecetype::PieceType;
 use crate::chessmove::piecemove::{Move, PieceMove};
+use crate::player::aiplayer::AIPlayer;
 use crate::player::humanplayer::HumanPlayer;
 use core::panic;
 use std::borrow::Borrow;
@@ -83,10 +84,20 @@ impl Board {
         Err(Box::from(format!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x, y)))
     }
 
-    pub fn get_possible_moves(&self, current_position: Coordinate, turn_num: i32, human_player: &HumanPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+    pub fn get_possible_moves_human(&self, current_position: Coordinate, turn_num: i32, human_player: &HumanPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
         let target_piece = self.get_piece(current_position.x, current_position.y)?;
 
         if target_piece.color != human_player.color {
+            return Err(Box::from("Thats not your piece!"));
+        }
+         
+        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
+    }
+
+    pub fn get_possible_moves_ai(&self, current_position: Coordinate, turn_num: i32, ai_player: &AIPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+        let target_piece = self.get_piece(current_position.x, current_position.y)?;
+
+        if target_piece.color != ai_player.color {
             return Err(Box::from("Thats not your piece!"));
         }
          
@@ -107,6 +118,31 @@ impl Board {
             }
         }
     }
+
+    pub fn get_pieces_of_color(&self, color: Color) -> Vec<&ChessPiece> {
+        let mut pieces: Vec<&ChessPiece> = Vec::new();
+        for cell in self.get_all_cells() {
+            if let Some(piece_ref) = &cell.space {
+                if piece_ref.color == color {
+                    pieces.push(piece_ref);
+                }
+            }
+        }
+        pieces
+    }
+
+    pub fn get_cells_with_pieces_with_color(&self, color: Color) -> Vec<&Cell> {
+        let mut cells: Vec<&Cell> = Vec::new();
+        for cell in self.get_all_cells() {
+            if let Some(piece_ref) = &cell.space {
+                if piece_ref.color == color {
+                    cells.push(cell);
+                }
+            }
+        }
+        cells
+    }
+
 
     pub fn move_piece(&mut self, from: Coordinate, to: Coordinate) {
         //1: get the reference to the piece we're going to move

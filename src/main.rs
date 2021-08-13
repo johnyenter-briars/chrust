@@ -50,3 +50,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	Ok(())
 }
+
+// pub fn main() {
+//     let mut arr = ["a", "b"]; //mutable arr
+//     change(&mut arr, "oo"); //passing reference
+// }
+
+// fn change(arr: &mut [&str], n: &str) { //mutable ref to arr
+//     arr[1] = n; //replacing he mutable refern
+//     println!("{:?}", arr);
+// }

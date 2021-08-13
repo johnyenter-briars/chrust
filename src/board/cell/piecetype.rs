@@ -1,7 +1,7 @@
 use std::{collections::HashSet, thread::current};
 
 use crate::{
-    board::{chessboard::Board, coordinate::Coordinate},
+    board::{cell::color, chessboard::Board, coordinate::Coordinate},
     chessmove::piecemove::Move,
 };
 
@@ -29,11 +29,26 @@ impl PieceType {
         let valid_moves: Vec<Coordinate> = match *self {
             PieceType::Pawn => {
                 //pawns can only move one or two spaces (depending on turn num)
-                let possible_coordinates = if turn_num == 1 {
-                    vec![current_position.up_by(1), current_position.up_by(2)]
+
+                let possible_coordinates = if target_piece.color == color::Color::White {
+                    if turn_num == 1 {
+                        vec![current_position.up_by(1), current_position.up_by(2)]
+                    } else {
+                        vec![current_position.up_by(1)]
+                    }
                 } else {
-                    vec![current_position.up_by(1)]
+                    if turn_num == 1 {
+                        vec![current_position.down_by(1), current_position.down_by(2)]
+                    } else {
+                        vec![current_position.down_by(1)]
+                    }
                 };
+
+                // let possible_coordinates = if turn_num == 1 {
+                //     vec![current_position.up_by(1), current_position.up_by(2)]
+                // } else {
+                //     vec![current_position.up_by(1)]
+                // };
 
                 //only include the ones where the enemy is NOT in front of
                 let mut possible_coordinates: Vec<Coordinate> = possible_coordinates
@@ -43,13 +58,21 @@ impl PieceType {
                     .collect();
 
                 //Pawns can move diagonally if there's an enemy there
-                let possible_enemy_positions: Vec<Coordinate> = vec![
-                    current_position.diagonal_up_right_by(1),
-                    current_position.diagonal_up_left_by(1),
-                ]
-                .into_iter()
-                .filter(|coord| coord.is_valid()) //filter out the ones that arent valid (i.e, diagonal left might be off the map)
-                .collect();
+                let possible_enemy_positions: Vec<Coordinate> =
+                    if target_piece.color == color::Color::White {
+                        vec![
+                            current_position.diagonal_up_right_by(1),
+                            current_position.diagonal_up_left_by(1),
+                        ]
+                    } else {
+                        vec![
+                            current_position.diagonal_down_left_by(1),
+                            current_position.diagonal_down_right_by(1),
+                        ]
+                    }
+                    .into_iter()
+                    .filter(|coord| coord.is_valid()) //filter out the ones that arent valid (i.e, diagonal left might be off the map)
+                    .collect();
 
                 for coord in possible_enemy_positions {
                     if enemy_occupied(coord, target_piece.color, board) {
