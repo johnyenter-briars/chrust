@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 crossterm = { version = "0.20", features = [ "serde" ] }
 chrono = { version = "0.4", features = ["serde"] }
-rand = { version = "0.7.3", default-features = false, features = ["std"] }
+rand = { version = "0.8.4", default-features = false, features = ["std", "std_rng"] }
 tui = { version = "0.15", default-features = false, features = ['crossterm', 'serde'] }
 thiserror = "1.0"
 serde="1.0"
