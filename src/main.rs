@@ -16,6 +16,8 @@ use crate::board::cell::chesspiece::ChessPiece;
 
 mod chessmove;
 
+mod ai;
+
 mod visualize;
 use visualize::visualizer::Visualizer;
 
