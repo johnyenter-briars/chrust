@@ -7,6 +7,8 @@ use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
 use crate::player::humanplayer::{self, *};
 
+use crate::ai::decisionmaker::DecisionMaker;
+
 use crate::chessmove::action::{self, Action, HumanAction};
 
 extern crate rand;
@@ -25,6 +27,7 @@ pub struct ChessGame<'a> {
     pub ai_player: AIPlayer,
     pub board: Board,
     pub history: Vec<&'a dyn Action<'a>>,
+    // pub decision_maker: DecisionMaker,
 }
 
 impl<'a> ChessGame<'a> {
@@ -34,6 +37,7 @@ impl<'a> ChessGame<'a> {
             ai_player,
             board,
             history: Vec::new(),
+            // DecisionMaker{}
         }
     }
 
@@ -71,21 +75,23 @@ impl<'a> ChessGame<'a> {
             .get_cells_with_pieces_with_color(self.ai_player.color);
 
         loop {
-            let choice = possible_cells.choose(&mut rand::thread_rng()).unwrap();
 
-            let current_position = Coordinate::new(choice.x, choice.y);
 
-            let coord_choices =
-                self.board
-                    .get_possible_moves_ai(current_position, turn_num, &self.ai_player)?;
+            // let choice = possible_cells.choose(&mut rand::thread_rng()).unwrap();
 
-            if coord_choices.len() < 1 {
-                continue;
-            }
+            // let current_position = Coordinate::new(choice.x, choice.y);
 
-            let coord_to_move_to = coord_choices.choose(&mut rand::thread_rng()).unwrap();
+            // let coord_choices =
+            //     self.board
+            //         .get_possible_moves_ai(current_position, turn_num, &self.ai_player)?;
 
-            self.board.move_piece(current_position, coord_to_move_to.clone());
+            // if coord_choices.len() < 1 {
+            //     continue;
+            // }
+
+            // let coord_to_move_to = coord_choices.choose(&mut rand::thread_rng()).unwrap();
+
+            // self.board.move_piece(current_position, coord_to_move_to.clone());
 
             break;
         }
