@@ -2,7 +2,7 @@ use crate::board;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::chessboard::Board;
 use crate::board::coordinate::Coordinate;
-use crate::chessmove::piecemove::Move;
+// use crate::chessmove::piecemove::Move;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
 use crate::player::humanplayer::{self, *};
