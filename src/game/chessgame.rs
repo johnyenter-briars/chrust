@@ -1,3 +1,5 @@
+use crate::ai::minimax::boardstate::BoardState;
+use crate::ai::minimax::max::minimax_decition_max;
 use crate::board;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::chessboard::Board;
@@ -70,31 +72,38 @@ impl<'a> ChessGame<'a> {
     }
 
     pub fn ai_moves(&mut self, turn_num: i32) -> Result<bool, Box<dyn Error>> {
-        let possible_cells = self
-            .board
-            .get_cells_with_pieces_with_color(self.ai_player.color);
 
-        loop {
+        let board_state = BoardState{board:self.board.clone()};
 
+        let max_decision = minimax_decition_max(&board_state, 1)?.0;
 
-            // let choice = possible_cells.choose(&mut rand::thread_rng()).unwrap();
+        let ai_move = max_decision.unwrap();
 
-            // let current_position = Coordinate::new(choice.x, choice.y);
+        self.board.move_piece(ai_move.from, ai_move.to);
 
-            // let coord_choices =
-            //     self.board
-            //         .get_possible_moves_ai(current_position, turn_num, &self.ai_player)?;
+        // let possible_cells = self
+        //     .board
+        //     .get_cells_with_pieces_with_color(self.ai_player.color);
 
-            // if coord_choices.len() < 1 {
-            //     continue;
-            // }
+        // loop {
+        //     let choice = possible_cells.choose(&mut rand::thread_rng()).unwrap();
 
-            // let coord_to_move_to = coord_choices.choose(&mut rand::thread_rng()).unwrap();
+        //     let current_position = Coordinate::new(choice.x, choice.y);
 
-            // self.board.move_piece(current_position, coord_to_move_to.clone());
+        //     let coord_choices =
+        //         self.board
+        //             .get_possible_moves(current_position, turn_num, self.ai_player.color)?;
 
-            break;
-        }
+        //     if coord_choices.len() < 1 {
+        //         continue;
+        //     }
+
+        //     let coord_to_move_to = coord_choices.choose(&mut rand::thread_rng()).unwrap();
+
+        //     self.board.move_piece(current_position, coord_to_move_to.clone());
+
+        //     break;
+        // }
 
         Ok(true)
     }

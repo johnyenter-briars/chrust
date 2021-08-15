@@ -109,27 +109,25 @@ impl Board {
          
         Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
     }
-    pub fn get_all_possible_moves(&self,turn_num: i32, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
 
+    pub fn get_all_possible_moves(&self, turn_num: i32, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
         let cells = self.get_cells_with_pieces_with_color(color);
 
-        let possible_moves: Vec<PieceMove> = Vec::new();
+        let mut possible_moves: Vec<PieceMove> = Vec::new();
 
         for cell in cells{
             let current_position = Coordinate::new(cell.x, cell.y);
             let piece_at_position = self.get_piece(current_position.x, current_position.y)?;
             let coord_choices = self.get_possible_moves(current_position, turn_num, color)?;
 
-            let idk = 
-                coord_choices.iter().map(|coord | PieceMove::new(&piece_at_position, current_position, coord)).collect();
+            let mut possible_moves_for_piece: Vec<PieceMove> = 
+                coord_choices.iter().map(|coord | PieceMove::new(&piece_at_position, current_position, coord.clone())).collect();
 
-
-
-
-
+            
+            possible_moves.append(&mut possible_moves_for_piece);
         }
 
-        Err(Box::from("idk"))
+        Ok(possible_moves)
 
         // if coord_choices.len() < 1 {
         //     continue;
@@ -144,8 +142,10 @@ impl Board {
     }
 
 
-    pub fn apply_action(&mut self, action: &dyn Action) {
-    //    self.move_piece(action.get_x(), action.get_y(), action.get_piece_()) 
+    pub fn apply_action(&self, action: &PieceMove) -> Board {
+        let mut new_board = self.clone();
+        new_board.move_piece(action.from, action.to);
+        new_board
     }
 
     fn set_space_to_empty(&mut self, x: char, y: i32) {

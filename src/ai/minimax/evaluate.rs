@@ -2,7 +2,7 @@ use crate::board::cell::{color::Color, piecetype::PieceType};
 
 use super::boardstate::BoardState;
 
-pub fn evaluate(board_state: BoardState) -> i32{
+pub fn evaluate(board_state: &BoardState) -> i32{
     let pieces = board_state.board.get_all_pieces();
     pieces.iter().map(|p| get_piece_score(p.piece_type, p.color)).sum()
 }
