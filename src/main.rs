@@ -13,6 +13,7 @@ mod game;
 use game::chessgame::ChessGame;
 
 use crate::board::cell::chesspiece::ChessPiece;
+use crate::visualize::visualizer2::Visualizer2;
 
 mod chessmove;
 
@@ -37,16 +38,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut game = ChessGame::new(human, ai, board); //values are MOVED
 
-    let winner = match game.start_game() {
-        Ok(wnnr) => wnnr,
-        Err(err) => {
-            panic!("Error in game!: {:?}", err)
-        }
-    };
-    println!("Winner: {}", winner);
+    // let winner = match game.start_game() {
+    //     Ok(wnnr) => wnnr,
+    //     Err(err) => {
+    //         panic!("Error in game!: {:?}", err)
+    //     }
+    // };
+    // println!("Winner: {}", winner);
 	
-    // let mut viz = Visualizer::new(game);
-	// viz.start_viz();
+    let mut viz = Visualizer2::new(game);
+	viz.start_viz();
 
 	Ok(())
 }
