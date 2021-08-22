@@ -40,6 +40,10 @@ impl Board {
         }
     }
 
+    pub fn test_cell_at(&self, coordinate: Coordinate) -> Option<&Cell> {
+        self.get_all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).map(|x| x.to_owned()).next()
+    }
+
     fn get_all_cells(&self) -> Vec<&Cell> {
         self.squares.iter().flatten().collect()
     }
@@ -54,8 +58,8 @@ impl Board {
         self.get_all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
     }
     
-    pub fn print_to_screen(&self) {
-        println!("-----------------------------");
+    pub fn print_to_screen(&self, configuration_name: String) {
+        println!("-----------------------------{}", configuration_name);
         for row in  &self.squares {
             if let Some(first_cell) = row.into_iter().next() {
                 print!("{}", first_cell.y);
@@ -118,6 +122,11 @@ impl Board {
         for cell in cells{
             let current_position = Coordinate::new(cell.x, cell.y);
             let piece_at_position = self.get_piece(current_position.x, current_position.y)?;
+            let x = match piece_at_position.piece_type {
+                PieceType::Queen => 10,
+                _ => 5
+            };
+
             let coord_choices = self.get_possible_moves(current_position, turn_num, color)?;
 
             let mut possible_moves_for_piece: Vec<PieceMove> = 

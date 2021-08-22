@@ -8,6 +8,13 @@ pub struct ChessPiece {
 }
 
 impl ChessPiece {
+    pub fn get_opposite_color(&self) -> Color {
+        match self.color {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        }
+    }
+
     pub fn get_str(&self) -> &str {
         match (self.piece_type, self.color) {
             (PieceType::Pawn, Color::White) => "\u{2659}",
