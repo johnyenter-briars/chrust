@@ -137,17 +137,6 @@ impl Board {
         }
 
         Ok(possible_moves)
-
-        // if coord_choices.len() < 1 {
-        //     continue;
-        // }
-
-        // let coord_to_move_to = coord_choices.choose(&mut rand::thread_rng()).unwrap();
-
-        // self.board.move_piece(current_position, coord_to_move_to.clone());
-
-
-
     }
 
 
