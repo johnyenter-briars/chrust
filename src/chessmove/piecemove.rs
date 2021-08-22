@@ -1,18 +1,20 @@
-use crate::board::cell::chesspiece::*;
+use crate::board::{cell::chesspiece::*, coordinate::Coordinate};
 
+#[derive(Debug, Clone, Copy)]
 pub struct PieceMove<'a> {
     pub chess_piece: &'a ChessPiece,
-    pub chess_move: Move,
+    pub from: Coordinate,
+    pub to: Coordinate,
 }
 
 impl<'a> PieceMove<'a> {
-    pub fn new(chess_piece: &'a ChessPiece, chess_move: Move) -> Self {
-        PieceMove{chess_piece, chess_move}
+    pub fn new(chess_piece: &'a ChessPiece, from: Coordinate, to: Coordinate) -> Self {
+        PieceMove{chess_piece, from, to}
     }
 }
 
-#[derive(Clone, Copy)]
-pub struct Move { //denotes where the piece is moving TO
-    pub x: char, //a-h
-    pub y: i32, //1-8
-}
+// #[derive(Clone, Copy)]
+// pub struct Move { //denotes where the piece is moving TO
+//     pub x: char, //a-h
+//     pub y: i32, //1-8
+// }

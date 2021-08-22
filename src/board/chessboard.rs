@@ -3,7 +3,7 @@ extern crate serde_json;
 
 use crate::board::cell::Cell;
 use crate::board::cell::piecetype::PieceType;
-use crate::chessmove::piecemove::{Move, PieceMove};
+use crate::chessmove::piecemove::{PieceMove};
 use crate::player::aiplayer::AIPlayer;
 use crate::player::humanplayer::HumanPlayer;
 use core::panic;
@@ -20,7 +20,7 @@ use crate::board::cell::color::Color;
 
 use super::coordinate::Coordinate;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Board {
     pub squares: Vec<Vec<Cell>>,
     pub board_size: i32,
@@ -40,16 +40,26 @@ impl Board {
         }
     }
 
+    pub fn test_cell_at(&self, coordinate: Coordinate) -> Option<&Cell> {
+        self.get_all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).map(|x| x.to_owned()).next()
+    }
+
     fn get_all_cells(&self) -> Vec<&Cell> {
         self.squares.iter().flatten().collect()
+    }
+
+    //should really ONLY be used in an evaluation function
+    pub fn get_all_pieces<'a>(&self) -> Vec<ChessPiece>{
+        let im_worried_this_will_move: Vec<ChessPiece> = self.get_all_cells().iter().map(|cell| cell.space).into_iter().flat_map(|e| e).collect();
+        im_worried_this_will_move
     }
 
     pub fn get_empty_spaces(&self) -> Vec<Coordinate>{
         self.get_all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
     }
     
-    pub fn print_to_screen(&self) {
-        println!("-----------------------------");
+    pub fn print_to_screen(&self, configuration_name: String) {
+        println!("-----------------------------{}", configuration_name);
         for row in  &self.squares {
             if let Some(first_cell) = row.into_iter().next() {
                 print!("{}", first_cell.y);
@@ -94,19 +104,46 @@ impl Board {
         Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
     }
 
-    pub fn get_possible_moves_ai(&self, current_position: Coordinate, turn_num: i32, ai_player: &AIPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+    pub fn get_possible_moves(&self, current_position: Coordinate, turn_num: i32, color: Color) -> Result<Vec<Coordinate>, Box<dyn Error>> {
         let target_piece = self.get_piece(current_position.x, current_position.y)?;
 
-        if target_piece.color != ai_player.color {
+        if target_piece.color != color {
             return Err(Box::from("Thats not your piece!"));
         }
          
         Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
     }
 
+    pub fn get_all_possible_moves(&self, turn_num: i32, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
+        let cells = self.get_cells_with_pieces_with_color(color);
 
-    pub fn apply_action(&mut self, action: &dyn Action) {
-    //    self.move_piece(action.get_x(), action.get_y(), action.get_piece_()) 
+        let mut possible_moves: Vec<PieceMove> = Vec::new();
+
+        for cell in cells{
+            let current_position = Coordinate::new(cell.x, cell.y);
+            let piece_at_position = self.get_piece(current_position.x, current_position.y)?;
+            let x = match piece_at_position.piece_type {
+                PieceType::Queen => 10,
+                _ => 5
+            };
+
+            let coord_choices = self.get_possible_moves(current_position, turn_num, color)?;
+
+            let mut possible_moves_for_piece: Vec<PieceMove> = 
+                coord_choices.iter().map(|coord | PieceMove::new(&piece_at_position, current_position, coord.clone())).collect();
+
+            
+            possible_moves.append(&mut possible_moves_for_piece);
+        }
+
+        Ok(possible_moves)
+    }
+
+
+    pub fn apply_action(&self, action: &PieceMove) -> Board {
+        let mut new_board = self.clone();
+        new_board.move_piece(action.from, action.to);
+        new_board
     }
 
     fn set_space_to_empty(&mut self, x: char, y: i32) {

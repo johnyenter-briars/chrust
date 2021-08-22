@@ -1,11 +1,15 @@
+use crate::ai::minimax::boardstate::BoardState;
+use crate::ai::minimax::funcs::minimax_decition_max;
 use crate::board;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::chessboard::Board;
 use crate::board::coordinate::Coordinate;
-use crate::chessmove::piecemove::Move;
+// use crate::chessmove::piecemove::Move;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
 use crate::player::humanplayer::{self, *};
+
+use crate::ai::decisionmaker::DecisionMaker;
 
 use crate::chessmove::action::{self, Action, HumanAction};
 
@@ -25,6 +29,7 @@ pub struct ChessGame<'a> {
     pub ai_player: AIPlayer,
     pub board: Board,
     pub history: Vec<&'a dyn Action<'a>>,
+    // pub decision_maker: DecisionMaker,
 }
 
 impl<'a> ChessGame<'a> {
@@ -34,26 +39,31 @@ impl<'a> ChessGame<'a> {
             ai_player,
             board,
             history: Vec::new(),
+            // DecisionMaker{}
         }
     }
 
     pub fn start_game(&mut self) -> Result<&str, Box<dyn Error>> {
-        self.board.print_to_screen();
+        self.board.print_to_screen("Initial".to_string());
 
         let mut turn_num = 1;
 
         loop {
             //Human moves
-            if !self.human_moves(turn_num)? {continue;}
+            if !self.human_moves(turn_num)? {
+                continue;
+            }
 
-            self.board.print_to_screen();
+            self.board
+                .print_to_screen(format!("after human turn {}", turn_num));
 
             //AI moves
             if !self.ai_moves(turn_num)? {
                 continue;
             }
 
-            self.board.print_to_screen();
+            self.board
+                .print_to_screen(format!("after ai turn {}", turn_num));
 
             turn_num += 1;
 
@@ -66,43 +76,39 @@ impl<'a> ChessGame<'a> {
     }
 
     pub fn ai_moves(&mut self, turn_num: i32) -> Result<bool, Box<dyn Error>> {
-        let possible_cells = self
-            .board
-            .get_cells_with_pieces_with_color(self.ai_player.color);
+        println!("ai moving");
 
-        loop {
-            let choice = possible_cells.choose(&mut rand::thread_rng()).unwrap();
+        let board_state = BoardState {
+            board: self.board.clone(),
+        };
 
-            let current_position = Coordinate::new(choice.x, choice.y);
+        let (max_decision, value) = minimax_decition_max(&board_state, self.ai_player.color, 2)?;
 
-            let coord_choices =
-                self.board
-                    .get_possible_moves_ai(current_position, turn_num, &self.ai_player)?;
+        let ai_move = match max_decision {
+            Some(d) => d,
+            None => panic!("Minimax unable to find a valid move!"),
+        };
 
-            if coord_choices.len() < 1 {
-                continue;
-            }
-
-            let coord_to_move_to = coord_choices.choose(&mut rand::thread_rng()).unwrap();
-
-            self.board.move_piece(current_position, coord_to_move_to.clone());
-
-            break;
-        }
+        self.board.move_piece(ai_move.from, ai_move.to);
 
         Ok(true)
     }
 
     pub fn human_moves(&mut self, turn_num: i32) -> Result<bool, Box<dyn Error>> {
-        println!("Select your piece!");
+        println!("Human moving!");
+        // println!("Select your piece!");
 
-        println!("x:");
-        let x: char = get_input::<char>()?;
+        // println!("x:");
+        // let x: char = get_input::<char>()?;
 
-        println!("y:");
-        let y: i32 = get_input::<i32>()?;
+        // println!("y:");
+        // let y: i32 = get_input::<i32>()?;
 
-        println!("Your choice: x: {} y: {}", x, y);
+        let x = 'b';
+
+        let y = 1;
+
+        // println!("Your choice: x: {} y: {}", x, y);
         let current_position = Coordinate::new(x, y);
 
         //this is syntax is really cool
@@ -124,14 +130,17 @@ impl<'a> ChessGame<'a> {
             }
         };
 
+        println!("Options: ");
         for (index, c) in coord_choices.iter().enumerate() {
             println!("choice: {}, coord: {:?}", index, c);
         }
 
         //take in choice
-        let choice: i32 = get_input::<i32>()?;
+        // let choice: i32 = get_input::<i32>()?;
+        let choice = 0;
 
         let coord_choice = coord_choices[choice as usize];
+        println!("Choice: {:?}", coord_choice);
 
         self.board.move_piece(Coordinate { x, y }, coord_choice);
 

@@ -7,7 +7,7 @@ use std::cell::RefCell;
 use chesspiece::ChessPiece;
 use color::Color;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Cell {
     pub space: Option<ChessPiece>,
     pub color: Color,

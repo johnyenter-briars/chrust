@@ -1,1 +1,1 @@
-pub mod chessgame;
+pub(crate) mod chessgame;

@@ -1,9 +1,7 @@
+use core::panic;
 use std::{collections::HashSet, thread::current};
 
-use crate::{
-    board::{cell::color, chessboard::Board, coordinate::Coordinate},
-    chessmove::piecemove::Move,
-};
+use crate::board::{cell::color, chessboard::Board, coordinate::Coordinate};
 
 use super::{chesspiece::ChessPiece, color::Color};
 
@@ -71,7 +69,7 @@ impl PieceType {
                         ]
                     }
                     .into_iter()
-                    .filter(|coord| coord.is_valid()) //filter out the ones that arent valid (i.e, diagonal left might be off the map)
+                    .filter(|coord| coord.is_valid(board)) //filter out the ones that arent valid (i.e, diagonal left might be off the map)
                     .collect();
 
                 for coord in possible_enemy_positions {
@@ -83,7 +81,7 @@ impl PieceType {
                 //only return the coordinates that are valid spaces (on the board)
                 possible_coordinates
                     .into_iter()
-                    .filter(|coord| coord.is_valid())
+                    .filter(|coord| coord.is_valid(board))
                     .collect()
             }
             PieceType::Rook => {
@@ -100,7 +98,7 @@ impl PieceType {
                     for position in (1..9).into_iter() {
                         let possible_position = direction_func(current_position, position);
 
-                        if !possible_position.is_valid() {
+                        if !possible_position.is_valid(board) {
                             continue;
                         };
 
@@ -132,7 +130,7 @@ impl PieceType {
                 ];
 
                 for possible_position in possible_directions {
-                    if !possible_position.is_valid() {
+                    if !possible_position.is_valid(board) {
                         continue;
                     };
 
@@ -166,7 +164,7 @@ impl PieceType {
                     for position in (1..9).into_iter() {
                         let possible_position = direction_func(current_position, position);
 
-                        if !possible_position.is_valid() {
+                        if !possible_position.is_valid(board) {
                             continue;
                         };
 
@@ -183,7 +181,7 @@ impl PieceType {
 
                 possible_coordinates
                     .into_iter()
-                    .filter(|coord| coord.is_valid())
+                    .filter(|coord| coord.is_valid(board))
                     .collect()
             }
             PieceType::Queen => {
@@ -204,7 +202,7 @@ impl PieceType {
                     for position in (1..9).into_iter() {
                         let possible_position = direction_func(current_position, position);
 
-                        if !possible_position.is_valid() {
+                        if !possible_position.is_valid(board) {
                             continue;
                         };
 
@@ -239,7 +237,7 @@ impl PieceType {
                     for position in (1..2).into_iter() {
                         let possible_position = direction_func(current_position, position);
 
-                        if !possible_position.is_valid() {
+                        if !possible_position.is_valid(board) {
                             continue;
                         };
 
@@ -280,19 +278,25 @@ fn filter_out_occupired_spaces(
 }
 
 fn enemy_occupied(coordinate: Coordinate, current_piece_color: Color, board: &Board) -> bool {
-    let cell = board.get_cell_at(coordinate);
+    let cell = board.test_cell_at(coordinate);
 
-    match cell.space {
-        Some(piece) => piece.color != current_piece_color,
+    match cell {
+        Some(c) => match c.space {
+            Some(piece) => piece.color != current_piece_color,
+            None => false,
+        },
         None => false,
     }
 }
 
 fn friendly_occupied(coordinate: Coordinate, current_piece_color: Color, board: &Board) -> bool {
-    let cell = board.get_cell_at(coordinate);
+    let cell = board.test_cell_at(coordinate);
 
-    match cell.space {
-        Some(piece) => piece.color == current_piece_color,
+    match cell {
+        Some(c) => match c.space {
+            Some(piece) => piece.color == current_piece_color,
+            None => false,
+        },
         None => false,
     }
 }
