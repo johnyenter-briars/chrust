@@ -12,9 +12,3 @@ impl<'a> PieceMove<'a> {
         PieceMove{chess_piece, from, to}
     }
 }
-
-// #[derive(Clone, Copy)]
-// pub struct Move { //denotes where the piece is moving TO
-//     pub x: char, //a-h
-//     pub y: i32, //1-8
-// }

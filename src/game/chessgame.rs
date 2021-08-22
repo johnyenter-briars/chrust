@@ -1,5 +1,5 @@
 use crate::ai::minimax::boardstate::BoardState;
-use crate::ai::minimax::funcs::minimax_decition_max;
+use crate::ai::minimax::funcs::{max_decision};
 use crate::board;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::chessboard::Board;
@@ -9,7 +9,6 @@ use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
 use crate::player::humanplayer::{self, *};
 
-use crate::ai::decisionmaker::DecisionMaker;
 
 use crate::chessmove::action::{self, Action, HumanAction};
 
@@ -82,12 +81,7 @@ impl<'a> ChessGame<'a> {
             board: self.board.clone(),
         };
 
-        let (max_decision, value) = minimax_decition_max(&board_state, self.ai_player.color, 2)?;
-
-        let ai_move = match max_decision {
-            Some(d) => d,
-            None => panic!("Minimax unable to find a valid move!"),
-        };
+        let ai_move= max_decision(&board_state, self.ai_player.color, 2);
 
         self.board.move_piece(ai_move.from, ai_move.to);
 
