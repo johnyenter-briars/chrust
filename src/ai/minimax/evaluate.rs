@@ -7,6 +7,7 @@ pub fn evaluate(board_state: &BoardState) -> i32{
     pieces.iter().map(|p| get_piece_score(p.piece_type, p.color)).sum()
 }
 
+//NOTE: this evaluation function assumes that the WHITE is the MIN player and BLACK is the MAX player
 fn get_piece_score(piece_type: PieceType, color: Color) -> i32 {
     match (piece_type, color) {
         // (PieceType::Pawn, Color::White) => 10,

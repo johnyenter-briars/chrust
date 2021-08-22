@@ -1,3 +1,3 @@
 pub mod evaluate;
 pub mod boardstate;
-pub mod max;
+pub mod funcs;

@@ -1,6 +1,6 @@
 use core::panic;
-use std::error::Error;
 use std::cmp;
+use std::error::Error;
 
 use crate::{
     board::{
@@ -58,11 +58,12 @@ pub fn min_value(board_state: BoardState, depth: i32) -> i32 {
 
 pub fn minimax_decition_min<'a>(
     board_state: &'a BoardState,
+    color: Color,
     max_depth: i32,
 ) -> Result<(Option<PieceMove<'a>>, i32), Box<dyn Error>> {
     let mut good_actions: Vec<_> = Vec::new();
 
-    for action in board_state.board.get_all_possible_moves(1, Color::White)? {
+    for action in board_state.board.get_all_possible_moves(1, color)? {
         good_actions.push((
             action,
             max_value(board_state.apply_action(action), max_depth),
@@ -83,11 +84,12 @@ pub fn minimax_decition_min<'a>(
 
 pub fn minimax_decition_max<'a>(
     board_state: &'a BoardState,
+    color: Color,
     max_depth: i32,
 ) -> Result<(Option<PieceMove<'a>>, i32), Box<dyn Error>> {
     let mut good_actions: Vec<_> = Vec::new();
 
-    for action in board_state.board.get_all_possible_moves(1, Color::Black)? {
+    for action in board_state.board.get_all_possible_moves(1, color)? {
         good_actions.push((
             action,
             min_value(board_state.apply_action(action), max_depth),
@@ -95,10 +97,6 @@ pub fn minimax_decition_max<'a>(
     }
 
     let mut max_action = (Option::None, -1000000);
-
-    for action in &good_actions {
-        println!("good action: {:?} {:?} {}", action.0.from, action.0.to, action.1);
-    }
 
     for action in good_actions {
         if action.1 > max_action.1 {

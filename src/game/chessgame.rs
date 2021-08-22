@@ -1,5 +1,5 @@
 use crate::ai::minimax::boardstate::BoardState;
-use crate::ai::minimax::max::minimax_decition_max;
+use crate::ai::minimax::funcs::minimax_decition_max;
 use crate::board;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::chessboard::Board;
@@ -50,16 +50,20 @@ impl<'a> ChessGame<'a> {
 
         loop {
             //Human moves
-            if !self.human_moves(turn_num)? {continue;}
+            if !self.human_moves(turn_num)? {
+                continue;
+            }
 
-            self.board.print_to_screen(format!("after human turn {}", turn_num));
+            self.board
+                .print_to_screen(format!("after human turn {}", turn_num));
 
             //AI moves
             if !self.ai_moves(turn_num)? {
                 continue;
             }
 
-            self.board.print_to_screen(format!("after ai turn {}", turn_num));
+            self.board
+                .print_to_screen(format!("after ai turn {}", turn_num));
 
             turn_num += 1;
 
@@ -72,14 +76,18 @@ impl<'a> ChessGame<'a> {
     }
 
     pub fn ai_moves(&mut self, turn_num: i32) -> Result<bool, Box<dyn Error>> {
-        println!("ai moves");
+        println!("ai moving");
 
-        let board_state = BoardState{board:self.board.clone()};
+        let board_state = BoardState {
+            board: self.board.clone(),
+        };
 
-        //something is wrong with minimax - the values are never large enough to get over the 100000 hump
-        let max_decision = minimax_decition_max(&board_state, 2)?.0;
+        let (max_decision, value) = minimax_decition_max(&board_state, self.ai_player.color, 2)?;
 
-        let ai_move = max_decision.unwrap();
+        let ai_move = match max_decision {
+            Some(d) => d,
+            None => panic!("Minimax unable to find a valid move!"),
+        };
 
         self.board.move_piece(ai_move.from, ai_move.to);
 
@@ -98,7 +106,7 @@ impl<'a> ChessGame<'a> {
 
         let x = 'b';
 
-        let y = 1; 
+        let y = 1;
 
         // println!("Your choice: x: {} y: {}", x, y);
         let current_position = Coordinate::new(x, y);
