@@ -12,7 +12,7 @@ use crate::{
 
 use super::boardstate::BoardState;
 
-pub fn max_value(board_state: BoardState, depth: i32) -> i32 {
+fn max_value(board_state: BoardState, depth: i32) -> i32 {
     if depth == 0 {
         return board_state.get_state_eval();
     }
@@ -34,7 +34,7 @@ pub fn max_value(board_state: BoardState, depth: i32) -> i32 {
     value
 }
 
-pub fn min_value(board_state: BoardState, depth: i32) -> i32 {
+fn min_value(board_state: BoardState, depth: i32) -> i32 {
     if depth == 0 {
         return board_state.get_state_eval();
     }
@@ -56,7 +56,7 @@ pub fn min_value(board_state: BoardState, depth: i32) -> i32 {
     value
 }
 
-pub fn minimax_decition_min<'a>(
+fn minimax_decision_min<'a>(
     board_state: &'a BoardState,
     color: Color,
     max_depth: i32,
@@ -82,7 +82,7 @@ pub fn minimax_decition_min<'a>(
     Ok(min_action)
 }
 
-pub fn minimax_decition_max<'a>(
+fn minimax_decision_max<'a>(
     board_state: &'a BoardState,
     color: Color,
     max_depth: i32,
@@ -106,4 +106,18 @@ pub fn minimax_decition_max<'a>(
     }
 
     Ok(max_action)
+}
+
+pub fn max_decision<'a>(
+    board_state: &'a BoardState,
+    color: Color,
+    max_depth: i32,
+) -> PieceMove<'a> {
+    match minimax_decision_max(&board_state, color, max_depth) {
+        Ok((max_decision, value)) => match max_decision {
+            Some(d) => d,
+            None => panic!("Minimax unable to find a valid move!"),
+        },
+        Err(err) => panic!("Something went wrong in minimax! : {:?}", err),
+    }
 }

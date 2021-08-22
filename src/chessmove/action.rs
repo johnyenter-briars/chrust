@@ -33,18 +33,13 @@ impl<'a> Action<'a> for HumanAction<'a> {
     }
 
     fn get_x(&self) -> char {
-        // self.piece_move.chess_move.x
         'a'
     }
 
     fn get_y(&self) -> i32 {
-        // self.piece_move.chess_move.y
         1
     }
 
-    // fn get_player(&self) -> &'a dyn ChessPlayer {
-    //     &self.player
-    // }
 }
 
 impl<'a> Action<'a> for AIAction<'a> {
@@ -60,8 +55,4 @@ impl<'a> Action<'a> for AIAction<'a> {
     fn get_y(&self) -> i32 {
         todo!()
     }
-
-    // fn get_player(&self) -> &'a dyn ChessPlayer {
-    //     todo!()
-    // }
 }
