@@ -1,0 +1,46 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'chrust'",
+			"cargo": {
+				"args": [
+					"build",
+					"--bin=chrust",
+					"--package=chrust"
+				],
+				"filter": {
+					"name": "chrust",
+					"kind": "bin"
+				}
+			},
+			"args": ["-z", "TERM", "-h", "true"], 
+			"cwd": "${workspaceFolder}",
+			"env": {"RUST_BACKTRACE":"1"}
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'chrust'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bin=chrust",
+					"--package=chrust"
+				],
+				"filter": {
+					"name": "chrust",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	]
+}
