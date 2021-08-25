@@ -99,8 +99,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let board = Board::load_from_file("game_start")?;
 
-    let human_player = HumanPlayer::new("kasparov", Color::White);
-    let ai_player = AIPlayer::new("rusty", Color::Black);
+    let human_player = HumanPlayer{name: "kasparov".to_string(), color: Color::White};
+    let ai_player = AIPlayer{name: "rusty".to_string(), color: Color::Black};
 
     let mut game = ChessGame::new(human_player, ai_player, board, program_state.human_plays, program_state.tick_speed); //values are MOVED
 

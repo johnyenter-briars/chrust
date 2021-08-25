@@ -2,11 +2,14 @@ use crate::ai::minimax::boardstate::BoardState;
 use crate::ai::minimax::funcs::max_decision;
 use crate::board;
 use crate::board::cell::chesspiece::ChessPiece;
+use crate::board::cell::color::Color;
+use crate::board::cell::piecetype::PieceType;
 use crate::board::chessboard::Board;
 use crate::board::coordinate::Coordinate;
 // use crate::chessmove::piecemove::Move;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
+use crate::player::chessplayer::ChessPlayer;
 use crate::player::humanplayer::{self, *};
 
 use crate::chessmove::action::{self, Action, HumanAction};
@@ -54,11 +57,15 @@ impl<'a> ChessGame<'a> {
     }
 
     pub fn check_for_winner(&self) -> Option<&str> {
-        let idk = board.
+        let white_king = self.board.get_piece_specific(Color::White, PieceType::King);
+        let black_king = self.board.get_piece_specific(Color::Black, PieceType::King);
 
-
-
-        Some("test")
+        match (white_king.is_some(), black_king.is_some()) {
+            (true, true) => None,
+            (true, false) => Some(self.get_user_of_color(Color::White).get_name()),
+            (false, true) => Some(self.get_user_of_color(Color::Black).get_name()),
+            (false, false) => panic!("Something went horribly wrong. Both kings are gone?"),
+        }
     }
 
     pub fn start_game(&mut self) -> Result<&str, Box<dyn Error>> {
@@ -89,10 +96,14 @@ impl<'a> ChessGame<'a> {
 
             turn_num += 1;
 
-            thread::sleep(Duration::from_millis(self.tick_speed));
+            if let Some(_) = self.check_for_winner() {
+                //would love to return the value itself here - but the borrow checker complains
+                //the wize wizards on the rust discord say its a bug in the borrow checker - so maybe it gets fixed later
+                break;
+            }
         }
 
-        Ok(&self.human_player.name)
+        Ok(self.check_for_winner().unwrap())
     }
 
     pub fn ai_moves(&mut self, turn_num: i32) -> Result<bool, Box<dyn Error>> {
@@ -191,6 +202,18 @@ impl<'a> ChessGame<'a> {
         self.board.move_piece(from, to);
 
         Ok(true)
+    }
+
+    fn get_user_of_color(&self, color: Color) -> Box<&dyn ChessPlayer> {
+        match (
+            self.human_player.color == color,
+            self.ai_player.color == color,
+        ) {
+            (true, true) => panic!("Players with the same color?"),
+            (true, false) => Box::new(&self.human_player),
+            (false, true) => Box::new(&self.ai_player),
+            (false, false) => panic!("Players with the same color?"),
+        }
     }
 }
 
