@@ -23,90 +23,91 @@ mod ai;
 mod visualize;
 use visualize::visualizer::Visualizer;
 
+mod state;
+use state::programstate::ProgramState;
+use state::viztype::VizType;
+
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
 
 extern crate clap;
-use clap::{Arg, App};
+use clap::{App, Arg};
 
-fn get_args() {
+fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
     let matches = App::new("Chrust")
-        .version("1.0")
+        .version("0.1")
         .author("John YB. <jyenterbriars@gmail.com>")
         .about("Simple Chess Engine")
-        .arg(Arg::new("viz")
-            .short('z')
-            .long("visualization_mode")
-            .value_name("GUI|TERM")
-            .about("Sets the method of visualization for the app")
-            .takes_value(true))
+        .arg(
+            Arg::new("viz")
+                .short('z')
+                .long("visualization_mode")
+                .value_name("GUI|TERM")
+                .about("Sets the method of visualization for the app")
+                .takes_value(true)
+                .required(true)
+                
+        )
+        .arg(
+            Arg::new("hplay")
+                .short('h')
+                .long("human_plays")
+                .value_name("true|false")
+                .about("Sets whether or not the human player will play the game. If false, the human player makes random decisions")
+                .takes_value(true)
+                .default_value("true")
+        )
         .get_matches();
 
-    // You can check the value provided by positional arguments, or option arguments
-    if let Some(i) = matches.value_of("INPUT") {
-        println!("Value for input: {}", i);
-    }
+    let viz_type = matches.value_of("viz").ok_or("idk")?;
+    let human_plays = matches.value_of("hplay").ok_or("idk")?;
 
-    if let Some(c) = matches.value_of("config") {
-        println!("Value for config: {}", c);
-    }
-
-    if let Some(c) = matches.value_of("viz") {
-        println!("Value for viz: {}", c);
-    }
-
-    // You can see how many times a particular flag or argument occurred
-    // Note, only flags can have multiple occurrences
-    match matches.occurrences_of("v") {
-        0 => println!("Verbose mode is off"),
-        1 => println!("Verbose mode is kind of on"),
-        2 => println!("Verbose mode is on"),
-        _ => println!("Don't be crazy"),
-    }
-
-    // You can check for the existence of subcommands, and if found use their
-    // matches just as you would the top level app
-    if let Some(ref matches) = matches.subcommand_matches("test") {
-        // "$ myapp test" was run
-        if matches.is_present("debug") {
-            // "$ myapp test -d" was run
-            println!("Printing debug info...");
-        } else {
-            println!("Printing normally...");
+    let program_state = ProgramState {
+        viz_type: match viz_type {
+            "GUI" => VizType::GUI,
+            "TERM" => VizType::TERM,
+            _ => {
+                return Err(Box::from("You must pass in a vaid argument for the -v flag!",));
+            }
+        },
+        human_plays: match human_plays {
+            "true" => true,
+            "false" => false,
+            _ => {
+                return Err(Box::from("You must pass in a vaid argument for the -h flag!",));
+            }
         }
-    }
+    };
 
+    Ok(program_state)
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let program_state = get_args()?;
 
-    get_args();
+    let board = Board::load_from_file("game_start_small")?;
 
-    return Ok(());
+    let human_player = HumanPlayer::new("kasparov", Color::White);
+    let ai_player = AIPlayer::new("rusty", Color::Black);
 
-    let board_result = Board::load_from_file("game_start_small");
+    let mut game = ChessGame::new(human_player, ai_player, board, program_state.human_plays); //values are MOVED
 
-    let board = match board_result {
-        Ok(brd) => brd,
-        Err(error) => panic!("error in creating the board: {}", error),
-    };
-
-    let human = HumanPlayer::new("kasparov", Color::White);
-    let ai = AIPlayer::new("rusty", Color::Black);
-
-    let mut game = ChessGame::new(human, ai, board); //values are MOVED
-
-    let winner = match game.start_game() {
-        Ok(wnnr) => wnnr,
-        Err(err) => {
-            panic!("Error in game!: {:?}", err)
+    match program_state.viz_type {
+        VizType::TERM => {
+            let winner = match game.start_game() {
+                Ok(wnnr) => wnnr,
+                Err(err) => {
+                    panic!("Error in game!: {:?}", err)
+                }
+            };
+            println!("Winner: {}", winner);
+            Ok(())
         }
-    };
-    println!("Winner: {}", winner);
-	
-    // let mut viz = Visualizer::new(game);
-	// viz.start_viz();
-
-	Ok(())
+        VizType::GUI => {
+            let mut viz = Visualizer::new(game);
+            viz.start_viz();
+            Ok(())
+        }
+    }
 }

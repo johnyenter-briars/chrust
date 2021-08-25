@@ -28,16 +28,18 @@ pub struct ChessGame<'a> {
     pub ai_player: AIPlayer,
     pub board: Board,
     pub history: Vec<&'a dyn Action<'a>>,
+    human_plays: bool,
     // pub decision_maker: DecisionMaker,
 }
 
 impl<'a> ChessGame<'a> {
-    pub fn new(human_player: HumanPlayer, ai_player: AIPlayer, board: Board) -> Self {
+    pub fn new(human_player: HumanPlayer, ai_player: AIPlayer, board: Board, human_plays: bool) -> Self {
         ChessGame {
             human_player,
             ai_player,
             board,
             history: Vec::new(),
+            human_plays,
             // DecisionMaker{}
         }
     }
