@@ -19,10 +19,10 @@ use rand::seq::SliceRandom;
 
 use std::borrow::Borrow;
 use std::error::Error;
-use std::{result, thread};
 use std::str::FromStr;
 use std::thread::current;
 use std::time::Duration;
+use std::{result, thread};
 
 pub struct ChessGame<'a> {
     pub human_player: HumanPlayer,
@@ -31,7 +31,7 @@ pub struct ChessGame<'a> {
     pub history: Vec<&'a dyn Action<'a>>,
     human_plays: bool,
     tick_speed: u64, //milli
-    // pub decision_maker: DecisionMaker,
+                     // pub decision_maker: DecisionMaker,
 }
 
 impl<'a> ChessGame<'a> {
@@ -53,6 +53,14 @@ impl<'a> ChessGame<'a> {
         }
     }
 
+    pub fn check_for_winner(&self) -> Option<&str> {
+        let idk = board.
+
+
+
+        Some("test")
+    }
+
     pub fn start_game(&mut self) -> Result<&str, Box<dyn Error>> {
         self.board.print_to_screen("Initial".to_string());
 
@@ -64,10 +72,12 @@ impl<'a> ChessGame<'a> {
                 continue;
             }
 
-            self.board
-                .print_to_screen(format!("after human turn {}", turn_num));
-
-            thread::sleep(Duration::from_millis(self.tick_speed));
+            if self.human_plays {
+                self.board
+                    .print_to_screen(format!("after human turn {}", turn_num));
+            } else {
+                thread::sleep(Duration::from_millis(self.tick_speed));
+            }
 
             //AI moves
             if !self.ai_moves(turn_num)? {
@@ -80,10 +90,6 @@ impl<'a> ChessGame<'a> {
             turn_num += 1;
 
             thread::sleep(Duration::from_millis(self.tick_speed));
-
-            // if turn_num == 10 {
-            //     break;
-            // }
         }
 
         Ok(&self.human_player.name)
@@ -172,7 +178,9 @@ impl<'a> ChessGame<'a> {
                     continue;
                 }
 
-                let to = *coord_choices.choose(&mut rand::thread_rng()).ok_or("There was an error while trying to get a choice randomly")?;
+                let to = *coord_choices
+                    .choose(&mut rand::thread_rng())
+                    .ok_or("There was an error while trying to get a choice randomly")?;
 
                 break (from.clone(), to.clone());
             };
