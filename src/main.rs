@@ -46,8 +46,7 @@ fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
                 .value_name("GUI|TERM")
                 .about("Sets the method of visualization for the app")
                 .takes_value(true)
-                .required(true)
-                
+                .default_value("TERM")
         )
         .arg(
             Arg::new("hplay")
@@ -58,10 +57,21 @@ fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
                 .takes_value(true)
                 .default_value("true")
         )
+        .arg(
+            Arg::new("tick")
+                .short('t')
+                .long("tick_speed")
+                .value_name("positive integer")
+                .about("Sets the interval between moves. (Milliseconds)")
+                .takes_value(true)
+                .default_value("1000")
+        )
         .get_matches();
-
+    
+    //this is horrible and i'm sorry
     let viz_type = matches.value_of("viz").ok_or("idk")?;
     let human_plays = matches.value_of("hplay").ok_or("idk")?;
+    let tick_speed = matches.value_of("tick").ok_or("idk")?;
 
     let program_state = ProgramState {
         viz_type: match viz_type {
@@ -77,7 +87,8 @@ fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
             _ => {
                 return Err(Box::from("You must pass in a vaid argument for the -h flag!",));
             }
-        }
+        },
+        tick_speed: tick_speed.parse()?
     };
 
     Ok(program_state)
@@ -86,12 +97,12 @@ fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let program_state = get_args()?;
 
-    let board = Board::load_from_file("game_start_small")?;
+    let board = Board::load_from_file("game_start")?;
 
     let human_player = HumanPlayer::new("kasparov", Color::White);
     let ai_player = AIPlayer::new("rusty", Color::Black);
 
-    let mut game = ChessGame::new(human_player, ai_player, board, program_state.human_plays); //values are MOVED
+    let mut game = ChessGame::new(human_player, ai_player, board, program_state.human_plays, program_state.tick_speed); //values are MOVED
 
     match program_state.viz_type {
         VizType::TERM => {

@@ -19,7 +19,7 @@
 					"kind": "bin"
 				}
 			},
-			"args": ["-z", "TERM", "-h", "true"], 
+			"args": ["-z", "TERM", "-h", "false"], 
 			"cwd": "${workspaceFolder}",
 			"env": {"RUST_BACKTRACE":"1"}
 		},
