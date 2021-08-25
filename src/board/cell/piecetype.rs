@@ -5,7 +5,7 @@ use crate::board::{cell::color, chessboard::Board, coordinate::Coordinate};
 
 use super::{chesspiece::ChessPiece, color::Color};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum PieceType {
     Pawn = 1,
     Rook = 2,

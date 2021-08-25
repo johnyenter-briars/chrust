@@ -8,11 +8,10 @@ pub struct AIPlayer {
 }
 
 impl ChessPlayer for AIPlayer {
-    fn new(name: &str, color: Color) -> Self {
-        AIPlayer{name: name.to_string(), color}    
-    }
-    
-    fn take_action(board: Board) {
+    fn take_action(&self, board: Board) {
         println!("hello there from AI!");
+    }
+    fn get_name(&self) -> &str{
+        &self.name
     }
 }

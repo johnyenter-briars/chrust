@@ -180,6 +180,14 @@ impl Board {
         cells
     }
 
+    pub fn get_piece_specific(&self, color: Color, piece_type: PieceType) -> Option<&ChessPiece>{
+        let pieces = self.get_pieces_of_color(color);
+
+        let piece = pieces.into_iter().find(|x| x.piece_type == piece_type);
+        
+        piece
+    }
+
 
     pub fn move_piece(&mut self, from: Coordinate, to: Coordinate) {
         //1: get the reference to the piece we're going to move

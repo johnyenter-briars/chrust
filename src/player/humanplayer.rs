@@ -8,11 +8,10 @@ pub struct HumanPlayer {
 }
 
 impl ChessPlayer for HumanPlayer {
-    fn new(name: &str, color: Color) -> Self {
-        HumanPlayer{name: name.to_string(), color}    
-    }
-    
-    fn take_action(board: Board) {
+    fn take_action(&self, board: Board) {
         println!("hello there from human!");
+    }
+    fn get_name(&self) -> &str{
+        &self.name
     }
 }
