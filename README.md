@@ -37,10 +37,8 @@
   </a>
 
   <h3 align="center">Chrust</h3>
-
   <p align="center">
     Chess + Rust <3. Chess engine written in Rust. 
-    <br />
     <br />
     <a href="https://github.com/johnyenter-briars/chrust">View Demo</a>
     ·
@@ -81,7 +79,7 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About Chrust
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
@@ -168,9 +166,9 @@ Currently, the list of features I would like to add are outlined below.
 Feel free to fork, update, change, modify as you see fit. If you would like to explicitly contribute to this project, I would love it if you:
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b feature/FeatureToChrust`)
+3. Commit your Changes (`git commit -m 'Add some cool stuff'`)
+4. Push to the Branch (`git push origin feature/FeatureToChrust`)
 5. Open a Pull Request
 
 
