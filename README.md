@@ -91,11 +91,14 @@ Here's a blank template to get started:
 **To avoid retyping too much info. Do a search and replace with your text editor for the following:**
 `johnyenter-briars`, `chrust`, `twitter_handle`, `email`, `Chrust`, `project_description`
 
-
 ### Built With
 
 * [Rust](https://www.rust-lang.org/)
 
+<!-- GETTING STARTED -->
+## Getting Started
+
+To try your hand at beating rusty, follow the standard installation steps:
 
 ### Installation
 
@@ -207,6 +210,6 @@ Project Link: [https://github.com/johnyenter-briars/chrust](https://github.com/j
 [issues-shield]: https://img.shields.io/github/issues/johnyenter-briars/repo.svg?style=for-the-badge
 [issues-url]: https://github.com/johnyenter-briars/chrust/issues
 [license-shield]: https://img.shields.io/github/license/johnyenter-briars/repo.svg?style=for-the-badge
-[license-url]: https://github.com/johnyenter-briars/chrust/blob/master/LICENSE.txt
+[license-url]: https://github.com/johnyenter-briars/chrust/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/johnyenter-briars
