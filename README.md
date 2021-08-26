@@ -7,7 +7,7 @@
 ***
 ***
 *** To avoid retyping too much info. Do a search and replace for the following:
-*** johnyenter-briars, chrust, twitter_handle, email, Chrust, project_description
+*** johnyenter-briars, chrust, twitter_handle, email, Chrust, Chess + Rust <3. Chess engine written in Rust. 
 -->
 
 
@@ -39,9 +39,7 @@
   <h3 align="center">Chrust</h3>
 
   <p align="center">
-    project_description
-    <br />
-    <a href="https://github.com/johnyenter-briars/chrust"><strong>Explore the docs »</strong></a>
+    Chess + Rust <3. Chess engine written in Rust. 
     <br />
     <br />
     <a href="https://github.com/johnyenter-briars/chrust">View Demo</a>
@@ -87,9 +85,12 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`johnyenter-briars`, `chrust`, `twitter_handle`, `email`, `Chrust`, `project_description`
+Chrust is a chess engine written in Rust. (Very original I know). This is also an opportunity for me to learn rust above a beginner level.
+
+Chrust supports the standard Minimax algorighm for its decision making, and will expand to include other heuristics and optimizations. 
+
+I'm by no means a Rust expert, so if you see any issues in the source code please don't hesitate to show me where I'm stupid.
+
 
 ### Built With
 
