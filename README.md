@@ -8,12 +8,10 @@
 
 
 
-### AI Features
+### TODO - AI Features
 - [X] MiniMax Implementation
-- [X] 
-
-### Visual Features
-- [ ] Saturn
-- [ ] Uranus
-- [ ] Neptune
-- [ ] Comet Haley
+- [ ] Alpha-Beta Pruning
+- [ ] Shannon Type B
+- [ ] Move Ordering
+- [ ] Transposition Tables
+- [ ] Quiescence search
