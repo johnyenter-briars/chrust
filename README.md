@@ -37,10 +37,8 @@
   </a>
 
   <h3 align="center">Chrust</h3>
-
   <p align="center">
     Chess + Rust <3. Chess engine written in Rust. 
-    <br />
     <br />
     <a href="https://github.com/johnyenter-briars/chrust">View Demo</a>
     ·
@@ -81,7 +79,7 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About Chrust
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
@@ -168,9 +166,9 @@ Currently, the list of features I would like to add are outlined below.
 Feel free to fork, update, change, modify as you see fit. If you would like to explicitly contribute to this project, I would love it if you:
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b feature/FeatureToChrust`)
+3. Commit your Changes (`git commit -m 'Add some cool stuff'`)
+4. Push to the Branch (`git push origin feature/FeatureToChrust`)
 5. Open a Pull Request
 
 
@@ -202,16 +200,16 @@ Project Link: [https://github.com/johnyenter-briars/chrust](https://github.com/j
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/johnyenter-briars/repo.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/johnyenter-briars/chrust.svg?style=plastic
 [contributors-url]: https://github.com/johnyenter-briars/chrust/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/johnyenter-briars/repo.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/johnyenter-briars/chrust.svg?style=plastic
 [forks-url]: https://github.com/johnyenter-briars/chrust/network/members
-[stars-shield]: https://img.shields.io/github/stars/johnyenter-briars/repo.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/johnyenter-briars/chrust.svg?style=plastic
 [stars-url]: https://github.com/johnyenter-briars/chrust/stargazers
-[issues-shield]: https://img.shields.io/github/issues/johnyenter-briars/repo.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/johnyenter-briars/chrust.svg?style=plastic
 [issues-url]: https://github.com/johnyenter-briars/chrust/issues
-[license-shield]: https://img.shields.io/github/license/johnyenter-briars/repo.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/johnyenter-briars/chrust.svg?style=plastic
 [license-url]: https://github.com/johnyenter-briars/chrust/blob/master/LICENSE
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=plastic&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/johnyenter-briars
 [product-screenshot]: images/screenshot.png
