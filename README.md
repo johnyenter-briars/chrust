@@ -202,16 +202,16 @@ Project Link: [https://github.com/johnyenter-briars/chrust](https://github.com/j
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/johnyenter-briars/repo.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/johnyenter-briars/chrust.svg?style=plastic
 [contributors-url]: https://github.com/johnyenter-briars/chrust/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/johnyenter-briars/repo.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/johnyenter-briars/chrust.svg?style=plastic
 [forks-url]: https://github.com/johnyenter-briars/chrust/network/members
-[stars-shield]: https://img.shields.io/github/stars/johnyenter-briars/repo.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/johnyenter-briars/chrust.svg?style=plastic
 [stars-url]: https://github.com/johnyenter-briars/chrust/stargazers
-[issues-shield]: https://img.shields.io/github/issues/johnyenter-briars/repo.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/johnyenter-briars/chrust.svg?style=plastic
 [issues-url]: https://github.com/johnyenter-briars/chrust/issues
-[license-shield]: https://img.shields.io/github/license/johnyenter-briars/repo.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/johnyenter-briars/chrust.svg?style=plastic
 [license-url]: https://github.com/johnyenter-briars/chrust/blob/master/LICENSE
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=plastic&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/johnyenter-briars
 [product-screenshot]: images/screenshot.png
