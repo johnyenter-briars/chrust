@@ -14,7 +14,9 @@ use player::humanplayer::HumanPlayer;
 mod game;
 use game::chessgame::ChessGame;
 
+use crate::api::backend::build_and_run_api;
 use crate::board::cell::chesspiece::ChessPiece;
+use crate::frontend::server::build_and_run_frontend;
 
 mod chessmove;
 
@@ -24,8 +26,16 @@ mod visualize;
 use visualize::visualizer::Visualizer;
 
 mod state;
-use state::programstate::ProgramState;
+use state::programstate::{ProgramState, get_args};
 use state::viztype::VizType;
+
+mod frontend;
+use frontend::server;
+use frontend::server::rocket;
+
+mod api;
+
+use futures::join;
 
 #[macro_use]
 extern crate serde_derive;
@@ -34,75 +44,28 @@ extern crate serde_json;
 extern crate clap;
 use clap::{App, Arg};
 
-fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
-    let matches = App::new("Chrust")
-        .version("0.1")
-        .author("John YB. <jyenterbriars@gmail.com>")
-        .about("Simple Chess Engine")
-        .arg(
-            Arg::new("viz")
-                .short('z')
-                .long("visualization_mode")
-                .value_name("GUI|TERM")
-                .about("Sets the method of visualization for the app")
-                .takes_value(true)
-                .default_value("TERM")
-        )
-        .arg(
-            Arg::new("hplay")
-                .short('h')
-                .long("human_plays")
-                .value_name("true|false")
-                .about("Sets whether or not the human player will play the game. If false, the human player makes random decisions")
-                .takes_value(true)
-                .default_value("true")
-        )
-        .arg(
-            Arg::new("tick")
-                .short('t')
-                .long("tick_speed")
-                .value_name("positive integer")
-                .about("Sets the interval between moves. (Milliseconds)")
-                .takes_value(true)
-                .default_value("1000")
-        )
-        .get_matches();
-    
-    //this is horrible and i'm sorry
-    let viz_type = matches.value_of("viz").ok_or("idk")?;
-    let human_plays = matches.value_of("hplay").ok_or("idk")?;
-    let tick_speed = matches.value_of("tick").ok_or("idk")?;
 
-    let program_state = ProgramState {
-        viz_type: match viz_type {
-            "GUI" => VizType::GUI,
-            "TERM" => VizType::TERM,
-            _ => {
-                return Err(Box::from("You must pass in a vaid argument for the -v flag!",));
-            }
-        },
-        human_plays: match human_plays {
-            "true" => true,
-            "false" => false,
-            _ => {
-                return Err(Box::from("You must pass in a vaid argument for the -h flag!",));
-            }
-        },
-        tick_speed: tick_speed.parse()?
-    };
-
-    Ok(program_state)
-}
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[rocket::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let program_state = get_args()?;
-
     let board = Board::load_from_file("game_start")?;
 
-    let human_player = HumanPlayer{name: "kasparov".to_string(), color: Color::White};
-    let ai_player = AIPlayer{name: "rusty".to_string(), color: Color::Black};
+    let human_player = HumanPlayer {
+        name: "kasparov".to_string(),
+        color: Color::White,
+    };
+    let ai_player = AIPlayer {
+        name: "rusty".to_string(),
+        color: Color::Black,
+    };
 
-    let mut game = ChessGame::new(human_player, ai_player, board, program_state.human_plays, program_state.tick_speed); //values are MOVED
+    let mut game = ChessGame::new(
+        human_player,
+        ai_player,
+        board,
+        program_state.human_plays,
+        program_state.tick_speed,
+    ); //values are MOVED
 
     match program_state.viz_type {
         VizType::TERM => {
@@ -119,6 +82,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut viz = Visualizer::new(game);
             viz.start_viz();
             Ok(())
-        }
+        },
+        VizType::WEB => {
+            let x = build_and_run_frontend();
+            let y  = build_and_run_api(game);
+
+            join!(x, y);
+
+            Ok(())
+        },
     }
 }

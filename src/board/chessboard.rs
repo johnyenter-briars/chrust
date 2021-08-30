@@ -141,6 +141,7 @@ impl Board {
 
 
     pub fn apply_action(&self, action: &PieceMove) -> Board {
+        //by jove i hope this doesnt have unexpected side affects
         let mut new_board = self.clone();
         new_board.move_piece(action.from, action.to);
         new_board

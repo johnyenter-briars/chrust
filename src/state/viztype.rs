@@ -1,9 +1,10 @@
 use core::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum VizType {
     GUI, 
-    TERM
+    TERM,
+    WEB,
 }
 
 impl fmt::Display for VizType {

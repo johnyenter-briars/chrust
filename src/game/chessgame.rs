@@ -31,11 +31,14 @@ pub struct ChessGame<'a> {
     pub human_player: HumanPlayer,
     pub ai_player: AIPlayer,
     pub board: Board,
-    pub history: Vec<&'a dyn Action<'a>>,
+    pub history: Vec<&'a (dyn Action<'a> + Sync)>,
     human_plays: bool,
     tick_speed: u64, //milli
                      // pub decision_maker: DecisionMaker,
 }
+
+// unsafe impl Send for ChessGame<'_> {
+// }
 
 impl<'a> ChessGame<'a> {
     pub fn new(
@@ -113,7 +116,7 @@ impl<'a> ChessGame<'a> {
             board: self.board.clone(),
         };
 
-        let ai_move = max_decision(&board_state, self.ai_player.color, 3);
+        let ai_move = max_decision(&board_state, self.ai_player.color, 2);
 
         if ai_move.from.x == ai_move.to.x && ai_move.from.y == ai_move.to.y {
             let idk = "im sad";
