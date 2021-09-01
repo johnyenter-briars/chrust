@@ -27,26 +27,12 @@ impl PieceType {
         let valid_moves: Vec<Coordinate> = match *self {
             PieceType::Pawn => {
                 //pawns can only move one or two spaces (depending on turn num)
-
-                let possible_coordinates = if target_piece.color == color::Color::White {
-                    if turn_num == 1 {
-                        vec![current_position.up_by(1), current_position.up_by(2)]
-                    } else {
-                        vec![current_position.up_by(1)]
-                    }
-                } else {
-                    if turn_num == 1 {
-                        vec![current_position.down_by(1), current_position.down_by(2)]
-                    } else {
-                        vec![current_position.down_by(1)]
-                    }
+                let possible_coordinates = match (target_piece.color, current_position.y) {
+                    (Color::White, 2) => vec![current_position.up_by(1), current_position.up_by(2)],
+                    (Color::Black, 2) => vec![current_position.down_by(1), current_position.down_by(2)],
+                    (Color::White, _) => vec![current_position.up_by(1)],
+                    (Color::Black, _) => vec![current_position.down_by(1)],
                 };
-
-                // let possible_coordinates = if turn_num == 1 {
-                //     vec![current_position.up_by(1), current_position.up_by(2)]
-                // } else {
-                //     vec![current_position.up_by(1)]
-                // };
 
                 //only include the ones where the enemy is NOT in front of
                 let mut possible_coordinates: Vec<Coordinate> = possible_coordinates

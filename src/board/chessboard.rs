@@ -62,20 +62,19 @@ impl Board {
         println!("-----------------------------{}", configuration_name);
         for row in  &self.squares {
             if let Some(first_cell) = row.into_iter().next() {
-                print!("{}", first_cell.y);
+                print!("{}|", first_cell.y);
             }
             for cell in row {
                 if let Some(piece_ref) = &cell.space {
-                    print!(" {} ", piece_ref.get_str());
+                    print!(" {} |", piece_ref.get_str());
                 } else {
-                    print!("   ");
+                    print!("   |");
                 }
             }
             println!("");
-            println!("");
         }
         print!(" ");
-        "abcdefgh".to_string().chars().into_iter().for_each(|int| print!(" {} ", int));
+        "abcdefgh".to_string().chars().into_iter().for_each(|int| print!("  {} ", int));
         println!("");
     }
 
@@ -254,5 +253,33 @@ impl Board {
         }
 
         Ok(board)
+    }
+
+    pub fn get_board_fen_section(&self) -> String {
+        let mut fen = "".to_string();
+
+        //construct the piece position portion
+        for row in &self.squares {
+            let mut num_empty_squares:i32 = 0;
+            for cell in row {
+                if let Some(piece) = cell.space {
+                    if num_empty_squares == 0 {
+                        fen.push_str(piece.get_fen_code());
+                    } else {
+                        fen.push_str(&num_empty_squares.to_string());
+                        fen.push_str(piece.get_fen_code());
+                    }
+                    num_empty_squares = 0;
+                } else {
+                    num_empty_squares += 1;
+                }
+            }
+            if num_empty_squares != 0 {
+                fen.push_str(&num_empty_squares.to_string());
+            }
+            fen.push_str("/");
+        }
+
+        fen
     }
 }

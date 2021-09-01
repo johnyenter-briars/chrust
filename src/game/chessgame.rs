@@ -34,11 +34,8 @@ pub struct ChessGame<'a> {
     pub history: Vec<&'a (dyn Action<'a> + Sync)>,
     human_plays: bool,
     tick_speed: u64, //milli
-                     // pub decision_maker: DecisionMaker,
+    side_to_move: char,
 }
-
-// unsafe impl Send for ChessGame<'_> {
-// }
 
 impl<'a> ChessGame<'a> {
     pub fn new(
@@ -55,6 +52,7 @@ impl<'a> ChessGame<'a> {
             history: Vec::new(),
             human_plays,
             tick_speed,
+            side_to_move: 'W',
             // DecisionMaker{}
         }
     }
@@ -72,7 +70,7 @@ impl<'a> ChessGame<'a> {
     }
 
     pub fn start_game(&mut self) -> Result<&str, Box<dyn Error>> {
-        self.board.print_to_screen("Initial".to_string());
+        self.print_to_screen("Initial".to_string());
 
         let mut turn_num = 1;
 
@@ -82,9 +80,10 @@ impl<'a> ChessGame<'a> {
                 continue;
             }
 
+            self.side_to_move = self.ai_player.get_color_abbr();
+
             if self.human_plays {
-                self.board
-                    .print_to_screen(format!("after human turn {}", turn_num));
+                self.print_to_screen(format!("after ai turn {}", turn_num));
             } else {
                 thread::sleep(Duration::from_millis(self.tick_speed));
             }
@@ -94,8 +93,9 @@ impl<'a> ChessGame<'a> {
                 continue;
             }
 
-            self.board
-                .print_to_screen(format!("after ai turn {}", turn_num));
+            self.side_to_move = self.human_player.get_color_abbr();
+
+            self.print_to_screen(format!("after ai turn {}", turn_num));
 
             turn_num += 1;
 
@@ -192,7 +192,7 @@ impl<'a> ChessGame<'a> {
                     continue;
                 }
 
-                let to = *coord_choices
+                let to = coord_choices
                     .choose(&mut rand::thread_rng())
                     .ok_or("There was an error while trying to get a choice randomly")?;
 
@@ -219,8 +219,14 @@ impl<'a> ChessGame<'a> {
         }
     }
 
-    fn get_fen(&self) {
+    //for an explanation of this crazy algo check out: https://www.chessprogramming.org/Forsyth-Edwards_Notation
+    fn get_fen(&self) -> String {
+        format!("{} {} {} {} {} {}", self.board.get_board_fen_section(), self.side_to_move, '-', '-', '-', '-')
+    }
 
+    fn print_to_screen(&mut self, configuration_name: String) {
+        self.board.print_to_screen(configuration_name);
+        println!("{}", self.get_fen());
     }
 }
 

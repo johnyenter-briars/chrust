@@ -14,4 +14,7 @@ impl ChessPlayer for HumanPlayer {
     fn get_name(&self) -> &str{
         &self.name
     }
+    fn get_color_abbr(&self) -> char{
+        self.color.get_color_abbr()
+    }
 }
