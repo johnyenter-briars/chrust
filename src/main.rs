@@ -14,7 +14,6 @@ use player::humanplayer::HumanPlayer;
 mod game;
 use game::chessgame::ChessGame;
 
-use crate::api::backend::build_and_run_api;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::frontend::server::build_and_run_frontend;
 
@@ -31,11 +30,6 @@ use state::viztype::VizType;
 
 mod frontend;
 use frontend::server;
-use frontend::server::rocket;
-
-mod api;
-
-use futures::join;
 
 #[macro_use]
 extern crate serde_derive;
@@ -84,11 +78,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         },
         VizType::WEB => {
-            let x = build_and_run_frontend();
-            let y  = build_and_run_api(game);
-
-            join!(x, y);
-
+            build_and_run_frontend().await;
+            // let y  = build_and_run_api(game);
             Ok(())
         },
     }

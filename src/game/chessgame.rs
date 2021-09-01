@@ -218,6 +218,10 @@ impl<'a> ChessGame<'a> {
             (false, false) => panic!("Players with the same color?"),
         }
     }
+
+    fn get_fen(&self) {
+
+    }
 }
 
 //this is a mess and i dont fully understand it - i just did what the compiler told me to

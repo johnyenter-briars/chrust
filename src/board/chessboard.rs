@@ -139,7 +139,6 @@ impl Board {
         Ok(possible_moves)
     }
 
-
     pub fn apply_action(&self, action: &PieceMove) -> Board {
         //by jove i hope this doesnt have unexpected side affects
         let mut new_board = self.clone();
@@ -227,7 +226,6 @@ impl Board {
 
         // //3: set the current cell to nothing
         self.set_space_to_empty(from.x, from.y);
-
     }
 
     pub fn load_from_file(board_name: &str) -> Result<Board, Box<dyn std::error::Error>> {
