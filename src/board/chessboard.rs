@@ -12,6 +12,7 @@ use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader};
 use core::result::Result;
+use std::str::Chars;
 
 use crate::chessmove::action::{Action, HumanAction};
 
@@ -46,6 +47,10 @@ impl Board {
 
     fn get_all_cells(&self) -> Vec<&Cell> {
         self.squares.iter().flatten().collect()
+    }
+
+    fn get_all_cells_mut(&mut self) -> Vec<&mut Cell> {
+        self.squares.iter_mut().flatten().collect()
     }
 
     //should really ONLY be used in an evaluation function
@@ -254,6 +259,35 @@ impl Board {
 
         Ok(board)
     }
+    
+    // assumes the game section of the fen has been taken out
+    pub fn load_from_fen(fen: String) -> Result<Board, Box<dyn std::error::Error>> {
+        let mut board = Board::load_from_file("empty_board")?;
+        let mut split= fen.split('/');
+        let sections: Vec<Vec<char>> = fen.split('/').into_iter().map(|s| s.to_string().chars().collect()).collect();
+
+        let mut cells = board.get_all_cells_mut();
+        let mut cell_iter = cells.iter_mut();
+
+        for c_vec in sections {
+            for c in c_vec {
+                if c.is_numeric() {
+                    let num_to_skip = c.to_digit(10).expect("Unable to convert the num to skip to i32");
+                    for num in 0..num_to_skip {
+                        cell_iter.next();
+                    }
+                }
+                else {
+                    let mut cell = cell_iter.next().expect("The iterator really shouldnt be empty :(");
+                    cell.space.get_or_insert(get_piece_from_fen_char(c));
+                }
+            }
+        }
+
+        board.print_to_screen("test".to_string());
+
+        Ok(board)
+    }
 
     pub fn get_board_fen_section(&self) -> String {
         let mut fen = "".to_string();
@@ -280,6 +314,24 @@ impl Board {
             fen.push_str("/");
         }
 
-        fen
+        fen[0..fen.len()-1].to_string()
+    }
+}
+
+fn get_piece_from_fen_char(c: char) -> ChessPiece {
+    match c {
+        'p' => ChessPiece{piece_type: PieceType::Pawn, color: Color::Black},
+        'r' => ChessPiece{piece_type: PieceType::Rook, color: Color::Black},
+        'n' => ChessPiece{piece_type: PieceType::Knight, color: Color::Black},
+        'b' => ChessPiece{piece_type: PieceType::Bishop, color: Color::Black},
+        'k' => ChessPiece{piece_type: PieceType::King, color: Color::Black},
+        'q' => ChessPiece{piece_type: PieceType::Queen, color: Color::Black},
+        'P' => ChessPiece{piece_type: PieceType::Pawn, color: Color::White},
+        'R' => ChessPiece{piece_type: PieceType::Rook, color: Color::White},
+        'N' => ChessPiece{piece_type: PieceType::Knight, color: Color::White},
+        'B' => ChessPiece{piece_type: PieceType::Bishop, color: Color::White},
+        'K' => ChessPiece{piece_type: PieceType::King, color: Color::White},
+        'Q' => ChessPiece{piece_type: PieceType::Queen, color: Color::White},
+        wrong => panic!("the char {} is not valid", wrong),
     }
 }

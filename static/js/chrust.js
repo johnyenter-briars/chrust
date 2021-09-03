@@ -19,10 +19,12 @@ class ChessSync {
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
     send_fen() {
         var fen = game.fen();
+        var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
         debugger;
-        var idk = fetch("http://localhost:8000/api/process",
+        // var betterNote = encodeURIComponent(url);
+        fetch(url,
             {
-                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
                 credentials: 'same-origin', // include, *same-origin, omit
@@ -38,7 +40,6 @@ class ChessSync {
             // var responseFen = JSON.parse(text);
             try {
                 this.chessBoard.position(text, true);
-                
             }catch(err) {
                 console.log(err);
             }

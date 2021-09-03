@@ -1,22 +1,33 @@
-use rocket::{
-    fs::{relative, FileServer},
-    get, launch, routes, Build, Rocket,
-};
+use std::{ops::DerefMut, sync::{Arc, Mutex}};
 
-mod api {
-    use rocket::{fs::NamedFile, get};
-    use std::path::{Path, PathBuf};
+use rocket::{Build, Rocket, State, fs::{relative, FileServer}, get, launch, post, routes};
 
-    #[get("/process")]
-    pub async fn process() -> &'static str {
-        "rnbqkbnr/1ppppppp/p7/8/8/7P/PPPPPPP1/RNBQKBNR w KQkq - 0 1"
-    }
+use crate::game::chessgame::ChessGame;
+pub struct SharedGame {
+    chess_game: Mutex<ChessGame>,
 }
 
-pub async fn build_and_run_frontend() -> Result<(), rocket::Error> {
+struct MyConfig {
+    user_val: String
+}
+
+// #[get("/")]
+// fn index(state: &State<MyConfig>) -> String {
+//     state.user_val = String::from("test");
+//     format!("The config value is: {}", state.user_val)
+// }
+
+#[post("/process/<fen>")]
+pub async fn process(fen: String, game: &State<SharedGame>) -> String {
+    let returned_fen = game.chess_game.lock().unwrap().process_fen(fen);
+    returned_fen
+}
+
+pub async fn build_and_run_frontend(game: ChessGame) -> Result<(), rocket::Error> {
     rocket::build()
+        .manage(SharedGame{chess_game: Mutex::from(game)})
         .mount("/", FileServer::from(relative!("static")))
-        .mount("/api", routes![api::process])
+        .mount("/api", routes![process])
         .launch()
         .await
 }

@@ -50,12 +50,12 @@ impl From<MenuItem> for usize {
     }
 }
 
-pub struct Visualizer<'a> {
-    game: ChessGame<'a>,
+pub struct Visualizer {
+    game: ChessGame,
 }
 
-impl<'a> Visualizer<'a> {
-    pub fn new(game: ChessGame<'a>) -> Self {
+impl Visualizer {
+    pub fn new(game: ChessGame) -> Self {
         Visualizer { game }
     }
 

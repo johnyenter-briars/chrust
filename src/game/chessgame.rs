@@ -19,6 +19,7 @@ extern crate rand;
 // use rand::thread_rng;
 use rand::prelude::*;
 use rand::seq::SliceRandom;
+use rocket::request::FromRequest;
 
 use std::borrow::Borrow;
 use std::error::Error;
@@ -27,17 +28,17 @@ use std::thread::current;
 use std::time::Duration;
 use std::{result, thread};
 
-pub struct ChessGame<'a> {
+pub struct ChessGame {
     pub human_player: HumanPlayer,
     pub ai_player: AIPlayer,
     pub board: Board,
-    pub history: Vec<&'a (dyn Action<'a> + Sync)>,
+    // pub history: Vec<&'a (dyn Action<'a> + Sync)>,
     human_plays: bool,
     tick_speed: u64, //milli
     side_to_move: char,
 }
 
-impl<'a> ChessGame<'a> {
+impl ChessGame {
     pub fn new(
         human_player: HumanPlayer,
         ai_player: AIPlayer,
@@ -49,7 +50,7 @@ impl<'a> ChessGame<'a> {
             human_player,
             ai_player,
             board,
-            history: Vec::new(),
+            // history: Vec::new(),
             human_plays,
             tick_speed,
             side_to_move: 'W',
@@ -219,9 +220,29 @@ impl<'a> ChessGame<'a> {
         }
     }
 
+    pub fn process_fen(&mut self, fen: String) -> String {
+        let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
+        let bd = Board::load_from_fen(board_section.to_string());
+
+        //old board object is hopefully destructed from memory right?
+        self.board = bd.expect("idk");
+
+        self.ai_moves(1);
+
+        self.get_fen()
+    }
+
     //for an explanation of this crazy algo check out: https://www.chessprogramming.org/Forsyth-Edwards_Notation
     fn get_fen(&self) -> String {
-        format!("{} {} {} {} {} {}", self.board.get_board_fen_section(), self.side_to_move, '-', '-', '-', '-')
+        format!(
+            "{} {} {} {} {} {}",
+            self.board.get_board_fen_section(),
+            'w',
+            "KQkq",
+            '-',
+            '1',
+            '2'
+        )
     }
 
     fn print_to_screen(&mut self, configuration_name: String) {
@@ -229,6 +250,54 @@ impl<'a> ChessGame<'a> {
         println!("{}", self.get_fen());
     }
 }
+
+// pub fn process_fen(fen: String) -> String {
+//     let bd = Board::load_from_fen(fen);
+
+//     //old board object is hopefully destructed from memory right?
+//     ai_moves(1);
+
+    
+// }
+// pub fn ai_moves(board: &Board, turn_num: i32) -> Result<Board, Box<dyn Error>> {
+//     println!("ai moving");
+
+//     let board_state = BoardState {
+//         board: board.clone(),
+//     };
+
+//     let ai_move = max_decision(&board_state, self.ai_player.color, 2);
+
+//     if ai_move.from.x == ai_move.to.x && ai_move.from.y == ai_move.to.y {
+//         let idk = "im sad";
+//     }
+//     self.board.move_piece(ai_move.from, ai_move.to);
+
+//     Ok(true)
+// }
+// fn process_fen(fen: String) -> String {
+//     let bd = Board::load_from_fen(fen);
+
+//     self.ai_moves_better(1);
+
+//     self.get_fen()
+// }
+// pub fn ai_moves_better(&, turn_num: i32) -> Result<bool, Box<dyn Error>> {
+//     println!("ai moving");
+
+//     let board_state = BoardState {
+//         board: self.board.clone(),
+//     };
+
+//     let ai_move = max_decision(&board_state, self.ai_player.color, 2);
+
+//     if ai_move.from.x == ai_move.to.x && ai_move.from.y == ai_move.to.y {
+//         let idk = "im sad";
+//     }
+//     self.board.move_piece(ai_move.from, ai_move.to);
+
+//     Ok(true)
+// }
 
 //this is a mess and i dont fully understand it - i just did what the compiler told me to
 fn get_input<I: std::str::FromStr>() -> Result<I, Box<dyn Error>>
