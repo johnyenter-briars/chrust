@@ -1,26 +1,80 @@
 class ChessSync {
-	constructor(chessGame) {
-		this.chessGame = chessGame;
-	}
-
+    constructor(chessGame, board) {
+        this.chessGame = chessGame;
+        this.chessBoard = board;
+    }
 
     async test() {
         var response = await fetch("http://localhost:8000/api/test");
         console.log(response);
         console.log(await response.text());
     }
+
+    async print_fen() {
+        console.log(this.chessGame.fen());
+    }
+
+    // sends the fen of the current state to the API
+    // API will return a fen with it's move in resposne
+    // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
+    send_fen() {
+        var fen = game.fen();
+        debugger;
+        var idk = fetch("http://localhost:8000/api/process",
+            {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }
+
+        ).then((response) => { return response.text() }
+        ).then((text) => {
+            debugger;
+            // var responseFen = JSON.parse(text);
+            try {
+                this.chessBoard.position(text, true);
+                
+            }catch(err) {
+                console.log(err);
+            }
+        })
+        .catch((err) => {
+            debugger;
+            console.log(err);
+        });
+        // var response = await fetch("http://localhost:8000/api/process" + fen, {
+        //     method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        //     mode: 'cors', // no-cors, *cors, same-origin
+        //     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        //     credentials: 'same-origin', // include, *same-origin, omit
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //         // 'Content-Type': 'application/x-www-form-urlencoded',
+        //     }
+        // });
+
+        // if (response.status_code == 200) {
+        //     var responseFen = JSON.parse(await response.text());
+        //     this.chessGame.position(responseFen, true);
+        // }
+
+    }
 }
 
 var board,
     game = new Chess();
 
-var chessSync = new ChessSync(game);
 
-chessSync.test();
+// chessSync.test();
 
 /*The "AI" part starts here */
 
-var calculateBestMove =function(game) {
+var calculateBestMove = function (game) {
     var newGameMoves = game.ugly_moves();
 
     return newGameMoves[Math.floor(Math.random() * newGameMoves.length)];
@@ -57,11 +111,15 @@ var renderMoveHistory = function (moves) {
     var historyElement = $('#move-history').empty();
     historyElement.empty();
     for (var i = 0; i < moves.length; i = i + 2) {
-        historyElement.append('<span>' + moves[i] + ' ' + ( moves[i + 1] ? moves[i + 1] : ' ') + '</span><br>')
+        historyElement.append('<span>' + moves[i] + ' ' + (moves[i + 1] ? moves[i + 1] : ' ') + '</span><br>')
     }
     historyElement.scrollTop(historyElement[0].scrollHeight);
 
 };
+
+var getMoveAPI = () => {
+    chessSync.send_fen();
+}
 
 var onDrop = function (source, target) {
     var move = game.move({
@@ -76,14 +134,15 @@ var onDrop = function (source, target) {
     }
 
     renderMoveHistory(game.history());
-    window.setTimeout(makeBestMove, 250);
+    chessSync.print_fen();
+    window.setTimeout(getMoveAPI, 250);
 };
 
 var onSnapEnd = function () {
     board.position(game.fen());
 };
 
-var onMouseoverSquare = function(square, piece) {
+var onMouseoverSquare = function (square, piece) {
     var moves = game.moves({
         square: square,
         verbose: true
@@ -98,15 +157,15 @@ var onMouseoverSquare = function(square, piece) {
     }
 };
 
-var onMouseoutSquare = function(square, piece) {
+var onMouseoutSquare = function (square, piece) {
     removeGreySquares();
 };
 
-var removeGreySquares = function() {
+var removeGreySquares = function () {
     $('#board .square-55d63').css('background', '');
 };
 
-var greySquare = function(square) {
+var greySquare = function (square) {
     var squareEl = $('#board .square-' + square);
 
     var background = '#a9a9a9';
@@ -127,3 +186,4 @@ var cfg = {
     onSnapEnd: onSnapEnd
 };
 board = ChessBoard('board1', cfg);
+var chessSync = new ChessSync(game, board);

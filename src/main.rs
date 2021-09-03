@@ -79,7 +79,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         VizType::WEB => {
             build_and_run_frontend().await;
-            // let y  = build_and_run_api(game);
             Ok(())
         },
     }

@@ -7,16 +7,16 @@ mod api {
     use rocket::{fs::NamedFile, get};
     use std::path::{Path, PathBuf};
 
-    #[get("/test")]
-    pub async fn test() -> &'static str {
-        "YOU HIT THE API"
+    #[get("/process")]
+    pub async fn process() -> &'static str {
+        "rnbqkbnr/1ppppppp/p7/8/8/7P/PPPPPPP1/RNBQKBNR w KQkq - 0 1"
     }
 }
 
 pub async fn build_and_run_frontend() -> Result<(), rocket::Error> {
     rocket::build()
         .mount("/", FileServer::from(relative!("static")))
-        .mount("/api", routes![api::test])
+        .mount("/api", routes![api::process])
         .launch()
         .await
 }
