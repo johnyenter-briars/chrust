@@ -12,6 +12,7 @@ use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader};
 use core::result::Result;
+use std::str::Chars;
 
 use crate::chessmove::action::{Action, HumanAction};
 
@@ -27,60 +28,57 @@ pub struct Board {
 }
 
 impl Board {
-
-    // TODO - figure out a way to do this
-    // fn get_all_pieces(&self) -> Vec<&Cell> {
-    //     self.squares.into_iter().flatten().map(|cell| &cell ).collect()
-    // }
-
-    pub fn get_cell_at(&self, coordinate: Coordinate) -> &Cell {
-        match self.get_all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).next() {
+    pub fn cell_at(&self, coordinate: Coordinate) -> &Cell {
+        match self.all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).next() {
             Some(cell) => cell,
             None => panic!("No cell found at: {:?}", coordinate),
         }
     }
 
     pub fn test_cell_at(&self, coordinate: Coordinate) -> Option<&Cell> {
-        self.get_all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).map(|x| x.to_owned()).next()
+        self.all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).map(|x| x.to_owned()).next()
     }
 
-    fn get_all_cells(&self) -> Vec<&Cell> {
+    fn all_cells(&self) -> Vec<&Cell> {
         self.squares.iter().flatten().collect()
     }
 
+    fn all_cells_mut(&mut self) -> Vec<&mut Cell> {
+        self.squares.iter_mut().flatten().collect()
+    }
+
     //should really ONLY be used in an evaluation function
-    pub fn get_all_pieces<'a>(&self) -> Vec<ChessPiece>{
-        let im_worried_this_will_move: Vec<ChessPiece> = self.get_all_cells().iter().map(|cell| cell.space).into_iter().flat_map(|e| e).collect();
+    pub fn all_pieces<'a>(&self) -> Vec<ChessPiece>{
+        let im_worried_this_will_move: Vec<ChessPiece> = self.all_cells().iter().map(|cell| cell.space).into_iter().flat_map(|e| e).collect();
         im_worried_this_will_move
     }
 
-    pub fn get_empty_spaces(&self) -> Vec<Coordinate>{
-        self.get_all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
+    pub fn empty_spaces(&self) -> Vec<Coordinate>{
+        self.all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
     }
     
     pub fn print_to_screen(&self, configuration_name: String) {
         println!("-----------------------------{}", configuration_name);
         for row in  &self.squares {
             if let Some(first_cell) = row.into_iter().next() {
-                print!("{}", first_cell.y);
+                print!("{}|", first_cell.y);
             }
             for cell in row {
                 if let Some(piece_ref) = &cell.space {
-                    print!(" {} ", piece_ref.get_str());
+                    print!(" {} |", piece_ref.str());
                 } else {
-                    print!("   ");
+                    print!("   |");
                 }
             }
             println!("");
-            println!("");
         }
         print!(" ");
-        "abcdefgh".to_string().chars().into_iter().for_each(|int| print!(" {} ", int));
+        "abcdefgh".to_string().chars().into_iter().for_each(|int| print!("  {} ", int));
         println!("");
     }
 
-    pub fn get_piece(&self, x: char, y: i32) -> core::result::Result<&ChessPiece, Box<dyn Error>> {
-        for cell in self.get_all_cells() {
+    pub fn piece(&self, x: char, y: i32) -> core::result::Result<&ChessPiece, Box<dyn Error>> {
+        for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
                 if let Some(piece_ref) = &cell.space {
                     return Ok(piece_ref);
@@ -94,8 +92,8 @@ impl Board {
         Err(Box::from(format!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x, y)))
     }
 
-    pub fn get_possible_moves_human(&self, current_position: Coordinate, turn_num: i32, human_player: &HumanPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
-        let target_piece = self.get_piece(current_position.x, current_position.y)?;
+    pub fn possible_moves_human(&self, current_position: Coordinate, turn_num: i32, human_player: &HumanPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+        let target_piece = self.piece(current_position.x, current_position.y)?;
 
         if target_piece.color != human_player.color {
             return Err(Box::from("Thats not your piece!"));
@@ -104,8 +102,8 @@ impl Board {
         Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
     }
 
-    pub fn get_possible_moves(&self, current_position: Coordinate, turn_num: i32, color: Color) -> Result<Vec<Coordinate>, Box<dyn Error>> {
-        let target_piece = self.get_piece(current_position.x, current_position.y)?;
+    pub fn possible_moves(&self, current_position: Coordinate, turn_num: i32, color: Color) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+        let target_piece = self.piece(current_position.x, current_position.y)?;
 
         if target_piece.color != color {
             return Err(Box::from("Thats not your piece!"));
@@ -114,20 +112,20 @@ impl Board {
         Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
     }
 
-    pub fn get_all_possible_moves(&self, turn_num: i32, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
-        let cells = self.get_cells_with_pieces_with_color(color);
+    pub fn all_possible_moves(&self, turn_num: i32, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
+        let cells = self.cells_with_pieces_with_color(color);
 
         let mut possible_moves: Vec<PieceMove> = Vec::new();
 
         for cell in cells{
             let current_position = Coordinate::new(cell.x, cell.y);
-            let piece_at_position = self.get_piece(current_position.x, current_position.y)?;
+            let piece_at_position = self.piece(current_position.x, current_position.y)?;
             let x = match piece_at_position.piece_type {
                 PieceType::Queen => 10,
                 _ => 5
             };
 
-            let coord_choices = self.get_possible_moves(current_position, turn_num, color)?;
+            let coord_choices = self.possible_moves(current_position, turn_num, color)?;
 
             let mut possible_moves_for_piece: Vec<PieceMove> = 
                 coord_choices.iter().map(|coord | PieceMove::new(&piece_at_position, current_position, coord.clone())).collect();
@@ -139,14 +137,14 @@ impl Board {
         Ok(possible_moves)
     }
 
-
     pub fn apply_action(&self, action: &PieceMove) -> Board {
+        //by jove i hope this doesnt have unexpected side affects
         let mut new_board = self.clone();
         new_board.move_piece(action.from, action.to);
         new_board
     }
 
-    fn set_space_to_empty(&mut self, x: char, y: i32) {
+    fn space_to_empty(&mut self, x: char, y: i32) {
         for row in  self.squares.iter_mut() {
             for cell in row {
                 if cell.x == x && cell.y == y {
@@ -156,9 +154,9 @@ impl Board {
         }
     }
 
-    pub fn get_pieces_of_color(&self, color: Color) -> Vec<&ChessPiece> {
+    pub fn pieces_of_color(&self, color: Color) -> Vec<&ChessPiece> {
         let mut pieces: Vec<&ChessPiece> = Vec::new();
-        for cell in self.get_all_cells() {
+        for cell in self.all_cells() {
             if let Some(piece_ref) = &cell.space {
                 if piece_ref.color == color {
                     pieces.push(piece_ref);
@@ -168,9 +166,9 @@ impl Board {
         pieces
     }
 
-    pub fn get_cells_with_pieces_with_color(&self, color: Color) -> Vec<&Cell> {
+    pub fn cells_with_pieces_with_color(&self, color: Color) -> Vec<&Cell> {
         let mut cells: Vec<&Cell> = Vec::new();
-        for cell in self.get_all_cells() {
+        for cell in self.all_cells() {
             if let Some(piece_ref) = &cell.space {
                 if piece_ref.color == color {
                     cells.push(cell);
@@ -180,8 +178,8 @@ impl Board {
         cells
     }
 
-    pub fn get_piece_specific(&self, color: Color, piece_type: PieceType) -> Option<&ChessPiece>{
-        let pieces = self.get_pieces_of_color(color);
+    pub fn piece_specific(&self, color: Color, piece_type: PieceType) -> Option<&ChessPiece>{
+        let pieces = self.pieces_of_color(color);
 
         let piece = pieces.into_iter().find(|x| x.piece_type == piece_type);
         
@@ -195,7 +193,7 @@ impl Board {
             color: Color::Black,
             piece_type: PieceType::Bishop
         };
-        for cell in self.get_all_cells(){
+        for cell in self.all_cells(){
             if cell.x == from.x && cell.y == from.y {
                 if let Some(piece_ref) = cell.space {
                     target_piece = piece_ref; //should be moving the value i hope
@@ -225,8 +223,7 @@ impl Board {
         }
 
         // //3: set the current cell to nothing
-        self.set_space_to_empty(from.x, from.y);
-
+        self.space_to_empty(from.x, from.y);
     }
 
     pub fn load_from_file(board_name: &str) -> Result<Board, Box<dyn std::error::Error>> {
@@ -255,5 +252,80 @@ impl Board {
         }
 
         Ok(board)
+    }
+    
+    // assumes the game section of the fen has been taken out
+    pub fn load_from_fen(fen: String) -> Result<Board, Box<dyn std::error::Error>> {
+        let mut board = Board::load_from_file("empty_board")?;
+        let mut split= fen.split('/');
+        let sections: Vec<Vec<char>> = fen.split('/').into_iter().map(|s| s.to_string().chars().collect()).collect();
+
+        let mut cells = board.all_cells_mut();
+        let mut cell_iter = cells.iter_mut();
+
+        for c_vec in sections {
+            for c in c_vec {
+                if c.is_numeric() {
+                    let num_to_skip = c.to_digit(10).expect("Unable to convert the num to skip to i32");
+                    for num in 0..num_to_skip {
+                        cell_iter.next();
+                    }
+                }
+                else {
+                    let mut cell = cell_iter.next().expect("The iterator really shouldnt be empty :(");
+                    cell.space.get_or_insert(piece_from_fen_char(c));
+                }
+            }
+        }
+
+        board.print_to_screen("test".to_string());
+
+        Ok(board)
+    }
+
+    pub fn board_fen_section(&self) -> String {
+        let mut fen = "".to_string();
+
+        //construct the piece position portion
+        for row in &self.squares {
+            let mut num_empty_squares:i32 = 0;
+            for cell in row {
+                if let Some(piece) = cell.space {
+                    if num_empty_squares == 0 {
+                        fen.push_str(piece.fen_code());
+                    } else {
+                        fen.push_str(&num_empty_squares.to_string());
+                        fen.push_str(piece.fen_code());
+                    }
+                    num_empty_squares = 0;
+                } else {
+                    num_empty_squares += 1;
+                }
+            }
+            if num_empty_squares != 0 {
+                fen.push_str(&num_empty_squares.to_string());
+            }
+            fen.push_str("/");
+        }
+
+        fen[0..fen.len()-1].to_string()
+    }
+}
+
+fn piece_from_fen_char(c: char) -> ChessPiece {
+    match c {
+        'p' => ChessPiece{piece_type: PieceType::Pawn, color: Color::Black},
+        'r' => ChessPiece{piece_type: PieceType::Rook, color: Color::Black},
+        'n' => ChessPiece{piece_type: PieceType::Knight, color: Color::Black},
+        'b' => ChessPiece{piece_type: PieceType::Bishop, color: Color::Black},
+        'k' => ChessPiece{piece_type: PieceType::King, color: Color::Black},
+        'q' => ChessPiece{piece_type: PieceType::Queen, color: Color::Black},
+        'P' => ChessPiece{piece_type: PieceType::Pawn, color: Color::White},
+        'R' => ChessPiece{piece_type: PieceType::Rook, color: Color::White},
+        'N' => ChessPiece{piece_type: PieceType::Knight, color: Color::White},
+        'B' => ChessPiece{piece_type: PieceType::Bishop, color: Color::White},
+        'K' => ChessPiece{piece_type: PieceType::King, color: Color::White},
+        'Q' => ChessPiece{piece_type: PieceType::Queen, color: Color::White},
+        wrong => panic!("the char {} is not valid", wrong),
     }
 }

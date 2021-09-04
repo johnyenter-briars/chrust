@@ -11,7 +11,10 @@ impl ChessPlayer for AIPlayer {
     fn take_action(&self, board: Board) {
         println!("hello there from AI!");
     }
-    fn get_name(&self) -> &str{
+    fn name(&self) -> &str{
         &self.name
+    }
+    fn color_abbr(&self) -> char{
+        self.color.color_abbr()
     }
 }

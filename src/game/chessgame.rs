@@ -19,6 +19,7 @@ extern crate rand;
 // use rand::thread_rng;
 use rand::prelude::*;
 use rand::seq::SliceRandom;
+use rocket::request::FromRequest;
 
 use std::borrow::Borrow;
 use std::error::Error;
@@ -27,17 +28,22 @@ use std::thread::current;
 use std::time::Duration;
 use std::{result, thread};
 
-pub struct ChessGame<'a> {
+pub struct ChessGame {
     pub human_player: HumanPlayer,
     pub ai_player: AIPlayer,
     pub board: Board,
-    pub history: Vec<&'a dyn Action<'a>>,
+    // pub history: Vec<&'a (dyn Action<'a> + Sync)>,
     human_plays: bool,
     tick_speed: u64, //milli
-                     // pub decision_maker: DecisionMaker,
+
+    side_to_move: char,
+    castling_ability: String,
+    en_passant_target_square: String,
+    halfmove_clock: u32,
+    fullmove_counter: u32,
 }
 
-impl<'a> ChessGame<'a> {
+impl ChessGame {
     pub fn new(
         human_player: HumanPlayer,
         ai_player: AIPlayer,
@@ -49,29 +55,34 @@ impl<'a> ChessGame<'a> {
             human_player,
             ai_player,
             board,
-            history: Vec::new(),
+            // history: Vec::new(),
             human_plays,
             tick_speed,
+            side_to_move: 'w',
+            castling_ability: "KQkq".to_string(),
+            en_passant_target_square: "h3".to_string(),
+            halfmove_clock: 0,
+            fullmove_counter: 1,
             // DecisionMaker{}
         }
     }
 
     pub fn check_for_winner(&self) -> Option<&str> {
-        let white_king = self.board.get_piece_specific(Color::White, PieceType::King);
-        let black_king = self.board.get_piece_specific(Color::Black, PieceType::King);
+        let white_king = self.board.piece_specific(Color::White, PieceType::King);
+        let black_king = self.board.piece_specific(Color::Black, PieceType::King);
 
         match (white_king.is_some(), black_king.is_some()) {
             (true, true) => None,
-            (true, false) => Some(self.get_user_of_color(Color::White).get_name()),
-            (false, true) => Some(self.get_user_of_color(Color::Black).get_name()),
+            (true, false) => Some(self.user_of_color(Color::White).name()),
+            (false, true) => Some(self.user_of_color(Color::Black).name()),
             (false, false) => panic!("Something went horribly wrong. Both kings are gone?"),
         }
     }
 
     pub fn start_game(&mut self) -> Result<&str, Box<dyn Error>> {
-        self.board.print_to_screen("Initial".to_string());
+        self.print_to_screen("Initial".to_string());
 
-        let mut turn_num = 1;
+        let mut turn_num: u32 = 1;
 
         loop {
             //Human moves
@@ -79,9 +90,10 @@ impl<'a> ChessGame<'a> {
                 continue;
             }
 
+            self.side_to_move = self.ai_player.color_abbr();
+
             if self.human_plays {
-                self.board
-                    .print_to_screen(format!("after human turn {}", turn_num));
+                self.print_to_screen(format!("after ai turn {}", turn_num));
             } else {
                 thread::sleep(Duration::from_millis(self.tick_speed));
             }
@@ -91,8 +103,9 @@ impl<'a> ChessGame<'a> {
                 continue;
             }
 
-            self.board
-                .print_to_screen(format!("after ai turn {}", turn_num));
+            self.side_to_move = self.human_player.color_abbr();
+
+            self.print_to_screen(format!("after ai turn {}", turn_num));
 
             turn_num += 1;
 
@@ -106,24 +119,27 @@ impl<'a> ChessGame<'a> {
         Ok(self.check_for_winner().unwrap())
     }
 
-    pub fn ai_moves(&mut self, turn_num: i32) -> Result<bool, Box<dyn Error>> {
+    pub fn ai_moves(&mut self, turn_num: u32) -> Result<bool, Box<dyn Error>> {
         println!("ai moving");
 
         let board_state = BoardState {
             board: self.board.clone(),
         };
 
-        let ai_move = max_decision(&board_state, self.ai_player.color, 3);
+        let ai_move = max_decision(&board_state, self.ai_player.color, 2);
 
         if ai_move.from.x == ai_move.to.x && ai_move.from.y == ai_move.to.y {
             let idk = "im sad";
         }
         self.board.move_piece(ai_move.from, ai_move.to);
 
+        self.fullmove_counter += 1;
+        self.halfmove_clock += 1;
+
         Ok(true)
     }
 
-    pub fn human_moves(&mut self, turn_num: i32) -> Result<bool, Box<dyn Error>> {
+    pub fn human_moves(&mut self, turn_num: u32) -> Result<bool, Box<dyn Error>> {
         println!("Human moving!");
 
         let (from, to) = if self.human_plays {
@@ -138,9 +154,9 @@ impl<'a> ChessGame<'a> {
             let current_position = Coordinate::new(x, y);
 
             //this is syntax is really cool
-            let coord_choices = match self.board.get_possible_moves_human(
+            let coord_choices = match self.board.possible_moves_human(
                 current_position,
-                turn_num,
+                turn_num as i32,
                 &self.human_player,
             ) {
                 Ok(choices) => {
@@ -170,7 +186,7 @@ impl<'a> ChessGame<'a> {
         } else {
             let cells = self
                 .board
-                .get_cells_with_pieces_with_color(self.human_player.color);
+                .cells_with_pieces_with_color(self.human_player.color);
 
             let (from, to) = loop {
                 let mut random_white_square = cells.choose(&mut rand::thread_rng());
@@ -182,14 +198,14 @@ impl<'a> ChessGame<'a> {
 
                 let coord_choices =
                     self.board
-                        .get_possible_moves_human(from, turn_num, &self.human_player)?;
+                        .possible_moves_human(from, turn_num as i32, &self.human_player)?;
 
                 if coord_choices.len() < 1 {
                     //that piece can't go anywhere - try to get another one
                     continue;
                 }
 
-                let to = *coord_choices
+                let to = coord_choices
                     .choose(&mut rand::thread_rng())
                     .ok_or("There was an error while trying to get a choice randomly")?;
 
@@ -204,7 +220,7 @@ impl<'a> ChessGame<'a> {
         Ok(true)
     }
 
-    fn get_user_of_color(&self, color: Color) -> Box<&dyn ChessPlayer> {
+    fn user_of_color(&self, color: Color) -> Box<&dyn ChessPlayer> {
         match (
             self.human_player.color == color,
             self.ai_player.color == color,
@@ -214,6 +230,38 @@ impl<'a> ChessGame<'a> {
             (false, true) => Box::new(&self.ai_player),
             (false, false) => panic!("Players with the same color?"),
         }
+    }
+
+    pub fn process_fen(&mut self, fen: String) -> String {
+        let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
+        let bd = Board::load_from_fen(board_section.to_string());
+
+        //old board object is hopefully destructed from memory right?
+        self.board = bd.expect("idk");
+
+        self.ai_moves(self.fullmove_counter);
+
+        self.board.print_to_screen("test".to_string());
+
+        self.fen()
+    }
+
+    //for an explanation of this crazy algo check out: https://www.chessprogramming.org/Forsyth-Edwards_Notation
+    fn fen(&self) -> String {
+        format!(
+            "{} {} {} {} {} {}",
+            self.board.board_fen_section(), //board formatted
+            self.side_to_move,
+            self.castling_ability,
+            self.en_passant_target_square,
+            self.halfmove_clock,
+            self.fullmove_counter
+        )
+    }
+
+    fn print_to_screen(&mut self, configuration_name: String) {
+        self.board.print_to_screen(configuration_name);
+        println!("{}", self.fen());
     }
 }
 
