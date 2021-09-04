@@ -93,6 +93,8 @@ I'm by no means a Rust expert, so if you see any issues in the source code pleas
 ### Built With
 
 * [Rust](https://www.rust-lang.org/)
+* [Rocket](https://rocket.rs/)
+* [ChessBoard.js](https://chessboardjs.com/)
 
 <!-- GETTING STARTED -->
 ## Getting Started

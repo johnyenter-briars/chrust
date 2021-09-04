@@ -1,6 +1,5 @@
 class ChessSync {
-    constructor(chessGame, board) {
-        this.chessGame = chessGame;
+    constructor(chessGame) {
         this.chessBoard = board;
     }
 
@@ -18,11 +17,11 @@ class ChessSync {
     // API will return a fen with it's move in resposne
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
     send_fen() {
-        var fen = game.fen();
+        var fen = board.fen();
         var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
         debugger;
         // var betterNote = encodeURIComponent(url);
-        fetch(url,
+        return fetch(url,
             {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
@@ -35,35 +34,22 @@ class ChessSync {
             }
 
         ).then((response) => { return response.text() }
-        ).then((text) => {
+        ).then((fen) => {
             debugger;
+            console.log(fen);
+            // return fen;
             // var responseFen = JSON.parse(text);
             try {
-                this.chessBoard.position(text, true);
+                this.chessBoard.position(fen, true);
             }catch(err) {
                 console.log(err);
             }
         })
         .catch((err) => {
             debugger;
-            console.log(err);
+            console.log(err);s
+            return false;
         });
-        // var response = await fetch("http://localhost:8000/api/process" + fen, {
-        //     method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        //     mode: 'cors', // no-cors, *cors, same-origin
-        //     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        //     credentials: 'same-origin', // include, *same-origin, omit
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //         // 'Content-Type': 'application/x-www-form-urlencoded',
-        //     }
-        // });
-
-        // if (response.status_code == 200) {
-        //     var responseFen = JSON.parse(await response.text());
-        //     this.chessGame.position(responseFen, true);
-        // }
-
     }
 }
 
@@ -71,7 +57,6 @@ var board,
     game = new Chess();
 
 
-// chessSync.test();
 
 /*The "AI" part starts here */
 
@@ -122,25 +107,8 @@ var getMoveAPI = () => {
     chessSync.send_fen();
 }
 
-var onDrop = function (source, target) {
-    var move = game.move({
-        from: source,
-        to: target,
-        promotion: 'q'
-    });
-
-    removeGreySquares();
-    if (move === null) {
-        return 'snapback';
-    }
-
-    renderMoveHistory(game.history());
-    chessSync.print_fen();
-    window.setTimeout(getMoveAPI, 250);
-};
-
 var onSnapEnd = function () {
-    board.position(game.fen());
+    // board.position(game.fen());
 };
 
 var onMouseoverSquare = function (square, piece) {
@@ -186,5 +154,19 @@ var cfg = {
     onMouseoverSquare: onMouseoverSquare,
     onSnapEnd: onSnapEnd
 };
-board = ChessBoard('board1', cfg);
-var chessSync = new ChessSync(game, board);
+
+
+function onDrop (source, target, piece, newPos, oldPos, orientation) {
+
+    window.setTimeout(getMoveAPI, 500);
+}
+
+var config = {
+  draggable: true,
+  position: 'start',
+  onDrop: onDrop,
+  sparePieces: true
+}
+var board = Chessboard('board1', config)
+
+var chessSync = new ChessSync(board);

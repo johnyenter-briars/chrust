@@ -8,7 +8,7 @@ pub struct ChessPiece {
 }
 
 impl ChessPiece {
-    pub fn get_str(&self) -> &str {
+    pub fn str(&self) -> &str {
         match (self.piece_type, self.color) {
             (PieceType::Pawn, Color::White) => "\u{2659}",
             (PieceType::Pawn, Color::Black) => "\u{265F}",
@@ -25,7 +25,7 @@ impl ChessPiece {
         }
     }
 
-    pub fn get_fen_code(&self) -> &str {
+    pub fn fen_code(&self) -> &str {
         match (self.piece_type, self.color) {
             (PieceType::Pawn, Color::White) => "P",
             (PieceType::Pawn, Color::Black) => "p",

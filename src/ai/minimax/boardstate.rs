@@ -7,7 +7,7 @@ pub struct BoardState {
 }
 
 impl BoardState {
-    pub fn get_state_eval(&self) -> i32 {
+    pub fn state_eval(&self) -> i32 {
         evaluate(self)
     }
 

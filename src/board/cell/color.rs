@@ -7,13 +7,13 @@ pub enum Color {
 }
 
 impl Color {
-    pub fn get_opposite_color(&self) -> Color {
+    pub fn opposite_color(&self) -> Color {
         match self {
             Color::White => Color::Black,
             Color::Black => Color::White,
         }
     }
-    pub fn get_color_abbr(&self) -> char {
+    pub fn color_abbr(&self) -> char {
         self.to_string().chars().next().unwrap()
     }
 }

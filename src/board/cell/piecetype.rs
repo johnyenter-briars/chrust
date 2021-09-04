@@ -250,7 +250,7 @@ fn filter_out_occupired_spaces(
     possible_coordinates: Vec<Coordinate>,
     board: &Board,
 ) -> Vec<Coordinate> {
-    let empty_spaces_on_board = board.get_empty_spaces();
+    let empty_spaces_on_board = board.empty_spaces();
 
     //should do something cute with intersection here - but my first try was 'cant do intersection on non primitative types' so oh well
     possible_coordinates

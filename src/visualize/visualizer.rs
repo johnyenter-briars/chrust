@@ -190,7 +190,7 @@ fn render_board<'a>(board: &'a Board) -> Table<'a> {
         for boardcell in row {
             if let Some(piece) = &boardcell.space {
                 new_row.push(
-                    Cell::from(piece.get_str())
+                    Cell::from(piece.str())
                         .style(Style::default().bg(translate_color(boardcell.color))),
                 );
             } else {

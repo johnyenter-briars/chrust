@@ -11,10 +11,10 @@ impl ChessPlayer for HumanPlayer {
     fn take_action(&self, board: Board) {
         println!("hello there from human!");
     }
-    fn get_name(&self) -> &str{
+    fn name(&self) -> &str{
         &self.name
     }
-    fn get_color_abbr(&self) -> char{
-        self.color.get_color_abbr()
+    fn color_abbr(&self) -> char{
+        self.color.color_abbr()
     }
 }
