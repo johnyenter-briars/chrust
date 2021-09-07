@@ -155,7 +155,9 @@ Currently, the list of features I would like to add are outlined below.
 - [ ] Quiescence search
 
 ### Visual Features
-- [ ] Use GUI (or localhost websever)
+- [X] Terminal UI
+- [ ] GUI
+- [X] Web
 
 ### 'Program Ease of Use' Features
 - [ ] Access to mutable AI difficulty settings

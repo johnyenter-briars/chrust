@@ -1,6 +1,7 @@
 use crate::ai::minimax::boardstate::BoardState;
 use crate::ai::minimax::funcs::max_decision;
 use crate::board;
+use crate::board::cell::Cell;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::cell::color::Color;
 use crate::board::cell::piecetype::PieceType;
@@ -234,16 +235,33 @@ impl ChessGame {
 
     pub fn process_fen(&mut self, fen: String) -> String {
         let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
-        let bd = Board::load_from_fen(board_section.to_string());
 
         //old board object is hopefully destructed from memory right?
-        self.board = bd.expect("idk");
+        self.board = Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
         self.ai_moves(self.fullmove_counter);
 
         self.board.print_to_screen("test".to_string());
 
         self.fen()
+    }
+
+    pub fn valid_moves(&mut self, fen: String, location: String) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
+        let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
+        //old board object is hopefully destructed from memory right?
+        self.board = Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+
+        if location.as_str().len() != 2 {
+            return Err(Box::from("Invalid format for location string"));
+        }
+
+        let x: char = location.chars().nth(0).unwrap();
+        let y: u32 = location.chars().nth(1).unwrap().to_digit(10).unwrap();
+
+        let current_position = Coordinate{x, y: y as i32};
+        let coords = self.board.possible_moves(current_position, 1, Color::White).expect("Unable to find the valid moves!");
+
+        Ok(coords)
     }
 
     //for an explanation of this crazy algo check out: https://www.chessprogramming.org/Forsyth-Edwards_Notation
