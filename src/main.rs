@@ -38,6 +38,9 @@ extern crate serde_json;
 extern crate clap;
 use clap::{App, Arg};
 
+#[macro_use]
+extern crate rocket_include_static_resources;
+
 
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
