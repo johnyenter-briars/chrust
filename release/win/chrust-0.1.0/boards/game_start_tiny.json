@@ -1,0 +1,19 @@
+{
+	"squares": [
+		[
+			{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "Black", "x": "a", "y": 2},
+				{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "White", "x": "b", "y": 2},
+					{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "Black", "x": "c", "y": 2},
+						{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "White", "x": "d", "y": 2}
+		],
+
+
+		[
+			{"space": null, "color": "White", "x": "a", "y": 1},
+				{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "b", "y": 1},
+					{"space": {"piece_type": "Pawn", "color": "White"}, "color": "White", "x": "c", "y": 1},
+						{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "d", "y": 1}
+		]
+	],
+	"board_size": 2
+}

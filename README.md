@@ -116,6 +116,18 @@ To try your hand at beating rusty, follow the standard installation steps:
    cargo run <args>
    ```
 
+### Building For Release
+
+The latest release builds are located in the 'release' folder, under subfolder `chrust-<latest_version>`. The executable must be run within the context of that subfolder, as Chrust requires the bundled resources.
+
+If you wish to build in release mode yourself, build scripts are located in the repo root and titled `build_<platform>.<extension>`.
+
+#### Dependencies to Build on Windows
+
+* Rust target profile: x86_64-pc-windows-msvc
+* Visual C++ tools
+
+#### Dependencies to Build on MacOS
 
 <!-- USAGE EXAMPLES -->
 ## Usage

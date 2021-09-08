@@ -44,6 +44,7 @@ extern crate rocket_include_static_resources;
 
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("test 333");
     let program_state = get_args()?;
     let board = Board::load_from_file("game_start")?;
 
