@@ -18,7 +18,7 @@ class ChessSync {
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
     send_fen() {
         var fen = board.fen();
-        var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
+        var url = "http://127.0.0.1/api/process/" + encodeURIComponent(fen);
         debugger;
         // var betterNote = encodeURIComponent(url);
         return fetch(url,
