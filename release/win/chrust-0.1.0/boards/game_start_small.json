@@ -1,0 +1,35 @@
+{
+	"squares": [
+		[
+			{"space": {"piece_type": "Rook", "color": "Black"}, "color": "White", "x": "a", "y": 4},
+				{"space": {"piece_type": "Knight", "color": "Black"}, "color": "Black", "x": "b", "y": 4},
+					{"space": {"piece_type": "Bishop", "color": "Black"}, "color": "White", "x": "c", "y": 4},
+						{"space": {"piece_type": "Queen", "color": "Black"}, "color": "Black", "x": "d", "y": 4}
+		],
+
+
+		[
+			{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "Black", "x": "a", "y": 3},
+				{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "White", "x": "b", "y": 3},
+					{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "Black", "x": "c", "y": 3},
+						{"space": {"piece_type": "Pawn", "color": "Black"}, "color": "White", "x": "d", "y": 3}
+		],
+
+
+		[
+			{"space": null, "color": "White", "x": "a", "y": 2},
+				{"space": null, "color": "Black", "x": "b", "y": 2},
+					{"space": {"piece_type": "Pawn", "color": "White"}, "color": "White", "x": "c", "y": 2},
+						{"space": {"piece_type": "Pawn", "color": "White"}, "color": "Black", "x": "d", "y": 2}
+		],
+
+
+		[
+			{"space": null, "color": "Black", "x": "a", "y": 1},
+				{"space": {"piece_type": "Knight", "color": "White"}, "color": "White", "x": "b", "y": 1},
+					{"space": null, "color": "Black", "x": "c", "y": 1},
+						{"space": null, "color": "White", "x": "d", "y": 1}
+		]
+	],
+	"board_size": 4
+}

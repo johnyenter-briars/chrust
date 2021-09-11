@@ -17,7 +17,7 @@ class ChessSync {
     // API will return a fen with it's move in resposne
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
     send_fen() {
-        var fen = board.fen();
+        var fen = this.chessBoard.fen();
         var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
         debugger;
         // var betterNote = encodeURIComponent(url);
@@ -47,7 +47,7 @@ class ChessSync {
         })
         .catch((err) => {
             debugger;
-            console.log(err);s
+            console.log(err);
             return false;
         });
     }
