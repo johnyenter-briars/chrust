@@ -125,9 +125,12 @@ If you wish to build in release mode yourself, build scripts are located in the 
 #### Dependencies to Build on Windows
 
 * Rust target profile: x86_64-pc-windows-msvc
-* Visual C++ tools
+* Visual C++ tool chain
 
 #### Dependencies to Build on MacOS
+
+* Rust target profile: x86_64-apple-darwin
+* XCode tool chain
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -135,12 +138,12 @@ If you wish to build in release mode yourself, build scripts are located in the 
 The binary currently supports several command line arguments.
 
 ```
-./chrust [-z TERM|GUI] [-t TICK_SPEED] [-h HUMAN_PLAYS]
+./chrust [-z TERM|GUI|WEB] [-t TICK_SPEED] [-h HUMAN_PLAYS]
 ```
 
 | Flag | Name | Description |
 | ----------- | ----------- | ----------- |
-| z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical TBD |
+| z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical in the browser over localhost |
 | t | tick_speed | Sets the interval between moves in milliseconds | 
 | h | human_plays | Sets whether or not the human player will play the game. If false, the human player makes random decisions | 
 
@@ -167,7 +170,7 @@ Currently, the list of features I would like to add are outlined below.
 - [ ] Quiescence search
 
 ### Visual Features
-- [ ] Use GUI (or localhost websever)
+- [X] Use localhost webserver as frontend
 
 ### 'Program Ease of Use' Features
 - [ ] Access to mutable AI difficulty settings
