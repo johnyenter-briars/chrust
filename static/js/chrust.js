@@ -7,7 +7,7 @@ class ChrustAPI {
     // API will return a fen with it's move in resposne
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
     send_fen() {
-        var fen = board.fen();
+        var fen = this.chessBoard.fen();
         var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
         return fetch(url,
             {

@@ -116,6 +116,21 @@ To try your hand at beating rusty, follow the standard installation steps:
    cargo run <args>
    ```
 
+### Building For Release
+
+The latest release builds are located in the 'release' folder, under subfolder `chrust-<latest_version>`. The executable must be run within the context of that subfolder, as Chrust requires the bundled resources.
+
+If you wish to build in release mode yourself, build scripts are located in the repo root and titled `build_<platform>.<extension>`.
+
+#### Dependencies to Build on Windows
+
+* Rust target profile: x86_64-pc-windows-msvc
+* Visual C++ tool chain
+
+#### Dependencies to Build on MacOS
+
+* Rust target profile: x86_64-apple-darwin
+* XCode tool chain
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -123,12 +138,12 @@ To try your hand at beating rusty, follow the standard installation steps:
 The binary currently supports several command line arguments.
 
 ```
-./chrust [-z TERM|GUI] [-t TICK_SPEED] [-h HUMAN_PLAYS]
+./chrust [-z TERM|GUI|WEB] [-t TICK_SPEED] [-h HUMAN_PLAYS]
 ```
 
 | Flag | Name | Description |
 | ----------- | ----------- | ----------- |
-| z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical TBD |
+| z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical in the browser over localhost |
 | t | tick_speed | Sets the interval between moves in milliseconds | 
 | h | human_plays | Sets whether or not the human player will play the game. If false, the human player makes random decisions | 
 
