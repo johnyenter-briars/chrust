@@ -9,7 +9,7 @@ class ChrustAPI {
     send_fen() {
         var fen = this.chessBoard.fen();
         var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
-        return fetch(url,
+        fetch(url,
             {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
@@ -24,13 +24,7 @@ class ChrustAPI {
         ).then((response) => { return response.text() }
         ).then((fen) => {
             console.log(fen);
-            // return fen;
-            // var responseFen = JSON.parse(text);
-            try {
-                this.chessBoard.position(fen, true);
-            } catch (err) {
-                console.log(err);
-            }
+            this.chessBoard.position(fen, true);
         })
         .catch((err) => {
             console.log(err);
@@ -39,8 +33,33 @@ class ChrustAPI {
     }
 
     //location of form "h2"
-    validMoves(fen, location) {
+    validMoves(location) {
+        debugger;
+        var fen = this.chessBoard.fen();
+        var url = "http://localhost:8000/api/validate/" + encodeURIComponent(fen) + "/" + location;
+        return fetch(url,
+            {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }
 
+        ).then((response) => { return response.text() }
+        ).then((text) => {
+            debugger;
+            console.log(text);
+            var foo = JSON.parse(text);
+            return foo.options;
+        })
+        .catch((err) => {
+            console.log(err);
+            return false;
+        });
     }
 }
 
@@ -112,9 +131,10 @@ var onMouseoverSquare = (square, piece) => {
     // });
 
     //moves needs to be in format: ["h3", "h4"]
-    var moves = chrustAPI.validMoves();
+    return;
+    var moves = chrustAPI.validMoves(square);
 
-
+    debugger;
     if (moves.length === 0) return;
 
     greySquare(square);

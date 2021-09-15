@@ -127,7 +127,7 @@ impl ChessGame {
             board: self.board.clone(),
         };
 
-        let ai_move = max_decision(&board_state, self.ai_player.color, 2);
+        let ai_move = max_decision(&board_state, self.ai_player.color, 2)?;
 
         if ai_move.from.x == ai_move.to.x && ai_move.from.y == ai_move.to.y {
             let idk = "im sad";

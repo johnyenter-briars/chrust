@@ -47,6 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         name: "kasparov".to_string(),
         color: Color::White,
     };
+
     let ai_player = AIPlayer {
         name: "rusty".to_string(),
         color: Color::Black,
@@ -58,19 +59,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         board,
         program_state.human_plays,
         program_state.tick_speed,
-    ); //values are MOVED
+    ); 
 
     match program_state.viz_type {
         VizType::TERM => {
-            let winner = match game.start_game() {
-                Ok(wnnr) => wnnr,
-                Err(err) => {
-                    panic!("Error in game!: {:?}", err)
-                }
-            };
+            let winner = game.start_game()?;
             println!("Winner: {}", winner);
             Ok(())
-        }
+        },
         VizType::GUI => {
             let mut viz = Visualizer::new(game);
             viz.start_viz();
