@@ -53,8 +53,7 @@ class ChessSync {
     }
 }
 
-var board,
-    game = new Chess();
+var board;
 
 
 
