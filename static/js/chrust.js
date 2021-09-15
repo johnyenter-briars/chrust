@@ -63,8 +63,7 @@ class ChrustAPI {
     }
 }
 
-var board,
-    game = new Chess();
+var board;
 
 
 
