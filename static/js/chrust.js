@@ -34,7 +34,6 @@ class ChrustAPI {
 
     //location of form "h2"
     validMoves(location) {
-        debugger;
         var fen = this.chessBoard.fen();
         var url = "http://localhost:8000/api/validate/" + encodeURIComponent(fen) + "/" + location;
         return fetch(url,
@@ -64,6 +63,8 @@ class ChrustAPI {
 }
 
 var board;
+
+var squareCache = {};
 
 
 
@@ -120,26 +121,24 @@ var onSnapEnd = function () {
     // board.position(game.fen());
 };
 
-var onMouseoverSquare = (square, piece) => {
-    console.log("test");
+var onMouseoverSquare = async (square, piece) => {
     debugger;
-    // var game = Chess();
-    // var moves = game.moves({
-    //     square: square,
-    //     verbose: true
-    // });
-
     //moves needs to be in format: ["h3", "h4"]
-    return;
-    var moves = chrustAPI.validMoves(square);
+    var moves = squareCache[[square, chrustAPI.chessBoard.fen()]];
 
+    if(!moves) {
+        moves = await chrustAPI.validMoves(square);    
+    }
     debugger;
+
     if (moves.length === 0) return;
+
+    squareCache[[square, chrustAPI.chessBoard.fen()]] = moves;
 
     greySquare(square);
 
     for (var i = 0; i < moves.length; i++) {
-        greySquare(moves[i].to);
+        greySquare(moves[i].x + moves[i].y);
     }
 };
 
@@ -175,8 +174,9 @@ var config = {
     position: 'start',
     onDrop: onDrop,
     onMouseoverSquare: onMouseoverSquare,
+    onMouseoutSquare: onMouseoutSquare,
 }
-var board = Chessboard('board1', config)
+var board = Chessboard('board', config)
 
 var chrustAPI = new ChrustAPI(board);
 
