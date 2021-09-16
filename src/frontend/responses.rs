@@ -20,3 +20,17 @@ impl<'r> Responder<'r, 'static> for MoveOptionsResponse {
             .ok()
     }
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct ValidateResponse {
+    pub is_valid: bool
+}
+
+impl<'r> Responder<'r, 'static> for ValidateResponse {
+    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
+		let response_string = serde_json::to_string(&self).unwrap();
+        Response::build()
+            .sized_body(response_string.len(), Cursor::new(response_string))
+            .ok()
+    }
+}

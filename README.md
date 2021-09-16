@@ -113,7 +113,7 @@ To try your hand at beating rusty, follow the standard installation steps:
    ```
 3. Run the project
    ```sh
-   cargo run <args>
+   cargo run -- <args>
    ```
 
 ### Building For Release

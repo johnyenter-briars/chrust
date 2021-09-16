@@ -31,6 +31,8 @@ use state::viztype::VizType;
 mod frontend;
 use frontend::server;
 
+mod ext;
+
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;

@@ -16,7 +16,7 @@ use crate::{
     game::chessgame::ChessGame,
 };
 
-use super::responses::MoveOptionsResponse;
+use super::responses::{MoveOptionsResponse, ValidateResponse};
 pub struct SharedGame {
     chess_game: Mutex<ChessGame>,
 }
@@ -25,47 +25,20 @@ struct MyConfig {
     user_val: String,
 }
 
-// #[get("/")]
-// fn index(state: &State<MyConfig>) -> String {
-//     state.user_val = String::from("test");
-//     format!("The config value is: {}", state.user_val)
-// }
-
-// pub struct Person {
-//     name: String,
-//     age: u16
-// }
-
-// use std::io::Cursor;
-
-// use rocket::request::Request;
-// use rocket::response::{self, Response, Responder};
-// use rocket::http::ContentType;
-
-// impl<'r> Responder<'r, 'static> for Person {
-//     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
-//         let person_string = format!("{}:{}", self.name, self.age);
-//         Response::build()
-//             .sized_body(person_string.len(), Cursor::new(person_string))
-//             .raw_header("X-Person-Name", self.name)
-//             .raw_header("X-Person-Age", self.age.to_string())
-//             .header(ContentType::new("application", "x-person"))
-//             .ok()
-//     }
-// }
-
 #[post("/process/<fen>")]
 pub async fn process(fen: String, game: &State<SharedGame>) -> String {
+    // TODO - have error handeling in the case that we can't unwrap cause the lock is poisoned
     let returned_fen = game.chess_game.lock().unwrap().process_fen(fen);
     returned_fen
 }
 
-#[get("/validate/<fen>/<location>")]
-pub async fn validate(
+#[get("/possible/<fen>/<location>")]
+pub async fn possible(
     fen: String,
     location: String,
     game: &State<SharedGame>,
 ) -> MoveOptionsResponse {
+    // TODO - have error handeling in the case that we can't unwrap cause the lock is poisoned
     let game = game.chess_game.lock().unwrap();
 
     let move_options = game.valid_moves(fen, location).unwrap_or(vec![]);
@@ -75,15 +48,20 @@ pub async fn validate(
     }
 }
 
-// #[get("/person/<id>")]
-// fn person(id: usize) -> Option<Person> {
-//     Some(Person{name:"test".to_string(), age: 10})
-// }
+#[get("/validate/<current_fen>/<current_location>/<possible_location>")]
+pub async fn validate(
+    current_fen: String,
+    current_location: String,
+    possible_location: String,
+    game: &State<SharedGame>,
+) -> ValidateResponse {
+    // TODO - have error handeling in the case that we can't unwrap cause the lock is poisoned
+    let game = game.chess_game.lock().unwrap();
 
-// #[get("/personidk/<id>")]
-// fn personidk(id: usize) -> Person {
-//     Person{name:"test".to_string(), age: 10}
-// }
+    let is_valid = game.is_valid(current_fen, current_location, possible_location).unwrap_or(false);
+
+    ValidateResponse{is_valid}
+}
 
 pub async fn build_and_run_frontend(game: ChessGame) -> Result<(), rocket::Error> {
     rocket::build()
@@ -92,6 +70,7 @@ pub async fn build_and_run_frontend(game: ChessGame) -> Result<(), rocket::Error
         })
         .mount("/", FileServer::from(relative!("static")))
         .mount("/api", routes![process])
+        .mount("/api", routes![possible])
         .mount("/api", routes![validate])
         // .mount("/api", routes![validate])
         .launch()

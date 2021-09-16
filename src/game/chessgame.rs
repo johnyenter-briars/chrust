@@ -1,10 +1,10 @@
 use crate::ai::minimax::boardstate::BoardState;
 use crate::ai::minimax::funcs::max_decision;
 use crate::board;
-use crate::board::cell::Cell;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::cell::color::Color;
 use crate::board::cell::piecetype::PieceType;
+use crate::board::cell::Cell;
 use crate::board::chessboard::Board;
 use crate::board::coordinate::Coordinate;
 // use crate::chessmove::piecemove::Move;
@@ -28,6 +28,8 @@ use std::str::FromStr;
 use std::thread::current;
 use std::time::Duration;
 use std::{result, thread};
+
+use crate::ext::stringext::ToCoord;
 
 pub struct ChessGame {
     pub human_player: HumanPlayer,
@@ -237,7 +239,8 @@ impl ChessGame {
         let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
         //old board object is hopefully destructed from memory right?
-        self.board = Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+        self.board =
+            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
         self.ai_moves(self.fullmove_counter);
 
@@ -246,25 +249,56 @@ impl ChessGame {
         self.fen()
     }
 
-    pub fn valid_moves(&self, fen: String, location: String) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
+    pub fn is_valid(
+        &self,
+        current_fen: String,
+        current_location: String,
+        possible_location: String,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        let board_section = current_fen
+            .split(' ')
+            .next()
+            .expect("Fen is improperly formatted!");
+
+        let board =
+            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+
+        let current_position = current_location.to_coord();
+
+        let possible_moves = board.possible_moves(current_position, 1, Color::White)?;
+
+        let possible_position = possible_location.to_coord();
+
+        let valid_move = possible_moves
+            .iter()
+            .any(|coord| coord.x == possible_position.x && coord.y == possible_position.y);
+
+        Ok(valid_move)
+    }
+
+    pub fn valid_moves(
+        &self,
+        fen: String,
+        location: String,
+    ) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
         let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
-        //old board object is hopefully destructed from memory right?
-        let board = Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+        
+        let board =
+            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
         if location.as_str().len() != 2 {
             return Err(Box::from("Invalid format for location string"));
         }
 
-        let x: char = location.chars().nth(0).unwrap();
-        let y: u32 = location.chars().nth(1).unwrap().to_digit(10).unwrap();
-
-        let current_position = Coordinate{x, y: y as i32};
+        let current_position = location.to_coord();
 
         if board.piece(current_position.x, current_position.y)?.color == Color::Black {
-            return Ok(vec![])
+            return Ok(vec![]);
         }
 
-        let coords = board.possible_moves(current_position, 1, Color::White).expect("Unable to find the valid moves!");
+        let coords = board
+            .possible_moves(current_position, 1, Color::White)
+            .expect("Unable to find the valid moves!");
 
         Ok(coords)
     }
