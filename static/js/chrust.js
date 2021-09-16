@@ -1,16 +1,6 @@
-class ChessSync {
-    constructor(chessGame) {
+class ChrustAPI {
+    constructor(board) {
         this.chessBoard = board;
-    }
-
-    async test() {
-        var response = await fetch("http://localhost:8000/api/test");
-        console.log(response);
-        console.log(await response.text());
-    }
-
-    async print_fen() {
-        console.log(this.chessGame.fen());
     }
 
     // sends the fen of the current state to the API
@@ -19,53 +9,75 @@ class ChessSync {
     send_fen() {
         var fen = this.chessBoard.fen();
         var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
-        debugger;
-        // var betterNote = encodeURIComponent(url);
-        return fetch(url,
+        fetch(url,
             {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                mode: 'cors', // no-cors, *cors, same-origin
-                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: 'same-origin', // include, *same-origin, omit
+                method: 'POST', 
+                mode: 'cors',
+                cache: 'no-cache', 
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json'
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                 }
             }
 
         ).then((response) => { return response.text() }
         ).then((fen) => {
-            debugger;
             console.log(fen);
-            // return fen;
-            // var responseFen = JSON.parse(text);
-            try {
-                this.chessBoard.position(fen, true);
-            }catch(err) {
-                console.log(err);
-            }
+            this.chessBoard.position(fen, true);
         })
-        .catch((err) => {
-            debugger;
-            console.log(err);
-            return false;
-        });
+            .catch((err) => {
+                console.log(err);
+                return false;
+            });
+    }
+
+    //location of form "h2"
+    validMoves(location) {
+        var fen = this.chessBoard.fen();
+        var url = "http://localhost:8000/api/possible/" + encodeURIComponent(fen) + "/" + location;
+        return fetch(url,
+            {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+
+        ).then((response) => { return response.text() }
+        ).then((text) => {
+            console.log(text);
+            var foo = JSON.parse(text);
+            return foo.options;
+        })
+            .catch((err) => {
+                console.log(err);
+                return false;
+            });
+    }
+
+    isValid(currentLocation, possibleLocation, resolve) {
+        var fen = this.chessBoard.fen();
+        var url = `http://localhost:8000/api/validate/${encodeURIComponent(fen)}/${currentLocation}/${possibleLocation}`;
+        var request = new XMLHttpRequest();
+        request.open('GET', url, false);
+        request.send(null);
+
+        if (request.status === 200) {
+            console.log(request.responseText);
+            var foo = JSON.parse(request.responseText);
+            return foo.is_valid;
+        }
     }
 }
 
 var board;
 
+var squareCache = {};
 
 
-/*The "AI" part starts here */
-
-var calculateBestMove = function (game) {
-    var newGameMoves = game.ugly_moves();
-
-    return newGameMoves[Math.floor(Math.random() * newGameMoves.length)];
-};
-
-/* board visualization and games state handling starts here*/
 
 var onDragStart = function (source, piece, position, orientation) {
     if (game.in_checkmate() === true || game.in_draw() === true ||
@@ -74,23 +86,6 @@ var onDragStart = function (source, piece, position, orientation) {
     }
 };
 
-var makeBestMove = function () {
-    var bestMove = getBestMove(game);
-    game.ugly_move(bestMove);
-    board.position(game.fen());
-    renderMoveHistory(game.history());
-    if (game.game_over()) {
-        alert('Game over');
-    }
-};
-
-var getBestMove = function (game) {
-    if (game.game_over()) {
-        alert('Game over');
-    }
-    var bestMove = calculateBestMove(game);
-    return bestMove;
-};
 
 var renderMoveHistory = function (moves) {
     var historyElement = $('#move-history').empty();
@@ -103,25 +98,30 @@ var renderMoveHistory = function (moves) {
 };
 
 var getMoveAPI = () => {
-    chessSync.send_fen();
+    chrustAPI.send_fen();
 }
 
 var onSnapEnd = function () {
     // board.position(game.fen());
 };
 
-var onMouseoverSquare = function (square, piece) {
-    var moves = game.moves({
-        square: square,
-        verbose: true
-    });
+var onMouseoverSquare = async (square, piece) => {
+    if (!piece) return;
+    //moves needs to be in format: ["h3", "h4"]
+    var moves = squareCache[[square, chrustAPI.chessBoard.fen()]];
+
+    if (!moves) {
+        moves = await chrustAPI.validMoves(square);
+    }
 
     if (moves.length === 0) return;
+
+    squareCache[[square, chrustAPI.chessBoard.fen()]] = moves;
 
     greySquare(square);
 
     for (var i = 0; i < moves.length; i++) {
-        greySquare(moves[i].to);
+        greySquare(moves[i].x + moves[i].y);
     }
 };
 
@@ -144,28 +144,29 @@ var greySquare = function (square) {
     squareEl.css('background', background);
 };
 
-var cfg = {
-    draggable: true,
-    position: 'start',
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onMouseoutSquare: onMouseoutSquare,
-    onMouseoverSquare: onMouseoverSquare,
-    onSnapEnd: onSnapEnd
-};
+var onDrop = (source, target, piece, newPos, oldPos, orientation) => {
+    if (source === target) {
+        return "snapback";
+    }
 
-
-function onDrop (source, target, piece, newPos, oldPos, orientation) {
+    if (!chrustAPI.isValid(source, target)) {
+        return "snapback";
+    }
 
     window.setTimeout(getMoveAPI, 500);
 }
 
 var config = {
-  draggable: true,
-  position: 'start',
-  onDrop: onDrop,
-  sparePieces: true
+    draggable: true,
+    position: 'start',
+    onDrop: onDrop,
+    onMouseoverSquare: onMouseoverSquare,
+    onMouseoutSquare: onMouseoutSquare,
 }
-var board = Chessboard('board1', config)
+var board = Chessboard('board', config)
 
-var chessSync = new ChessSync(board);
+var chrustAPI = new ChrustAPI(board);
+
+function resetBoard() {
+    board.start(true);
+}

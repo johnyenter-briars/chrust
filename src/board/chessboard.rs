@@ -273,7 +273,7 @@ impl Board {
                 }
                 else {
                     let mut cell = cell_iter.next().expect("The iterator really shouldnt be empty :(");
-                    cell.space.get_or_insert(piece_from_fen_char(c));
+                    cell.space.get_or_insert(piece_from_fen_char(c)?);
                 }
             }
         }
@@ -312,20 +312,20 @@ impl Board {
     }
 }
 
-fn piece_from_fen_char(c: char) -> ChessPiece {
+fn piece_from_fen_char(c: char) -> Result<ChessPiece, Box<dyn std::error::Error>> {
     match c {
-        'p' => ChessPiece{piece_type: PieceType::Pawn, color: Color::Black},
-        'r' => ChessPiece{piece_type: PieceType::Rook, color: Color::Black},
-        'n' => ChessPiece{piece_type: PieceType::Knight, color: Color::Black},
-        'b' => ChessPiece{piece_type: PieceType::Bishop, color: Color::Black},
-        'k' => ChessPiece{piece_type: PieceType::King, color: Color::Black},
-        'q' => ChessPiece{piece_type: PieceType::Queen, color: Color::Black},
-        'P' => ChessPiece{piece_type: PieceType::Pawn, color: Color::White},
-        'R' => ChessPiece{piece_type: PieceType::Rook, color: Color::White},
-        'N' => ChessPiece{piece_type: PieceType::Knight, color: Color::White},
-        'B' => ChessPiece{piece_type: PieceType::Bishop, color: Color::White},
-        'K' => ChessPiece{piece_type: PieceType::King, color: Color::White},
-        'Q' => ChessPiece{piece_type: PieceType::Queen, color: Color::White},
-        wrong => panic!("the char {} is not valid", wrong),
+        'p' => Ok(ChessPiece{piece_type: PieceType::Pawn, color: Color::Black}),
+        'r' => Ok(ChessPiece{piece_type: PieceType::Rook, color: Color::Black}),
+        'n' => Ok(ChessPiece{piece_type: PieceType::Knight, color: Color::Black}),
+        'b' => Ok(ChessPiece{piece_type: PieceType::Bishop, color: Color::Black}),
+        'k' => Ok(ChessPiece{piece_type: PieceType::King, color: Color::Black}),
+        'q' => Ok(ChessPiece{piece_type: PieceType::Queen, color: Color::Black}),
+        'P' => Ok(ChessPiece{piece_type: PieceType::Pawn, color: Color::White}),
+        'R' => Ok(ChessPiece{piece_type: PieceType::Rook, color: Color::White}),
+        'N' => Ok(ChessPiece{piece_type: PieceType::Knight, color: Color::White}),
+        'B' => Ok(ChessPiece{piece_type: PieceType::Bishop, color: Color::White}),
+        'K' => Ok(ChessPiece{piece_type: PieceType::King, color: Color::White}),
+        'Q' => Ok(ChessPiece{piece_type: PieceType::Queen, color: Color::White}),
+        wrong => Err(Box::from("Invalid char: {}")),
     }
 }

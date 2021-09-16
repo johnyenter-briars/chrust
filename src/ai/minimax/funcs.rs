@@ -23,7 +23,7 @@ fn max_value(board_state: BoardState, depth: i32) -> i32 {
 
     let moves = match board_state.board.all_possible_moves(1, Color::Black) {
         Ok(mvs) => mvs,
-        Err(e) => panic!("idk: {:?}", e),
+        Err(e) => panic!("Unable to get the possible moves from current board state: {:?}", e),
     };
 
     for action in moves {
@@ -45,7 +45,7 @@ fn min_value(board_state: BoardState, depth: i32) -> i32 {
 
     let moves = match board_state.board.all_possible_moves(1, Color::White) {
         Ok(mvs) => mvs,
-        Err(e) => panic!("idk: {:?}", e),
+        Err(e) => panic!("Unable to get the possible moves from current board state: {:?}", e),
     };
 
     for action in moves {
@@ -112,12 +112,11 @@ pub fn max_decision<'a>(
     board_state: &'a BoardState,
     color: Color,
     max_depth: i32,
-) -> PieceMove<'a> {
-    match minimax_decision_max(&board_state, color, max_depth) {
-        Ok((max_decision, value)) => match max_decision {
-            Some(d) => d,
-            None => panic!("Minimax unable to find a valid move!"),
-        },
-        Err(err) => panic!("Something went wrong in minimax! : {:?}", err),
+) -> Result<PieceMove<'a>, Box<dyn std::error::Error>> {
+    let (max_decision, value) = minimax_decision_max(&board_state, color, max_depth)?;
+
+    match max_decision {
+        Some(piece_move) => Ok(piece_move),
+        None => Err(Box::from("tes"))
     }
 }

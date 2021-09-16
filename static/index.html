@@ -13,35 +13,11 @@
 
 <body>
   <h1>Hello Chrust!</h1>
-  <div id="board2" style="width: 400px"></div>
-  <button id="startBtn">Start Position</button>
-  <button id="clearBtn">Clear Board</button>
-  <h3 class="board">
-    Minimax
-  </h3>
-  <div id="board1" style="width: 400px"></div>
-  <br>
-  <div class="info">
-    Search depth:
-    <select id="search-depth">
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3" selected>3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-    </select>
-
-    <br>
-    <span>Positions evaluated: <span id="position-count"></span></span>
-    <br>
-    <span>Time: <span id="time"></span></span>
-    <br>
-    <span>Positions/s: <span id="positions-per-s"></span> </span>
-    <br>
-    <br>
-    <div id="move-history" class="move-history">
-    </div>
+  <div class="controls">
+    <h3>Controls</h3>
+    <button id="startBtn" onclick="resetBoard()">Reset Board</button>
   </div>
+  <div id="board" class="board"></div>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"
     integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
     crossorigin="anonymous"></script>

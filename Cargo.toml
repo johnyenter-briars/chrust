@@ -1,8 +1,10 @@
 [package]
 name = "chrust"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["John Yenter-Briars <jyenterbriars@gmail.com>"]
 edition = "2018"
+description = "Chess engine written in Rust"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

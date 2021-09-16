@@ -4,6 +4,7 @@ use crate::board;
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::cell::color::Color;
 use crate::board::cell::piecetype::PieceType;
+use crate::board::cell::Cell;
 use crate::board::chessboard::Board;
 use crate::board::coordinate::Coordinate;
 // use crate::chessmove::piecemove::Move;
@@ -27,6 +28,8 @@ use std::str::FromStr;
 use std::thread::current;
 use std::time::Duration;
 use std::{result, thread};
+
+use crate::ext::stringext::ToCoord;
 
 pub struct ChessGame {
     pub human_player: HumanPlayer,
@@ -126,7 +129,7 @@ impl ChessGame {
             board: self.board.clone(),
         };
 
-        let ai_move = max_decision(&board_state, self.ai_player.color, 2);
+        let ai_move = max_decision(&board_state, self.ai_player.color, 2)?;
 
         if ai_move.from.x == ai_move.to.x && ai_move.from.y == ai_move.to.y {
             let idk = "im sad";
@@ -234,16 +237,70 @@ impl ChessGame {
 
     pub fn process_fen(&mut self, fen: String) -> String {
         let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
-        let bd = Board::load_from_fen(board_section.to_string());
 
         //old board object is hopefully destructed from memory right?
-        self.board = bd.expect("idk");
+        self.board =
+            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
         self.ai_moves(self.fullmove_counter);
 
         self.board.print_to_screen("test".to_string());
 
         self.fen()
+    }
+
+    pub fn is_valid(
+        &self,
+        current_fen: String,
+        current_location: String,
+        possible_location: String,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        let board_section = current_fen
+            .split(' ')
+            .next()
+            .expect("Fen is improperly formatted!");
+
+        let board =
+            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+
+        let current_position = current_location.to_coord();
+
+        let possible_moves = board.possible_moves(current_position, 1, Color::White)?;
+
+        let possible_position = possible_location.to_coord();
+
+        let valid_move = possible_moves
+            .iter()
+            .any(|coord| coord.x == possible_position.x && coord.y == possible_position.y);
+
+        Ok(valid_move)
+    }
+
+    pub fn valid_moves(
+        &self,
+        fen: String,
+        location: String,
+    ) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
+        let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
+        
+        let board =
+            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+
+        if location.as_str().len() != 2 {
+            return Err(Box::from("Invalid format for location string"));
+        }
+
+        let current_position = location.to_coord();
+
+        if board.piece(current_position.x, current_position.y)?.color == Color::Black {
+            return Ok(vec![]);
+        }
+
+        let coords = board
+            .possible_moves(current_position, 1, Color::White)
+            .expect("Unable to find the valid moves!");
+
+        Ok(coords)
     }
 
     //for an explanation of this crazy algo check out: https://www.chessprogramming.org/Forsyth-Edwards_Notation

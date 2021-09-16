@@ -113,7 +113,7 @@ To try your hand at beating rusty, follow the standard installation steps:
    ```
 3. Run the project
    ```sh
-   cargo run <args>
+   cargo run -- <args>
    ```
 
 ### Building For Release
@@ -170,7 +170,9 @@ Currently, the list of features I would like to add are outlined below.
 - [ ] Quiescence search
 
 ### Visual Features
-- [X] Use localhost webserver as frontend
+- [X] Terminal UI
+- [ ] GUI
+- [X] Web
 
 ### 'Program Ease of Use' Features
 - [ ] Access to mutable AI difficulty settings

@@ -2,7 +2,7 @@ use core::panic;
 
 use super::chessboard::Board;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Coordinate {
     pub x: char, //a-h
     pub y: i32,  //1-8
