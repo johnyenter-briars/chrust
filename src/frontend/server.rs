@@ -66,12 +66,9 @@ pub async fn validate(
     location: String,
     game: &State<SharedGame>,
 ) -> MoveOptionsResponse {
-    let move_options = game
-        .chess_game
-        .lock()
-        .unwrap()
-        .valid_moves(fen, location)
-        .unwrap_or(vec![]);
+    let game = game.chess_game.lock().unwrap();
+
+    let move_options = game.valid_moves(fen, location).unwrap_or(vec![]);
 
     MoveOptionsResponse {
         options: move_options,

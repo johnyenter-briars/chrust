@@ -122,7 +122,7 @@ var onSnapEnd = function () {
 };
 
 var onMouseoverSquare = async (square, piece) => {
-    debugger;
+    if(!piece) return;
     //moves needs to be in format: ["h3", "h4"]
     var moves = squareCache[[square, chrustAPI.chessBoard.fen()]];
 

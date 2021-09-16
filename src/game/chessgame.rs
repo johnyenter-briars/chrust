@@ -246,10 +246,10 @@ impl ChessGame {
         self.fen()
     }
 
-    pub fn valid_moves(&mut self, fen: String, location: String) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
+    pub fn valid_moves(&self, fen: String, location: String) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
         let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
         //old board object is hopefully destructed from memory right?
-        self.board = Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+        let board = Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
         if location.as_str().len() != 2 {
             return Err(Box::from("Invalid format for location string"));
@@ -259,7 +259,12 @@ impl ChessGame {
         let y: u32 = location.chars().nth(1).unwrap().to_digit(10).unwrap();
 
         let current_position = Coordinate{x, y: y as i32};
-        let coords = self.board.possible_moves(current_position, 1, Color::White).expect("Unable to find the valid moves!");
+
+        if board.piece(current_position.x, current_position.y)?.color == Color::Black {
+            return Ok(vec![])
+        }
+
+        let coords = board.possible_moves(current_position, 1, Color::White).expect("Unable to find the valid moves!");
 
         Ok(coords)
     }
