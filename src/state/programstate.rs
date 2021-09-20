@@ -19,10 +19,10 @@ pub fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
             Arg::new("viz")
                 .short('z')
                 .long("visualization_mode")
-                .value_name("GUI|TERM")
+                .value_name("GUI|TERM|WEB")
                 .about("Sets the method of visualization for the app")
                 .takes_value(true)
-                .default_value("TERM")
+                .default_value("WEB")
         )
         .arg(
             Arg::new("hplay")
