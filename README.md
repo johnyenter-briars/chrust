@@ -69,6 +69,7 @@
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#prerelease">Prerelease</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -177,6 +178,15 @@ Currently, the list of features I would like to add are outlined below.
 ### 'Program Ease of Use' Features
 - [ ] Access to mutable AI difficulty settings
 - [ ] Game saves/loads/history
+
+## Prerelease
+
+The first Chrust prerelease is completed! Checkout the prerelase here: [0.1.0](https://github.com/johnyenter-briars/chrust/releases/tag/0.1.0)
+
+Any feedback on any part of the codebase would be greatly appreciated!
+
+To run the program, unzip the archive pertaining to your operating system, and run the appropriate binary.
+
 
 
 <!-- CONTRIBUTING -->
