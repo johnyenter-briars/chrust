@@ -68,7 +68,7 @@ pub async fn build_and_run_frontend(game: ChessGame) -> Result<(), rocket::Error
         .manage(SharedGame {
             chess_game: Mutex::from(game),
         })
-        .mount("/", FileServer::from(relative!("static")))
+        .mount("/", FileServer::from("static"))
         .mount("/api", routes![process])
         .mount("/api", routes![possible])
         .mount("/api", routes![validate])
