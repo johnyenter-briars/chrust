@@ -1,6 +1,8 @@
 class ChrustAPI {
     constructor(board) {
         this.chessBoard = board;
+        this.hostname = window.location.hostname;
+        this.apiUrl = `http://${this.hostname}:8000`;
     }
 
     // sends the fen of the current state to the API
@@ -8,7 +10,7 @@ class ChrustAPI {
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
     send_fen() {
         var fen = this.chessBoard.fen();
-        var url = "http://localhost:8000/api/process/" + encodeURIComponent(fen);
+        var url = `${this.apiUrl}/api/process/${encodeURIComponent(fen)}`;
         fetch(url,
             {
                 method: 'POST', 
@@ -22,7 +24,6 @@ class ChrustAPI {
 
         ).then((response) => { return response.text() }
         ).then((fen) => {
-            console.log(fen);
             this.chessBoard.position(fen, true);
         })
             .catch((err) => {
@@ -34,7 +35,7 @@ class ChrustAPI {
     //location of form "h2"
     validMoves(location) {
         var fen = this.chessBoard.fen();
-        var url = "http://localhost:8000/api/possible/" + encodeURIComponent(fen) + "/" + location;
+        var url = `${this.apiUrl}/api/possible/${encodeURIComponent(fen)}/${location}`;
         return fetch(url,
             {
                 method: 'GET',
@@ -60,7 +61,7 @@ class ChrustAPI {
 
     isValid(currentLocation, possibleLocation, resolve) {
         var fen = this.chessBoard.fen();
-        var url = `http://localhost:8000/api/validate/${encodeURIComponent(fen)}/${currentLocation}/${possibleLocation}`;
+        var url = `${this.apiUrl}/api/validate/${encodeURIComponent(fen)}/${currentLocation}/${possibleLocation}`;
         var request = new XMLHttpRequest();
         request.open('GET', url, false);
         request.send(null);
@@ -76,8 +77,6 @@ class ChrustAPI {
 var board;
 
 var squareCache = {};
-
-
 
 var onDragStart = function (source, piece, position, orientation) {
     if (game.in_checkmate() === true || game.in_draw() === true ||
