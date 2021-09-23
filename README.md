@@ -119,9 +119,13 @@ To try your hand at beating rusty, follow the standard installation steps:
 
 ### Building For Release
 
-The latest release builds are located in the 'release' folder, under subfolder `chrust-<latest_version>`. The executable must be run within the context of that subfolder, as Chrust requires the bundled resources.
+The newest release of Chrust can be found [here](https://github.com/johnyenter-briars/chrust/releases)
 
 If you wish to build in release mode yourself, build scripts are located in the repo root and titled `build_<platform>.<extension>`.
+
+The build script will place the built binary in the `release` folder, under the sub folder named after the platform (win|mac|linux).
+
+Note: the binary expects to be run in the same execution context as the `static` folder.
 
 #### Dependencies to Build on Windows
 
