@@ -1,5 +1,3 @@
-use core::panic;
-
 use super::chessboard::Board;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]

@@ -1,5 +1,5 @@
 use super::chessplayer::ChessPlayer;
-use crate::board::{chessboard::Board, cell::color::Color};
+use crate::board::cell::color::Color;
 
 #[derive(Debug)]
 pub struct HumanPlayer {
@@ -8,9 +8,6 @@ pub struct HumanPlayer {
 }
 
 impl ChessPlayer for HumanPlayer {
-    fn take_action(&self, board: Board) {
-        println!("hello there from human!");
-    }
     fn name(&self) -> &str{
         &self.name
     }

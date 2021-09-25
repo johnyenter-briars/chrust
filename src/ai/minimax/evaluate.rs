@@ -1,9 +1,8 @@
-use crate::board::cell::{color::Color, piecetype::PieceType};
+use crate::board::{cell::{color::Color, piecetype::PieceType}, chessboard::Board};
 
-use super::boardstate::BoardState;
 
-pub fn evaluate(board_state: &BoardState) -> i32 {
-    let pieces = board_state.board.all_pieces();
+pub fn evaluate(board: &Board) -> i32 {
+    let pieces = board.all_pieces();
     pieces
         .iter()
         .map(|p| piece_score(p.piece_type, p.color))
@@ -20,7 +19,7 @@ fn piece_score(piece_type: PieceType, color: Color) -> i32 {
 }
 
 fn piece_value(piece_type: PieceType) -> i32 {
-    match (piece_type) {
+    match piece_type {
         PieceType::Pawn => 10,
         PieceType::Rook => 50,
         PieceType::Knight => 30,

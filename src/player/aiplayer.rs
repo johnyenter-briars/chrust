@@ -1,5 +1,6 @@
+use crate::board::cell::color::Color;
+
 use super::chessplayer::ChessPlayer;
-use crate::board::{chessboard::Board, cell::color::Color};
 
 #[derive(Debug)]
 pub struct AIPlayer {
@@ -8,9 +9,6 @@ pub struct AIPlayer {
 }
 
 impl ChessPlayer for AIPlayer {
-    fn take_action(&self, board: Board) {
-        println!("hello there from AI!");
-    }
     fn name(&self) -> &str{
         &self.name
     }

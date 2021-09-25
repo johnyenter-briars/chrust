@@ -1,33 +1,24 @@
-use crate::ai::minimax::boardstate::BoardState;
+// use crate::ai::minimax::boardstate::BoardState;
 use crate::ai::minimax::funcs::max_decision;
-use crate::board;
-use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::cell::color::Color;
 use crate::board::cell::piecetype::PieceType;
-use crate::board::cell::Cell;
 use crate::board::chessboard::Board;
 use crate::board::coordinate::Coordinate;
 // use crate::chessmove::piecemove::Move;
-use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
 use crate::player::chessplayer::ChessPlayer;
-use crate::player::humanplayer::{self, *};
+use crate::player::humanplayer::*;
 
-use crate::chessmove::action::{self, Action, HumanAction};
 
 extern crate rand;
 
 // use rand::thread_rng;
-use rand::prelude::*;
 use rand::seq::SliceRandom;
-use rocket::request::FromRequest;
 
-use std::borrow::Borrow;
 use std::error::Error;
 use std::str::FromStr;
-use std::thread::current;
 use std::time::Duration;
-use std::{result, thread};
+use std::thread;
 
 use crate::ext::stringext::ToCoord;
 
@@ -89,7 +80,7 @@ impl ChessGame {
 
         loop {
             //Human moves
-            if !self.human_moves(turn_num)? {
+            if !self.human_moves()? {
                 continue;
             }
 
@@ -102,7 +93,7 @@ impl ChessGame {
             }
 
             //AI moves
-            if !self.ai_moves(turn_num)? {
+            if !self.ai_moves()? {
                 continue;
             }
 
@@ -122,18 +113,13 @@ impl ChessGame {
         Ok(self.check_for_winner().unwrap())
     }
 
-    pub fn ai_moves(&mut self, turn_num: u32) -> Result<bool, Box<dyn Error>> {
+    pub fn ai_moves(&mut self) -> Result<bool, Box<dyn Error>> {
         println!("ai moving");
 
-        let board_state = BoardState {
-            board: self.board.clone(),
-        };
+        let board = self.board.clone();
 
-        let ai_move = max_decision(&board_state, self.ai_player.color, 2)?;
+        let ai_move = max_decision(&board, self.ai_player.color, 2)?;
 
-        if ai_move.from.x == ai_move.to.x && ai_move.from.y == ai_move.to.y {
-            let idk = "im sad";
-        }
         self.board.move_piece(ai_move.from, ai_move.to);
 
         self.fullmove_counter += 1;
@@ -142,7 +128,7 @@ impl ChessGame {
         Ok(true)
     }
 
-    pub fn human_moves(&mut self, turn_num: u32) -> Result<bool, Box<dyn Error>> {
+    pub fn human_moves(&mut self) -> Result<bool, Box<dyn Error>> {
         println!("Human moving!");
 
         let (from, to) = if self.human_plays {
@@ -159,7 +145,6 @@ impl ChessGame {
             //this is syntax is really cool
             let coord_choices = match self.board.possible_moves_human(
                 current_position,
-                turn_num as i32,
                 &self.human_player,
             ) {
                 Ok(choices) => {
@@ -192,7 +177,7 @@ impl ChessGame {
                 .cells_with_pieces_with_color(self.human_player.color);
 
             let (from, to) = loop {
-                let mut random_white_square = cells.choose(&mut rand::thread_rng());
+                let random_white_square = cells.choose(&mut rand::thread_rng());
 
                 let cell = random_white_square
                     .ok_or("There was an error while trying to get the human's player's squares")?;
@@ -201,7 +186,7 @@ impl ChessGame {
 
                 let coord_choices =
                     self.board
-                        .possible_moves_human(from, turn_num as i32, &self.human_player)?;
+                        .possible_moves_human(from, &self.human_player)?;
 
                 if coord_choices.len() < 1 {
                     //that piece can't go anywhere - try to get another one
@@ -235,74 +220,6 @@ impl ChessGame {
         }
     }
 
-    pub fn process_fen(&mut self, fen: String) -> String {
-        let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
-
-        //old board object is hopefully destructed from memory right?
-        self.board =
-            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
-
-        self.ai_moves(self.fullmove_counter);
-
-        self.board.print_to_screen("test".to_string());
-
-        self.fen()
-    }
-
-    pub fn is_valid(
-        &self,
-        current_fen: String,
-        current_location: String,
-        possible_location: String,
-    ) -> Result<bool, Box<dyn std::error::Error>> {
-        let board_section = current_fen
-            .split(' ')
-            .next()
-            .expect("Fen is improperly formatted!");
-
-        let board =
-            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
-
-        let current_position = current_location.to_coord();
-
-        let possible_moves = board.possible_moves(current_position, 1, Color::White)?;
-
-        let possible_position = possible_location.to_coord();
-
-        let valid_move = possible_moves
-            .iter()
-            .any(|coord| coord.x == possible_position.x && coord.y == possible_position.y);
-
-        Ok(valid_move)
-    }
-
-    pub fn valid_moves(
-        &self,
-        fen: String,
-        location: String,
-    ) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
-        let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
-        
-        let board =
-            Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
-
-        if location.as_str().len() != 2 {
-            return Err(Box::from("Invalid format for location string"));
-        }
-
-        let current_position = location.to_coord();
-
-        if board.piece(current_position.x, current_position.y)?.color == Color::Black {
-            return Ok(vec![]);
-        }
-
-        let coords = board
-            .possible_moves(current_position, 1, Color::White)
-            .expect("Unable to find the valid moves!");
-
-        Ok(coords)
-    }
-
     //for an explanation of this crazy algo check out: https://www.chessprogramming.org/Forsyth-Edwards_Notation
     fn fen(&self) -> String {
         format!(
@@ -320,6 +237,81 @@ impl ChessGame {
         self.board.print_to_screen(configuration_name);
         println!("{}", self.fen());
     }
+}
+pub fn process_fen(fen: String) -> Result<String, Box<dyn Error>> {
+    let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
+
+    //old board object is hopefully destructed from memory right?
+    let board =
+        Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+
+    // let board_state = BoardState { board };
+
+    let ai_move = max_decision(&board, Color::Black, 2)?;
+
+    // let new_board = board.move_piece(ai_move.from, ai_move.to);
+
+    let new_board = board.apply_action(&ai_move);
+
+    new_board.print_to_screen("test".to_string());
+
+    // board.fen()
+    //todo - combine the *new* board section with the old data from the fen (like the fullmove counter and shitself)
+    // let foo = format!("{}{}", board.board_fen_section(), game_section);
+
+    Ok(new_board.board_fen_section())
+}
+
+pub fn is_valid(
+    current_fen: String,
+    current_location: String,
+    possible_location: String,
+) -> Result<bool, Box<dyn std::error::Error>> {
+    let board_section = current_fen
+        .split(' ')
+        .next()
+        .expect("Fen is improperly formatted!");
+
+    let board =
+        Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+
+    let current_position = current_location.to_coord();
+
+    let possible_moves = board.possible_moves(current_position, Color::White)?;
+
+    let possible_position = possible_location.to_coord();
+
+    let valid_move = possible_moves
+        .iter()
+        .any(|coord| coord.x == possible_position.x && coord.y == possible_position.y);
+
+    Ok(valid_move)
+}
+
+pub fn valid_moves(
+    fen: String,
+    location: String,
+) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
+    let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
+
+    let board =
+        Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+
+    if location.as_str().len() != 2 {
+        return Err(Box::from("Invalid format for location string"));
+    }
+
+    let current_position = location.to_coord();
+
+    if board.piece(current_position.x, current_position.y)?.color == Color::Black {
+        return Ok(vec![]);
+    }
+
+    let coords = board
+        .possible_moves(current_position, Color::White)
+        .expect("Unable to find the valid moves!");
+
+    Ok(coords)
 }
 
 //this is a mess and i dont fully understand it - i just did what the compiler told me to

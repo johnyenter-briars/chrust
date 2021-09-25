@@ -3,12 +3,13 @@ class ChrustAPI {
         this.chessBoard = board;
         this.hostname = window.location.hostname;
         this.apiUrl = `http://${this.hostname}:8000`;
+        this.currenlyInWebRequest = false;
     }
 
     // sends the fen of the current state to the API
     // API will return a fen with it's move in resposne
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
-    send_fen() {
+    sendFen() {
         var fen = this.chessBoard.fen();
         var url = `${this.apiUrl}/api/process/${encodeURIComponent(fen)}`;
         fetch(url,
@@ -27,13 +28,13 @@ class ChrustAPI {
             this.chessBoard.position(fen, true);
         })
             .catch((err) => {
-                console.log(err);
                 return false;
             });
     }
 
     //location of form "h2"
     validMoves(location) {
+        if(!isValidLocationString(location)) return;
         var fen = this.chessBoard.fen();
         var url = `${this.apiUrl}/api/possible/${encodeURIComponent(fen)}/${location}`;
         return fetch(url,
@@ -49,25 +50,25 @@ class ChrustAPI {
 
         ).then((response) => { return response.text() }
         ).then((text) => {
-            console.log(text);
             var foo = JSON.parse(text);
             return foo.options;
         })
             .catch((err) => {
-                console.log(err);
                 return false;
             });
     }
 
     isValid(currentLocation, possibleLocation, resolve) {
+        if(!isValidLocationString(currentLocation) || !isValidLocationString(possibleLocation)) return;
         var fen = this.chessBoard.fen();
         var url = `${this.apiUrl}/api/validate/${encodeURIComponent(fen)}/${currentLocation}/${possibleLocation}`;
         var request = new XMLHttpRequest();
         request.open('GET', url, false);
+        this.currenlyInWebRequest = true;
         request.send(null);
+        this.currenlyInWebRequest = false;
 
         if (request.status === 200) {
-            console.log(request.responseText);
             var foo = JSON.parse(request.responseText);
             return foo.is_valid;
         }
@@ -79,10 +80,13 @@ var board;
 var squareCache = {};
 
 var onDragStart = function (source, piece, position, orientation) {
-    if (game.in_checkmate() === true || game.in_draw() === true ||
-        piece.search(/^b/) !== -1) {
-        return false;
-    }
+    // if(chrustAPI.currenlyInWebRequest) {
+    //     console.log(chrustAPI.currenlyInWebRequest)
+    // };
+    // if (game.in_checkmate() === true || game.in_draw() === true ||
+    //     piece.search(/^b/) !== -1) {
+    //     return false;
+    // }
 };
 
 
@@ -97,7 +101,7 @@ var renderMoveHistory = function (moves) {
 };
 
 var getMoveAPI = () => {
-    chrustAPI.send_fen();
+    chrustAPI.sendFen();
 }
 
 var onSnapEnd = function () {
@@ -105,6 +109,7 @@ var onSnapEnd = function () {
 };
 
 var onMouseoverSquare = async (square, piece) => {
+    if(chrustAPI.currenlyInWebRequest) return;
     if (!piece) return;
     //moves needs to be in format: ["h3", "h4"]
     var moves = squareCache[[square, chrustAPI.chessBoard.fen()]];
@@ -144,6 +149,7 @@ var greySquare = function (square) {
 };
 
 var onDrop = (source, target, piece, newPos, oldPos, orientation) => {
+    if(chrustAPI.currenlyInWebRequest) return;
     if (source === target) {
         return "snapback";
     }
@@ -159,6 +165,7 @@ var config = {
     draggable: true,
     position: 'start',
     onDrop: onDrop,
+    onDragStart: onDragStart,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,
 }
@@ -166,6 +173,6 @@ var board = Chessboard('board', config)
 
 var chrustAPI = new ChrustAPI(board);
 
-function resetBoard() {
-    board.start(true);
+function isValidLocationString(location) {
+    return location.length === 2;
 }

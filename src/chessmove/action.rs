@@ -1,4 +1,4 @@
-use crate::{board::cell::chesspiece::ChessPiece, player::{aiplayer::AIPlayer, chessplayer::ChessPlayer, humanplayer::HumanPlayer}};
+use crate::{board::cell::chesspiece::ChessPiece, player::{aiplayer::AIPlayer, humanplayer::HumanPlayer}};
 use super::piecemove::*;
 
 
@@ -16,9 +16,9 @@ pub struct HumanAction<'a> {
 }
 
 impl<'a> HumanAction<'a> {
-    pub fn new(piece_move: PieceMove<'a>, player: &'a HumanPlayer) -> Self {
-        HumanAction{piece_move, player}
-    }
+    // pub fn new(piece_move: PieceMove<'a>, player: &'a HumanPlayer) -> Self {
+    //     HumanAction{piece_move, player}
+    // }
 }
 
 pub struct AIAction<'a> {

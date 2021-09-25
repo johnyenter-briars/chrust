@@ -1,6 +1,5 @@
 use std::io::Cursor;
 
-use rocket::http::ContentType;
 use rocket::response::Responder;
 use rocket::response;
 use rocket::response::Response;
