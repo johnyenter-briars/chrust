@@ -2,7 +2,7 @@ use core::fmt;
 
 #[derive(Debug, PartialEq)]
 pub enum VizType {
-    GUI, 
+    GUI,
     TERM,
     WEB,
 }

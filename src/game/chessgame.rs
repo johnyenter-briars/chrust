@@ -9,7 +9,6 @@ use crate::player::aiplayer::*;
 use crate::player::chessplayer::ChessPlayer;
 use crate::player::humanplayer::*;
 
-
 extern crate rand;
 
 // use rand::thread_rng;
@@ -17,8 +16,8 @@ use rand::seq::SliceRandom;
 
 use std::error::Error;
 use std::str::FromStr;
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 use crate::ext::stringext::ToCoord;
 
@@ -143,10 +142,10 @@ impl ChessGame {
             let current_position = Coordinate::new(x, y);
 
             //this is syntax is really cool
-            let coord_choices = match self.board.possible_moves_human(
-                current_position,
-                &self.human_player,
-            ) {
+            let coord_choices = match self
+                .board
+                .possible_moves_human(current_position, &self.human_player)
+            {
                 Ok(choices) => {
                     if choices.len() < 1 {
                         println!("That piece can't go anywhere!");
@@ -184,9 +183,7 @@ impl ChessGame {
 
                 let from = Coordinate::new(cell.x, cell.y);
 
-                let coord_choices =
-                    self.board
-                        .possible_moves_human(from, &self.human_player)?;
+                let coord_choices = self.board.possible_moves_human(from, &self.human_player)?;
 
                 if coord_choices.len() < 1 {
                     //that piece can't go anywhere - try to get another one

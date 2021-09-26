@@ -2,7 +2,6 @@
 
 mod board;
 
-
 use board::{cell::color::Color, chessboard::Board};
 
 mod player;
@@ -53,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         board,
         program_state.human_plays,
         program_state.tick_speed,
-    ); 
+    );
 
     println!("hellloogsgsldghsdg");
 
@@ -63,13 +62,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Winner: {}", winner);
             Ok(())
             // panic!("Terminal visulization is broken while chessgame.rs is being refactored")
-        },
+        }
         VizType::WEB => {
             if build_and_run_frontend().await.is_err() {
                 panic!("Error while trying to start frontend! s");
             }
             Ok(())
-        },
+        }
         VizType::GUI => todo!(),
     }
 }

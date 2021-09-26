@@ -8,10 +8,10 @@ pub struct HumanPlayer {
 }
 
 impl ChessPlayer for HumanPlayer {
-    fn name(&self) -> &str{
+    fn name(&self) -> &str {
         &self.name
     }
-    fn color_abbr(&self) -> char{
+    fn color_abbr(&self) -> char {
         self.color.color_abbr()
     }
 }

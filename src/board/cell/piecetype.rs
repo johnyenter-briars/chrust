@@ -25,7 +25,9 @@ impl PieceType {
                 //pawns can only move one or two spaces (depending on turn num)
                 let possible_coordinates = match (target_piece.color, current_position.y) {
                     (Color::White, 2) => vec![current_position.up_by(1), current_position.up_by(2)],
-                    (Color::Black, 2) => vec![current_position.down_by(1), current_position.down_by(2)],
+                    (Color::Black, 2) => {
+                        vec![current_position.down_by(1), current_position.down_by(2)]
+                    }
                     (Color::White, _) => vec![current_position.up_by(1)],
                     (Color::Black, _) => vec![current_position.down_by(1)],
                 };

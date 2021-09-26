@@ -1,4 +1,3 @@
-
 use rocket::routes;
 use rocket::{fs::FileServer, get, post};
 
@@ -23,10 +22,7 @@ pub async fn process(fen: String) -> String {
 }
 
 #[get("/possible/<fen>/<location>")]
-pub async fn possible(
-    fen: String,
-    location: String,
-) -> MoveOptionsResponse {
+pub async fn possible(fen: String, location: String) -> MoveOptionsResponse {
     // TODO - have error handeling in the case that we can't unwrap cause the lock is poisoned
     // let game = game.chess_game.lock().unwrap();
 

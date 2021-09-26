@@ -9,6 +9,10 @@ pub struct PieceMove<'a> {
 
 impl<'a> PieceMove<'a> {
     pub fn new(chess_piece: &'a ChessPiece, from: Coordinate, to: Coordinate) -> Self {
-        PieceMove{chess_piece, from, to}
+        PieceMove {
+            chess_piece,
+            from,
+            to,
+        }
     }
 }
