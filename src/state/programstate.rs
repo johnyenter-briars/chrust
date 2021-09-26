@@ -9,7 +9,6 @@ pub struct ProgramState {
     pub tick_speed: u64,
 }
 
-
 pub fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
     let matches = App::new("Chrust")
         .version("0.1")

@@ -1,6 +1,8 @@
-use crate::{board::cell::chesspiece::ChessPiece, player::{aiplayer::AIPlayer, chessplayer::ChessPlayer, humanplayer::HumanPlayer}};
 use super::piecemove::*;
-
+use crate::{
+    board::cell::chesspiece::ChessPiece,
+    player::{aiplayer::AIPlayer, humanplayer::HumanPlayer},
+};
 
 pub trait Action<'a> {
     fn get_piece_(&self) -> &ChessPiece;
@@ -9,16 +11,15 @@ pub trait Action<'a> {
     // fn get_player(&self) -> &'a dyn ChessPlayer;
 }
 
-
 pub struct HumanAction<'a> {
     pub piece_move: PieceMove<'a>,
     pub player: &'a HumanPlayer,
 }
 
 impl<'a> HumanAction<'a> {
-    pub fn new(piece_move: PieceMove<'a>, player: &'a HumanPlayer) -> Self {
-        HumanAction{piece_move, player}
-    }
+    // pub fn new(piece_move: PieceMove<'a>, player: &'a HumanPlayer) -> Self {
+    //     HumanAction{piece_move, player}
+    // }
 }
 
 pub struct AIAction<'a> {
@@ -27,7 +28,6 @@ pub struct AIAction<'a> {
 }
 
 impl<'a> Action<'a> for HumanAction<'a> {
-
     fn get_piece_(&self) -> &ChessPiece {
         &self.piece_move.chess_piece
     }
@@ -39,11 +39,9 @@ impl<'a> Action<'a> for HumanAction<'a> {
     fn get_y(&self) -> i32 {
         1
     }
-
 }
 
 impl<'a> Action<'a> for AIAction<'a> {
-
     fn get_piece_(&self) -> &ChessPiece {
         &self.piece_move.chess_piece
     }

@@ -1,6 +1,3 @@
-use core::panic;
-use std::{collections::HashSet, thread::current};
-
 use crate::board::{cell::color, chessboard::Board, coordinate::Coordinate};
 
 use super::{chesspiece::ChessPiece, color::Color};
@@ -22,14 +19,15 @@ impl PieceType {
         target_piece: &ChessPiece,
         current_position: Coordinate,
         board: &Board,
-        turn_num: i32,
     ) -> Vec<Coordinate> {
         let valid_moves: Vec<Coordinate> = match *self {
             PieceType::Pawn => {
                 //pawns can only move one or two spaces (depending on turn num)
                 let possible_coordinates = match (target_piece.color, current_position.y) {
                     (Color::White, 2) => vec![current_position.up_by(1), current_position.up_by(2)],
-                    (Color::Black, 2) => vec![current_position.down_by(1), current_position.down_by(2)],
+                    (Color::Black, 2) => {
+                        vec![current_position.down_by(1), current_position.down_by(2)]
+                    }
                     (Color::White, _) => vec![current_position.up_by(1)],
                     (Color::Black, _) => vec![current_position.down_by(1)],
                 };
@@ -246,22 +244,22 @@ impl PieceType {
     }
 }
 
-fn filter_out_occupired_spaces(
-    possible_coordinates: Vec<Coordinate>,
-    board: &Board,
-) -> Vec<Coordinate> {
-    let empty_spaces_on_board = board.empty_spaces();
+// fn filter_out_occupired_spaces(
+//     possible_coordinates: Vec<Coordinate>,
+//     board: &Board,
+// ) -> Vec<Coordinate> {
+//     let empty_spaces_on_board = board.empty_spaces();
 
-    //should do something cute with intersection here - but my first try was 'cant do intersection on non primitative types' so oh well
-    possible_coordinates
-        .into_iter() //need to into_iter in order to coerce rust to NOT iterate over references
-        .filter(|coord| {
-            empty_spaces_on_board
-                .iter()
-                .any(|board_coord| board_coord.x == coord.x && board_coord.y == coord.y)
-        })
-        .collect()
-}
+//     //should do something cute with intersection here - but my first try was 'cant do intersection on non primitative types' so oh well
+//     possible_coordinates
+//         .into_iter() //need to into_iter in order to coerce rust to NOT iterate over references
+//         .filter(|coord| {
+//             empty_spaces_on_board
+//                 .iter()
+//                 .any(|board_coord| board_coord.x == coord.x && board_coord.y == coord.y)
+//         })
+//         .collect()
+// }
 
 fn enemy_occupied(coordinate: Coordinate, current_piece_color: Color, board: &Board) -> bool {
     let cell = board.test_cell_at(coordinate);

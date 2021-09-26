@@ -1,35 +1,27 @@
-#![allow(unused)]
+// #![allow(unused)]
 
 mod board;
-use std::env;
 
-use board::*;
 use board::{cell::color::Color, chessboard::Board};
 
 mod player;
 use player::aiplayer::AIPlayer;
-use player::chessplayer::ChessPlayer;
 use player::humanplayer::HumanPlayer;
 
 mod game;
 use game::chessgame::ChessGame;
 
-use crate::board::cell::chesspiece::ChessPiece;
 use crate::frontend::server::build_and_run_frontend;
 
 mod chessmove;
 
 mod ai;
 
-mod visualize;
-use visualize::visualizer::Visualizer;
-
 mod state;
-use state::programstate::{ProgramState, get_args};
+use state::programstate::get_args;
 use state::viztype::VizType;
 
 mod frontend;
-use frontend::server;
 
 mod ext;
 
@@ -38,7 +30,6 @@ extern crate serde_derive;
 extern crate serde_json;
 
 extern crate clap;
-use clap::{App, Arg};
 
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -61,22 +52,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         board,
         program_state.human_plays,
         program_state.tick_speed,
-    ); 
+    );
+
+    println!("hellloogsgsldghsdg");
 
     match program_state.viz_type {
         VizType::TERM => {
             let winner = game.start_game()?;
             println!("Winner: {}", winner);
             Ok(())
-        },
-        VizType::GUI => {
-            let mut viz = Visualizer::new(game);
-            viz.start_viz();
-            Ok(())
-        },
+            // panic!("Terminal visulization is broken while chessgame.rs is being refactored")
+        }
         VizType::WEB => {
-            build_and_run_frontend(game).await;
+            if build_and_run_frontend().await.is_err() {
+                panic!("Error while trying to start frontend! s");
+            }
             Ok(())
-        },
+        }
+        VizType::GUI => todo!(),
     }
 }

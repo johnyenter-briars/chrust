@@ -2,8 +2,6 @@ pub mod chesspiece;
 pub mod color;
 pub mod piecetype;
 
-use std::cell::RefCell;
-
 use chesspiece::ChessPiece;
 use color::Color;
 
@@ -16,10 +14,10 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn is_empty(&self) -> bool{
-        match self.space {
-            Some(piece) => false,
-            None => true
-        }
-    }
+    // pub fn is_empty(&self) -> bool{
+    //     match self.space {
+    //         Some(_) => false,
+    //         None => true
+    //     }
+    // }
 }

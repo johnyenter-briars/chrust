@@ -4,17 +4,11 @@ extern crate serde_json;
 use crate::board::cell::Cell;
 use crate::board::cell::piecetype::PieceType;
 use crate::chessmove::piecemove::{PieceMove};
-use crate::player::aiplayer::AIPlayer;
 use crate::player::humanplayer::HumanPlayer;
-use core::panic;
-use std::borrow::Borrow;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader};
 use core::result::Result;
-use std::str::Chars;
-
-use crate::chessmove::action::{Action, HumanAction};
 
 use crate::board::cell::chesspiece::ChessPiece;
 use crate::board::cell::color::Color;
@@ -28,12 +22,12 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn cell_at(&self, coordinate: Coordinate) -> &Cell {
-        match self.all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).next() {
-            Some(cell) => cell,
-            None => panic!("No cell found at: {:?}", coordinate),
-        }
-    }
+    // pub fn cell_at(&self, coordinate: Coordinate) -> &Cell {
+    //     match self.all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).next() {
+    //         Some(cell) => cell,
+    //         None => panic!("No cell found at: {:?}", coordinate),
+    //     }
+    // }
 
     pub fn test_cell_at(&self, coordinate: Coordinate) -> Option<&Cell> {
         self.all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).map(|x| x.to_owned()).next()
@@ -53,9 +47,9 @@ impl Board {
         im_worried_this_will_move
     }
 
-    pub fn empty_spaces(&self) -> Vec<Coordinate>{
-        self.all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
-    }
+    // pub fn empty_spaces(&self) -> Vec<Coordinate>{
+    //     self.all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
+    // }
     
     pub fn print_to_screen(&self, configuration_name: String) {
         println!("-----------------------------{}", configuration_name);
@@ -92,27 +86,27 @@ impl Board {
         Err(Box::from(format!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x, y)))
     }
 
-    pub fn possible_moves_human(&self, current_position: Coordinate, turn_num: i32, human_player: &HumanPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+    pub fn possible_moves_human(&self, current_position: Coordinate, human_player: &HumanPlayer) -> Result<Vec<Coordinate>, Box<dyn Error>> {
         let target_piece = self.piece(current_position.x, current_position.y)?;
 
         if target_piece.color != human_player.color {
             return Err(Box::from("Thats not your piece!"));
         }
          
-        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
+        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self))
     }
 
-    pub fn possible_moves(&self, current_position: Coordinate, turn_num: i32, color: Color) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+    pub fn possible_moves(&self, current_position: Coordinate, color: Color) -> Result<Vec<Coordinate>, Box<dyn Error>> {
         let target_piece = self.piece(current_position.x, current_position.y)?;
 
         if target_piece.color != color {
             return Err(Box::from("Thats not your piece!"));
         }
          
-        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self, turn_num))
+        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self))
     }
 
-    pub fn all_possible_moves(&self, turn_num: i32, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
+    pub fn all_possible_moves(&self, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
         let cells = self.cells_with_pieces_with_color(color);
 
         let mut possible_moves: Vec<PieceMove> = Vec::new();
@@ -120,12 +114,8 @@ impl Board {
         for cell in cells{
             let current_position = Coordinate::new(cell.x, cell.y);
             let piece_at_position = self.piece(current_position.x, current_position.y)?;
-            let x = match piece_at_position.piece_type {
-                PieceType::Queen => 10,
-                _ => 5
-            };
 
-            let coord_choices = self.possible_moves(current_position, turn_num, color)?;
+            let coord_choices = self.possible_moves(current_position, color)?;
 
             let mut possible_moves_for_piece: Vec<PieceMove> = 
                 coord_choices.iter().map(|coord | PieceMove::new(&piece_at_position, current_position, coord.clone())).collect();
@@ -187,8 +177,8 @@ impl Board {
     }
 
 
-    pub fn move_piece(&mut self, from: Coordinate, to: Coordinate) {
-        //1: get the reference to the piece we're going to move
+    pub fn move_piece(&mut self, from: Coordinate, to: Coordinate){
+        //1: get the reference to the piece we're going to movmute
         let mut target_piece: ChessPiece = ChessPiece {
             color: Color::Black,
             piece_type: PieceType::Bishop
@@ -210,7 +200,7 @@ impl Board {
                     //calculated ahead of time
 
                     match cell.space {
-                        Some(captured_piece) => {
+                        Some(_) => {
                             //TODO - handle the piece being captured
                             cell.space = Option::from(target_piece);
                         }
@@ -257,7 +247,6 @@ impl Board {
     // assumes the game section of the fen has been taken out
     pub fn load_from_fen(fen: String) -> Result<Board, Box<dyn std::error::Error>> {
         let mut board = Board::load_from_file("empty_board")?;
-        let mut split= fen.split('/');
         let sections: Vec<Vec<char>> = fen.split('/').into_iter().map(|s| s.to_string().chars().collect()).collect();
 
         let mut cells = board.all_cells_mut();
@@ -267,12 +256,12 @@ impl Board {
             for c in c_vec {
                 if c.is_numeric() {
                     let num_to_skip = c.to_digit(10).expect("Unable to convert the num to skip to i32");
-                    for num in 0..num_to_skip {
+                    for _ in 0..num_to_skip {
                         cell_iter.next();
                     }
                 }
                 else {
-                    let mut cell = cell_iter.next().expect("The iterator really shouldnt be empty :(");
+                    let cell = cell_iter.next().expect("The iterator really shouldnt be empty :(");
                     cell.space.get_or_insert(piece_from_fen_char(c)?);
                 }
             }
@@ -326,6 +315,6 @@ fn piece_from_fen_char(c: char) -> Result<ChessPiece, Box<dyn std::error::Error>
         'B' => Ok(ChessPiece{piece_type: PieceType::Bishop, color: Color::White}),
         'K' => Ok(ChessPiece{piece_type: PieceType::King, color: Color::White}),
         'Q' => Ok(ChessPiece{piece_type: PieceType::Queen, color: Color::White}),
-        wrong => Err(Box::from("Invalid char: {}")),
+        _ => Err(Box::from("Invalid char: {}")),
     }
 }
