@@ -2,7 +2,11 @@ use core::panic;
 use std::cmp;
 use std::error::Error;
 
-use crate::{ai::minimax::evaluate::evaluate, board::{cell::color::Color, chessboard::Board}, chessmove::piecemove::PieceMove};
+use crate::{
+    ai::minimax::evaluate::evaluate,
+    board::{cell::color::Color, chessboard::Board},
+    chessmove::piecemove::PieceMove,
+};
 
 // use super::boardstate::BoardState;
 
@@ -15,7 +19,10 @@ fn max_value(board: &Board, depth: i32) -> i32 {
 
     let moves = match board.all_possible_moves(Color::Black) {
         Ok(mvs) => mvs,
-        Err(e) => panic!("Unable to get the possible moves from current board state: {:?}", e),
+        Err(e) => panic!(
+            "Unable to get the possible moves from current board state: {:?}",
+            e
+        ),
     };
 
     for action in moves {
@@ -35,7 +42,10 @@ fn min_value(board: &Board, depth: i32) -> i32 {
 
     let moves = match board.all_possible_moves(Color::White) {
         Ok(mvs) => mvs,
-        Err(e) => panic!("Unable to get the possible moves from current board state: {:?}", e),
+        Err(e) => panic!(
+            "Unable to get the possible moves from current board state: {:?}",
+            e
+        ),
     };
 
     for action in moves {
@@ -50,7 +60,7 @@ fn min_value(board: &Board, depth: i32) -> i32 {
 //     board: &'a Board,
 //     color: Color,
 //     max_depth: i32,
-// ) -> Result<(Option<PieceMove<'a>>, i32), Box<dyn Error>> {
+// ) -> Result<(PieceMove<'a>, i32), Box<dyn Error>> {
 //     let mut good_actions: Vec<_> = Vec::new();
 
 //     for action in board.all_possible_moves(color)? {
@@ -59,43 +69,32 @@ fn min_value(board: &Board, depth: i32) -> i32 {
 //             max_value(&board.apply_action(&action), max_depth),
 //         ));
 //     }
-
-//     let mut min_action = (Option::None, 1000000);
-
-//     for action in good_actions {
-//         if action.1 <= min_action.1 {
-//             min_action.0 = Option::Some(action.0);
-//             min_action.1 = action.1;
-//         }
+    
+//     let min_action = good_actions.into_iter().min_by(|x, y| x.1.cmp(&y.1));
+    
+//     match min_action     {
+//         Some(action) => Ok(action),
+//         None => Err(Box::from("Minimax was unable to find a min decision!")),
 //     }
-
-//     Ok(min_action)
 // }
 
 fn minimax_decision_max<'a>(
     board: &'a Board,
     color: Color,
     max_depth: i32,
-) -> Result<(Option<PieceMove<'a>>, i32), Box<dyn Error>> {
-    let mut good_actions: Vec<_> = Vec::new();
+) -> Result<(PieceMove<'a>, i32), Box<dyn Error>> {
+    let mut good_actions = Vec::new();
 
     for action in board.all_possible_moves(color)? {
-        good_actions.push((
-            action,
-            min_value(&board.apply_action(&action), max_depth),
-        ));
+        good_actions.push((action, min_value(&board.apply_action(&action), max_depth)));
     }
 
-    let mut max_action = (Option::None, -1000000);
-
-    for action in good_actions {
-        if action.1 > max_action.1 {
-            max_action.0 = Option::Some(action.0);
-            max_action.1 = action.1;
-        }
+    let max_action = good_actions.into_iter().max_by(|x, y| x.1.cmp(&y.1));
+    
+    match max_action {
+        Some(action) => Ok(action),
+        None => Err(Box::from("Minimax was unable to find a max decision!")),
     }
-
-    Ok(max_action)
 }
 
 pub fn max_decision<'a>(
@@ -104,9 +103,5 @@ pub fn max_decision<'a>(
     max_depth: i32,
 ) -> Result<PieceMove<'a>, Box<dyn std::error::Error>> {
     let (max_decision, _) = minimax_decision_max(board, color, max_depth)?;
-
-    match max_decision {
-        Some(piece_move) => Ok(piece_move),
-        None => Err(Box::from("tes"))
-    }
+    Ok(max_decision)
 }

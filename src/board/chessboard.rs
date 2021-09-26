@@ -42,7 +42,7 @@ impl Board {
     }
 
     //should really ONLY be used in an evaluation function
-    pub fn all_pieces<'a>(&self) -> Vec<ChessPiece>{
+    pub fn all_pieces(&self) -> Vec<ChessPiece>{
         let im_worried_this_will_move: Vec<ChessPiece> = self.all_cells().iter().map(|cell| cell.space).into_iter().flat_map(|e| e).collect();
         im_worried_this_will_move
     }
