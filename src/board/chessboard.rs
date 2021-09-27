@@ -267,8 +267,6 @@ impl Board {
             }
         }
 
-        board.print_to_screen("test".to_string());
-
         Ok(board)
     }
 

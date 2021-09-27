@@ -235,6 +235,7 @@ impl ChessGame {
         println!("{}", self.fen());
     }
 }
+
 pub fn process_fen(fen: String) -> Result<String, Box<dyn Error>> {
     let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
@@ -251,10 +252,6 @@ pub fn process_fen(fen: String) -> Result<String, Box<dyn Error>> {
     let new_board = board.apply_action(&ai_move);
 
     new_board.print_to_screen("test".to_string());
-
-    // board.fen()
-    //todo - combine the *new* board section with the old data from the fen (like the fullmove counter and shitself)
-    // let foo = format!("{}{}", board.board_fen_section(), game_section);
 
     Ok(new_board.board_fen_section())
 }
