@@ -1,6 +1,7 @@
 use std::io::Cursor;
 
 use crate::board::coordinate::Coordinate;
+use rocket::http::ContentType;
 use rocket::request::Request;
 use rocket::response;
 use rocket::response::Responder;
@@ -15,6 +16,7 @@ impl<'r> Responder<'r, 'static> for MoveOptionsResponse {
     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
         let response_string = serde_json::to_string(&self).unwrap();
         Response::build()
+            .header(ContentType::JSON)
             .sized_body(response_string.len(), Cursor::new(response_string))
             .ok()
     }
@@ -29,6 +31,7 @@ impl<'r> Responder<'r, 'static> for ValidateResponse {
     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
         let response_string = serde_json::to_string(&self).unwrap();
         Response::build()
+            .header(ContentType::JSON)
             .sized_body(response_string.len(), Cursor::new(response_string))
             .ok()
     }
