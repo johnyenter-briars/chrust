@@ -56,7 +56,6 @@ pub async fn build_and_run_frontend() -> Result<(), rocket::Error> {
         .mount("/api", routes![process])
         .mount("/api", routes![possible])
         .mount("/api", routes![validate])
-        // .mount("/api", routes![validate])
         .launch()
         .await
 }

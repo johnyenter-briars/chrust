@@ -239,19 +239,14 @@ impl ChessGame {
 pub fn process_fen(fen: String) -> Result<String, Box<dyn Error>> {
     let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
-    //old board object is hopefully destructed from memory right?
     let board =
         Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
-    // let board_state = BoardState { board };
-
-    let ai_move = max_decision(&board, Color::Black, 2)?;
-
-    // let new_board = board.move_piece(ai_move.from, ai_move.to);
+    let ai_move = max_decision(&board, Color::Black, 3)?;
 
     let new_board = board.apply_action(&ai_move);
 
-    new_board.print_to_screen("test".to_string());
+    new_board.print_to_screen("ai move".to_string());
 
     Ok(new_board.board_fen_section())
 }
