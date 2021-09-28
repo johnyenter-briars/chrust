@@ -9,7 +9,7 @@
 
 <!-- PROJECT LOGO -->
 <br />
-<div style="display: flex">
+<div style="display: flex; line-height: 60px;">
   <div>
     <h3 align="center">Chrust</h3>
     <p align="center">
