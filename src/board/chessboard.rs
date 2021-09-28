@@ -22,18 +22,12 @@ pub struct Board {
 }
 
 impl Board {
-    // pub fn cell_at(&self, coordinate: Coordinate) -> &Cell {
-    //     match self.all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).next() {
-    //         Some(cell) => cell,
-    //         None => panic!("No cell found at: {:?}", coordinate),
-    //     }
-    // }
-
     pub fn test_cell_at(&self, coordinate: Coordinate) -> Option<&Cell> {
         self.all_cells().iter().filter(|cell| cell.x == coordinate.x && cell.y == coordinate.y).map(|x| x.to_owned()).next()
     }
 
-    fn all_cells(&self) -> Vec<&Cell> {
+    //should really ONLY be used in an evaluation function
+    pub fn all_cells(&self) -> Vec<&Cell> {
         self.squares.iter().flatten().collect()
     }
 
@@ -41,16 +35,6 @@ impl Board {
         self.squares.iter_mut().flatten().collect()
     }
 
-    //should really ONLY be used in an evaluation function
-    pub fn all_pieces(&self) -> Vec<ChessPiece>{
-        let im_worried_this_will_move: Vec<ChessPiece> = self.all_cells().iter().map(|cell| cell.space).into_iter().flat_map(|e| e).collect();
-        im_worried_this_will_move
-    }
-
-    // pub fn empty_spaces(&self) -> Vec<Coordinate>{
-    //     self.all_cells().iter().filter(|cell| cell.is_empty()).map(|cell| Coordinate::new(cell.x, cell.y)).collect()
-    // }
-    
     pub fn print_to_screen(&self, configuration_name: String) {
         println!("-----------------------------{}", configuration_name);
         for row in  &self.squares {

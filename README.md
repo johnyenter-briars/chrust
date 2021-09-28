@@ -169,7 +169,7 @@ Currently, the list of features I would like to add are outlined below.
 ### AI Features
 - [X] MiniMax Implementation
 - [X] Alpha-Beta Pruning
-- [ ] Shannon Type B
+- [ ] Piece-Square Tables
 - [ ] Move Ordering
 - [ ] Transposition Tables
 - [ ] Quiescence search
