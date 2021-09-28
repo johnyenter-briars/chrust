@@ -9,58 +9,37 @@
 
 <!-- PROJECT LOGO -->
 <br />
-<p align="center">
-  <a href="https://github.com/johnyenter-briars/chrust">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
-
-  <h3 align="center">Chrust</h3>
-  <p align="center">
-    Chess + Rust <3. Chess engine written in Rust. 
-    <br />
-    <a href="https://github.com/johnyenter-briars/chrust">View Demo</a>
-    ·
-    <a href="https://github.com/johnyenter-briars/chrust/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/johnyenter-briars/chrust/issues">Request Feature</a>
+<div style="display: flex">
+  <div>
+    <a href="https://github.com/johnyenter-briars/chrust">
+      <img src="images/logo.png" alt="Logo" width="80" height="80">
+    </a>
+  
+  </div>
+  <div>
+    <h3 align="center">Chrust</h3>
+    <p align="center">
+      Chess + Rust <3. Chess engine written in Rust. 
+      <br />
+      <a href="https://github.com/johnyenter-briars/chrust">View Demo</a>
+      ·
+      <a href="https://github.com/johnyenter-briars/chrust/issues">Report Bug</a>
+      ·
+      <a href="https://github.com/johnyenter-briars/chrust/issues">Request Feature</a>
+    </p>
+  </div>
+  <p align="right">
+    <a href="https://github.com/johnyenter-briars/chrust">
+      <img src="images/screenshot.png" alt="Logo" width="150" height="150">
+    </a>
   </p>
-</p>
-
-
-
-<!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#prerelease">Prerelease</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
-  </ol>
-</details>
-
+</div>
 
 
 <!-- ABOUT THE PROJECT -->
 ## About Chrust
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
 Chrust is a chess engine written in Rust. (Very original I know). This is also an opportunity for me to learn rust above a beginner level.
 
