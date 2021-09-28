@@ -1,8 +1,7 @@
 use core::fmt;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
 pub enum VizType {
-    GUI,
     TERM,
     WEB,
 }

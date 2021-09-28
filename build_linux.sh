@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.1.0
+VERSION=0.2.0
 TARGET_DIR=./release/linux/chrust-$VERSION/
 BUILD_TARGET=x86_64-unknown-linux-gnu
 

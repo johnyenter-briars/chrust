@@ -1,25 +1,3 @@
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Thanks again! Now go create something AMAZING! :D
-***
-***
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** johnyenter-briars, chrust, twitter_handle, email, Chrust, Chess + Rust <3. Chess engine written in Rust. 
--->
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -102,6 +80,10 @@ I'm by no means a Rust expert, so if you see any issues in the source code pleas
 
 To try your hand at beating rusty, follow the standard installation steps:
 
+### Prerequisits
+
+[Rust](https://www.rust-lang.org/) tooling installed.
+
 ### Installation
 
 1. Clone the repo
@@ -143,7 +125,7 @@ Note: the binary expects to be run in the same execution context as the `static`
 The binary currently supports several command line arguments.
 
 ```
-./chrust [-z TERM|GUI|WEB] [-t TICK_SPEED] [-h HUMAN_PLAYS]
+./chrust [-z TERM|WEB] [-t TICK_SPEED] [-h HUMAN_PLAYS] [-p NUM_PLIES]
 ```
 
 | Flag | Name | Description |
@@ -151,6 +133,7 @@ The binary currently supports several command line arguments.
 | z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical in the browser over localhost |
 | t | tick_speed | Sets the interval between moves in milliseconds | 
 | h | human_plays | Sets whether or not the human player will play the game. If false, the human player makes random decisions | 
+| p | num_plies | Sets the number of turns (plies) the AI will look ahead. Becareful on numbers > 4, as the program will become ungodly slow | 
 
 For a complete description on the arguments, run:
 
@@ -169,7 +152,7 @@ Currently, the list of features I would like to add are outlined below.
 ### AI Features
 - [X] MiniMax Implementation
 - [X] Alpha-Beta Pruning
-- [ ] Piece-Square Tables
+- [X] Piece-Square Tables
 - [ ] Move Ordering
 - [ ] Transposition Tables
 - [ ] Quiescence search
@@ -228,11 +211,6 @@ Project Link: [https://github.com/johnyenter-briars/chrust](https://github.com/j
 * [The Good People of the Rust Discord](https://discord.com/invite/rust)
 
 
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/johnyenter-briars/chrust.svg?style=plastic
 [contributors-url]: https://github.com/johnyenter-briars/chrust/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/johnyenter-briars/chrust.svg?style=plastic

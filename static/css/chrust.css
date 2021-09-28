@@ -1,5 +1,5 @@
 .board {
-  width: 400px;
+  width: 500px;
   margin: auto
 }
 
@@ -11,6 +11,17 @@ h1 {
 .controls {
   margin: auto;
   width: 400px;
+}
+
+.settings .setting {
+  margin-left: 10px;
+  float: left;
+  
+}
+
+.settings {
+  margin: auto;
+  width: 500px;
 }
 
 /* .info {
