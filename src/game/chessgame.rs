@@ -236,13 +236,13 @@ impl ChessGame {
     }
 }
 
-pub fn process_fen(fen: String) -> Result<String, Box<dyn Error>> {
+pub fn process_fen(fen: String, num_plies: u32) -> Result<String, Box<dyn Error>> {
     let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
     let board =
         Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
-    let ai_move = max_decision(&board, Color::Black, 3)?;
+    let ai_move = max_decision(&board, Color::Black, num_plies)?;
 
     let new_board = board.apply_action(&ai_move);
 

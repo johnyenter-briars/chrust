@@ -62,11 +62,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // panic!("Terminal visulization is broken while chessgame.rs is being refactored")
         }
         VizType::WEB => {
-            if build_and_run_frontend().await.is_err() {
+            if build_and_run_frontend(program_state).await.is_err() {
                 panic!("Error while trying to start frontend! s");
             }
             Ok(())
         }
-        VizType::GUI => todo!(),
     }
 }
