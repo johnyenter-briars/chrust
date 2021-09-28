@@ -11,12 +11,6 @@
 <br />
 <div style="display: flex">
   <div>
-    <a href="https://github.com/johnyenter-briars/chrust">
-      <img src="images/logo.png" alt="Logo" width="80" height="80">
-    </a>
-  
-  </div>
-  <div>
     <h3 align="center">Chrust</h3>
     <p align="center">
       Chess + Rust <3. Chess engine written in Rust. 
@@ -30,7 +24,7 @@
   </div>
   <p align="right">
     <a href="https://github.com/johnyenter-briars/chrust">
-      <img src="images/screenshot.png" alt="Logo" width="150" height="150">
+      <img src="images/screenshot.png" alt="Logo" width="250" height="350">
     </a>
   </p>
 </div>
