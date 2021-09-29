@@ -5,62 +5,21 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
+# Chrust: Chess + Rust <3
 
-
-<!-- PROJECT LOGO -->
-<br />
-<p align="center">
+<p float="left">
   <a href="https://github.com/johnyenter-briars/chrust">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/screenshot.png" alt="Logo" width="48%">
   </a>
-
-  <h3 align="center">Chrust</h3>
-  <p align="center">
-    Chess + Rust <3. Chess engine written in Rust. 
-    <br />
-    <a href="https://github.com/johnyenter-briars/chrust">View Demo</a>
-    ·
-    <a href="https://github.com/johnyenter-briars/chrust/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/johnyenter-briars/chrust/issues">Request Feature</a>
-  </p>
+  <a href="https://github.com/johnyenter-briars/chrust">
+    <img src="images/screenshot.png" alt="Logo" width="48%">
+  </a>
 </p>
-
-
-
-<!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#prerelease">Prerelease</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
-  </ol>
-</details>
-
-
 
 <!-- ABOUT THE PROJECT -->
 ## About Chrust
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
 Chrust is a chess engine written in Rust. (Very original I know). This is also an opportunity for me to learn rust above a beginner level.
 
@@ -141,7 +100,6 @@ For a complete description on the arguments, run:
 ./chrust --help
 ```
 
-
 <!-- ROADMAP -->
 ## Roadmap
 
@@ -159,16 +117,12 @@ Currently, the list of features I would like to add are outlined below.
 
 ### Visual Features
 - [X] Terminal UI
-- [ ] GUI
 - [X] Web
 
-### 'Program Ease of Use' Features
-- [ ] Access to mutable AI difficulty settings
-- [ ] Game saves/loads/history
 
 ## Prerelease
 
-The first Chrust prerelease is completed! Checkout the prerelase here: [0.1.0](https://github.com/johnyenter-briars/chrust/releases/tag/0.1.0)
+The second Chrust prerelease is completed! Checkout the prerelase here: [0.2.0](https://github.com/johnyenter-briars/chrust/releases/tag/0.2.0)
 
 Any feedback on any part of the codebase would be greatly appreciated!
 
@@ -179,14 +133,7 @@ To run the program, unzip the archive pertaining to your operating system, and r
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Feel free to fork, update, change, modify as you see fit. If you would like to explicitly contribute to this project, I would love it if you:
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/FeatureToChrust`)
-3. Commit your Changes (`git commit -m 'Add some cool stuff'`)
-4. Push to the Branch (`git push origin feature/FeatureToChrust`)
-5. Open a Pull Request
-
+Contribute if you want :)
 
 
 <!-- LICENSE -->
