@@ -52,8 +52,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         program_state.tick_speed,
     );
 
-    println!("hellloogsgsldghsdg");
-
     match program_state.viz_type {
         VizType::TERM => {
             let winner = game.start_game()?;

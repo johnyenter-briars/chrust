@@ -4,15 +4,16 @@ use crate::{
     game::chessgame::{is_valid, process_fen, valid_moves},
     state::programstate::ProgramState,
 };
-use rocket::{
-    fs::{relative, FileServer},
-    get, post, routes, State,
-};
-use std::sync::Mutex;
+use rocket::{State, get, http::ContentType, post, response::content::{Css, Custom, Html, JavaScript}, routes};
+use std::{collections::HashMap, sync::Mutex};
 
 pub struct Settings {
     program_state: Mutex<ProgramState>,
 }
+
+pub struct ImageMap {
+    map: HashMap<String, Vec<u8>>
+}   
 
 #[post("/process/<fen>")]
 pub async fn process(fen: String, settings: &State<Settings>) -> String {
@@ -46,12 +47,62 @@ pub async fn settings(settings: &State<Settings>) -> SettingsResponse {
     SettingsResponse { program_state }
 }
 
+#[get("/")]
+fn index() -> Html<&'static str> {
+    Html(include_str!("../../static/index.html"))
+}
+
+#[get("/chrust.js")]
+fn javascript() -> JavaScript<&'static str> {
+    JavaScript(include_str!("../../static/js/chrust.js"))
+}
+
+#[get("/chrust.css")]
+fn css() -> Css<&'static str> {
+    Css(include_str!("../../static/css/chrust.css"))
+}
+
+// /img/chesspieces/wikipedia/wB.png
+#[get("/chesspieces/wikipedia/<piece>")]
+fn chesspiece(piece: String, image_map: &State<ImageMap>) -> Custom<Vec<u8>> {
+    let byte_vec = match image_map.map.get(&piece.replace(".png", "")) {
+        Some(byte_vec) => byte_vec,
+        None => panic!("Unable to find the piece image in the image_map!")
+    };
+
+    Custom(ContentType::PNG, byte_vec.clone())
+}
+
+fn init_image_map() -> HashMap<String, Vec<u8>> {
+    [
+        ("bB".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bB.png").to_vec()),
+        ("bK".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bK.png").to_vec()),
+        ("bN".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bN.png").to_vec()),
+        ("bP".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bP.png").to_vec()),
+        ("bQ".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bQ.png").to_vec()),
+        ("bR".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bR.png").to_vec()),
+
+        ("wB".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wB.png").to_vec()),
+        ("wK".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wK.png").to_vec()),
+        ("wN".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wN.png").to_vec()),
+        ("wP".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wP.png").to_vec()),
+        ("wQ".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wQ.png").to_vec()),
+        ("wR".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wR.png").to_vec()),
+    ].iter().cloned().collect()
+}
+
 pub async fn build_and_run_frontend(ps: ProgramState) -> Result<(), rocket::Error> {
     rocket::build()
         .manage(Settings {
             program_state: Mutex::from(ps),
         })
-        .mount("/", FileServer::from(relative!("static")))
+        .manage(ImageMap{
+            map: init_image_map()
+        })
+        .mount("/", routes![index])
+        .mount("/js", routes![javascript])
+        .mount("/css", routes![css])
+        .mount("/img", routes![chesspiece])
         .mount("/api", routes![process])
         .mount("/api", routes![possible])
         .mount("/api", routes![validate])
