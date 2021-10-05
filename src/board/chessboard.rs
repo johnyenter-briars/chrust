@@ -34,7 +34,7 @@ impl Board {
     }
 
     pub fn print_to_screen(&self, configuration_name: String) {
-        println!("-----------------------------{}", configuration_name);
+        println!("---------------------------{}", configuration_name);
         for row in  &self.squares {
             if let Some(first_cell) = row.into_iter().next() {
                 print!("{}|", first_cell.y);
