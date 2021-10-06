@@ -35,9 +35,13 @@ I'm by no means a Rust expert, so if you see any issues in the source code pleas
 
 ## Getting Started
 
-To try your hand at beating rusty, follow the standard installation steps:
+To try your hand at beating rusty, either: 
 
-### Prerequisites
+1: go to the [releases](https://github.com/johnyenter-briars/chrust/releases) tab and download the latest binary
+
+2: Build and run from source
+
+### Prerequisites for Running From Source
 
 [Rust](https://www.rust-lang.org/) tooling installed.
 
@@ -46,7 +50,7 @@ Clone the source code and navigate to the root directory, and run:
 ```sh
 cargo run -- <args>
 ```
-Then navigate to a browser and then go to either [localhost:8000](http://localhost:8000) or [127.0.0.1:8000](http://127.0.0.1:8000)
+If running over the Web (default), navigate to a browser and then go to either [localhost:8000](http://localhost:8000) or [127.0.0.1:8000](http://127.0.0.1:8000)
 
 ## Usage
 
