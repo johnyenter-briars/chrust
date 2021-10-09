@@ -52,14 +52,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         program_state.tick_speed,
     );
 
-    println!("hellloogsgsldghsdg");
-
     match program_state.viz_type {
         VizType::TERM => {
             let winner = game.start_game()?;
-            println!("Winner: {}", winner);
+            println!("Winner: {}", &winner);
             Ok(())
-            // panic!("Terminal visulization is broken while chessgame.rs is being refactored")
         }
         VizType::WEB => {
             if build_and_run_frontend(program_state).await.is_err() {

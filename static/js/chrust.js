@@ -12,6 +12,8 @@ class ChrustAPI {
     sendFen() {
         var fen = this.chessBoard.fen();
         var url = `${this.apiUrl}/api/process/${encodeURIComponent(fen)}`;
+        notifyMove(true);
+        this.currenlyInWebRequest = true;
         fetch(url,
             {
                 method: 'POST',
@@ -26,6 +28,8 @@ class ChrustAPI {
         ).then((response) => { return response.text() }
         ).then((fen) => {
             this.chessBoard.position(fen, true);
+            notifyMove(false);
+            this.currenlyInWebRequest = false;
         })
             .catch((err) => {
                 return false;
@@ -85,9 +89,9 @@ class ChrustAPI {
         if (!isValidLocationString(currentLocation) || !isValidLocationString(possibleLocation)) return;
         var fen = this.chessBoard.fen();
         var url = `${this.apiUrl}/api/validate/${encodeURIComponent(fen)}/${currentLocation}/${possibleLocation}`;
+        this.currenlyInWebRequest = true;
         var request = new XMLHttpRequest();
         request.open('GET', url, false);
-        this.currenlyInWebRequest = true;
         request.send(null);
         this.currenlyInWebRequest = false;
 
@@ -102,27 +106,6 @@ var board;
 
 var squareCache = {};
 
-var onDragStart = function (source, piece, position, orientation) {
-    // if(chrustAPI.currenlyInWebRequest) {
-    //     console.log(chrustAPI.currenlyInWebRequest)
-    // };
-    // if (game.in_checkmate() === true || game.in_draw() === true ||
-    //     piece.search(/^b/) !== -1) {
-    //     return false;
-    // }
-};
-
-
-var renderMoveHistory = function (moves) {
-    var historyElement = $('#move-history').empty();
-    historyElement.empty();
-    for (var i = 0; i < moves.length; i = i + 2) {
-        historyElement.append('<span>' + moves[i] + ' ' + (moves[i + 1] ? moves[i + 1] : ' ') + '</span><br>')
-    }
-    historyElement.scrollTop(historyElement[0].scrollHeight);
-
-};
-
 var getMoveAPI = () => {
     chrustAPI.sendFen();
 }
@@ -130,6 +113,10 @@ var getMoveAPI = () => {
 var onSnapEnd = function () {
     // board.position(game.fen());
 };
+
+function notifyMove(aiMove) {
+    document.getElementById("current-mover").textContent = aiMove ? "rusty" : "you";
+}
 
 var onMouseoverSquare = async (square, piece) => {
     if (chrustAPI.currenlyInWebRequest) return;
@@ -188,7 +175,6 @@ var config = {
     draggable: true,
     position: 'start',
     onDrop: onDrop,
-    onDragStart: onDragStart,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,
 }
@@ -198,6 +184,10 @@ var chrustAPI = new ChrustAPI(board);
 
 function isValidLocationString(location) {
     return location.length === 2;
+}
+
+function resetBoard() {
+    chrustAPI.chessBoard.start(true);
 }
 
 const refreshSettings = async () => {

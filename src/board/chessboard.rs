@@ -6,8 +6,6 @@ use crate::board::cell::piecetype::PieceType;
 use crate::chessmove::piecemove::{PieceMove};
 use crate::player::humanplayer::HumanPlayer;
 use std::error::Error;
-use std::fs::File;
-use std::io::{BufReader};
 use core::result::Result;
 
 use crate::board::cell::chesspiece::ChessPiece;
@@ -36,7 +34,7 @@ impl Board {
     }
 
     pub fn print_to_screen(&self, configuration_name: String) {
-        println!("-----------------------------{}", configuration_name);
+        println!("---------------------------{}", configuration_name);
         for row in  &self.squares {
             if let Some(first_cell) = row.into_iter().next() {
                 print!("{}|", first_cell.y);
@@ -196,26 +194,18 @@ impl Board {
             }
         }
 
-        // //3: set the current cell to nothing
+        //3: set the current cell to nothing
         self.space_to_empty(from.x, from.y);
     }
 
     pub fn load_from_file(board_name: &str) -> Result<Board, Box<dyn std::error::Error>> {
-        let mut current_dir =
-            std::env::current_dir().expect("Cant find the path to the current directory!");
-
-        current_dir.push("boards");
-        current_dir.push(format!("{}.json", board_name));
-
-        if ! current_dir.is_file() {
-            return Err(Box::from("Not a valid file path to board!"));
-        }
-
-        let file = File::open(current_dir)?;
-
-        let reader = BufReader::new(file);
-
-        let board: Board = serde_json::from_reader(reader)?;
+        let board_string = match board_name {
+            "game_start" => include_str!("../../boards/game_start.json"),
+            "empty_board" => include_str!("../../boards/empty_board.json"),
+            _ => {return Err(Box::from("Invalid option for board_name"))}
+        };
+        
+        let board: Board = serde_json::from_str(board_string)?;
 
         if board.squares.len() as i32 != board.board_size {
             return Err(Box::from(format!(

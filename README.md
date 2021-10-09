@@ -5,66 +5,24 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
+# Chrust: Chess + Rust <3
 
-
-<!-- PROJECT LOGO -->
-<br />
-<p align="center">
+<p float="left">
   <a href="https://github.com/johnyenter-briars/chrust">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/chrust4.png" alt="Logo" width="48%">
   </a>
-
-  <h3 align="center">Chrust</h3>
-  <p align="center">
-    Chess + Rust <3. Chess engine written in Rust. 
-    <br />
-    <a href="https://github.com/johnyenter-briars/chrust">View Demo</a>
-    ·
-    <a href="https://github.com/johnyenter-briars/chrust/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/johnyenter-briars/chrust/issues">Request Feature</a>
-  </p>
+  <a href="https://github.com/johnyenter-briars/chrust">
+    <img src="images/screenshot_old.png" alt="Logo" width="48%">
+  </a>
 </p>
 
-
-
-<!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#prerelease">Prerelease</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
-  </ol>
-</details>
-
-
-
-<!-- ABOUT THE PROJECT -->
 ## About Chrust
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-Chrust is a chess engine written in Rust. (Very original I know). This is also an opportunity for me to learn rust above a beginner level.
+Chrust is a chess engine written in Rust. (Very original I know). This is also an opportunity for me to learn rust above a beginner level and maybe build something kinda cool
 
-Chrust supports the standard Minimax algorighm for its decision making, and will expand to include other heuristics and optimizations. 
+Chrust supports the standard Minimax algorighm, A+B pruning, and Piece-Square tables for its decision making.
 
 I'm by no means a Rust expert, so if you see any issues in the source code please don't hesitate to show me where I'm stupid.
 
@@ -75,39 +33,57 @@ I'm by no means a Rust expert, so if you see any issues in the source code pleas
 * [Rocket](https://rocket.rs/)
 * [ChessBoard.js](https://chessboardjs.com/)
 
-<!-- GETTING STARTED -->
 ## Getting Started
 
-To try your hand at beating rusty, follow the standard installation steps:
+To try your hand at beating rusty, either: 
 
-### Prerequisits
+1: go to the [releases](https://github.com/johnyenter-briars/chrust/releases) tab and download the latest binary
+
+2: Build and run from source
+
+### Prerequisites for Running From Source
 
 [Rust](https://www.rust-lang.org/) tooling installed.
 
-### Installation
+### Running Chrust
+Clone the source code and navigate to the root directory, and run:
+```sh
+cargo run -- <args>
+```
+If running over the Web (default), navigate to a browser and then go to either [localhost:8000](http://localhost:8000) or [127.0.0.1:8000](http://127.0.0.1:8000)
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/johnyenter-briars/chrust.git
-   ```
-2. Build the project
-   ```sh
-   cargo build
-   ```
-3. Run the project
-   ```sh
-   cargo run -- <args>
-   ```
+## Usage
 
-### Building For Release
+The binary currently supports several command line arguments.
+
+```sh
+./chrust [-z "TERM"|"WEB"] [-t TICK_SPEED] [-h HUMAN_PLAYS] [-p NUM_PLIES]
+```
+
+| Flag | Name | Description |
+| ----------- | ----------- | ----------- |
+| z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical in the browser over localhost |
+| t | tick_speed | Sets the interval between moves in milliseconds | 
+| h | human_plays | Sets whether or not the human player will play the game. If false, the human player makes random decisions | 
+| p | num_plies | Sets the number of turns (plies) the AI will look ahead. Becareful on numbers > 4, as the program will become ungodly slow | 
+
+For a complete description on the arguments, run using the `--help` flag.
+
+## Prerelease
+
+The second Chrust prerelease is completed! Checkout the prerelase here: [0.2.0](https://github.com/johnyenter-briars/chrust/releases/tag/0.2.0)
+
+To run the program, unzip the archive pertaining to your operating system, and run the appropriate binary.
+
+Any feedback is welcome! 
+
+## Building For Release
 
 The newest release of Chrust can be found [here](https://github.com/johnyenter-briars/chrust/releases)
 
 If you wish to build in release mode yourself, build scripts are located in the repo root and titled `build_<platform>.<extension>`.
 
 The build script will place the built binary in the `release` folder, under the sub folder named after the platform (win|mac|linux).
-
-Note: the binary expects to be run in the same execution context as the `static` folder.
 
 #### Dependencies to Build on Windows
 
@@ -119,84 +95,10 @@ Note: the binary expects to be run in the same execution context as the `static`
 * Rust target profile: x86_64-apple-darwin
 * XCode tool chain
 
-<!-- USAGE EXAMPLES -->
-## Usage
-
-The binary currently supports several command line arguments.
-
-```
-./chrust [-z TERM|WEB] [-t TICK_SPEED] [-h HUMAN_PLAYS] [-p NUM_PLIES]
-```
-
-| Flag | Name | Description |
-| ----------- | ----------- | ----------- |
-| z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical in the browser over localhost |
-| t | tick_speed | Sets the interval between moves in milliseconds | 
-| h | human_plays | Sets whether or not the human player will play the game. If false, the human player makes random decisions | 
-| p | num_plies | Sets the number of turns (plies) the AI will look ahead. Becareful on numbers > 4, as the program will become ungodly slow | 
-
-For a complete description on the arguments, run:
-
-```
-./chrust --help
-```
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-The scope and capabilities of the project will grow and expand as my knowledge of Rust grows and my freetime either inflates or contracts.
-
-Currently, the list of features I would like to add are outlined below.
-
-### AI Features
-- [X] MiniMax Implementation
-- [X] Alpha-Beta Pruning
-- [X] Piece-Square Tables
-- [ ] Move Ordering
-- [ ] Transposition Tables
-- [ ] Quiescence search
-
-### Visual Features
-- [X] Terminal UI
-- [ ] GUI
-- [X] Web
-
-### 'Program Ease of Use' Features
-- [ ] Access to mutable AI difficulty settings
-- [ ] Game saves/loads/history
-
-## Prerelease
-
-The first Chrust prerelease is completed! Checkout the prerelase here: [0.1.0](https://github.com/johnyenter-briars/chrust/releases/tag/0.1.0)
-
-Any feedback on any part of the codebase would be greatly appreciated!
-
-To run the program, unzip the archive pertaining to your operating system, and run the appropriate binary.
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Feel free to fork, update, change, modify as you see fit. If you would like to explicitly contribute to this project, I would love it if you:
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/FeatureToChrust`)
-3. Commit your Changes (`git commit -m 'Add some cool stuff'`)
-4. Push to the Branch (`git push origin feature/FeatureToChrust`)
-5. Open a Pull Request
-
-
-
-<!-- LICENSE -->
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-
-
-<!-- CONTACT -->
 ## Contact
 
 John Yenter-Briars - <jyenterbriars@gmail.com>
@@ -204,8 +106,6 @@ John Yenter-Briars - <jyenterbriars@gmail.com>
 Project Link: [https://github.com/johnyenter-briars/chrust](https://github.com/johnyenter-briars/chrust)
 
 
-
-<!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
 * [The Good People of the Rust Discord](https://discord.com/invite/rust)

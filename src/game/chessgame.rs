@@ -60,26 +60,27 @@ impl ChessGame {
         }
     }
 
-    pub fn check_for_winner(&self) -> Option<&str> {
+    pub fn check_for_winner(&self) -> Option<String> {
         let white_king = self.board.piece_specific(Color::White, PieceType::King);
         let black_king = self.board.piece_specific(Color::Black, PieceType::King);
 
         match (white_king.is_some(), black_king.is_some()) {
             (true, true) => None,
-            (true, false) => Some(self.user_of_color(Color::White).name()),
-            (false, true) => Some(self.user_of_color(Color::Black).name()),
+            (true, false) => Some(self.user_of_color(Color::White).name().to_string()),
+            (false, true) => Some(self.user_of_color(Color::Black).name().to_string()),
             (false, false) => panic!("Something went horribly wrong. Both kings are gone?"),
         }
     }
 
-    pub fn start_game(&mut self) -> Result<&str, Box<dyn Error>> {
+    pub fn start_game(&mut self) -> Result<String, Box<dyn Error>> {
         self.print_to_screen("Initial".to_string());
 
         let mut turn_num: u32 = 1;
 
-        loop {
+        let winner = loop {
             //Human moves
             if !self.human_moves()? {
+                println!("Had some difficulty parsing your input there, wanna try again?");
                 continue;
             }
 
@@ -102,14 +103,12 @@ impl ChessGame {
 
             turn_num += 1;
 
-            if let Some(_) = self.check_for_winner() {
-                //would love to return the value itself here - but the borrow checker complains
-                //the wize wizards on the rust discord say its a bug in the borrow checker - so maybe it gets fixed later
-                break;
+            if let Some(w) = self.check_for_winner() {
+                break w;
             }
-        }
+        };
 
-        Ok(self.check_for_winner().unwrap())
+        Ok(winner)
     }
 
     pub fn ai_moves(&mut self) -> Result<bool, Box<dyn Error>> {
@@ -134,10 +133,20 @@ impl ChessGame {
             println!("Select your piece!");
 
             println!("x:");
-            let x: char = get_input::<char>()?;
+            let x = match get_input::<char>() {
+                Ok(c) => c,
+                Err(_) => {
+                    return Ok(false);
+                }
+            };
 
             println!("y:");
-            let y: i32 = get_input::<i32>()?;
+            let y = match get_input::<i32>() {
+                Ok(i) => i,
+                Err(_) => {
+                    return Ok(false);
+                }
+            };
 
             let current_position = Coordinate::new(x, y);
 
@@ -164,7 +173,12 @@ impl ChessGame {
                 println!("choice: {}, coord: {:?}", index, c);
             }
 
-            let choice: i32 = get_input::<i32>()?;
+            let choice = match get_input::<i32>() {
+                Ok(i) => i,
+                Err(_) => {
+                    return Ok(false);
+                }
+            };
 
             let coord_choice = coord_choices[choice as usize];
             println!("Choice: {:?}", coord_choice);

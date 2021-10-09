@@ -8,6 +8,11 @@ h1 {
   width: 400px;
 }
 
+h3 {
+  margin: auto;
+  width: 400px;
+}
+
 .controls {
   margin: auto;
   width: 400px;
@@ -22,6 +27,10 @@ h1 {
 .settings {
   margin: auto;
   width: 500px;
+}
+
+label {
+  display: block;
 }
 
 /* .info {
