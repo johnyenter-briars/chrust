@@ -74,6 +74,7 @@ fn chesspiece(piece: String, image_map: &State<ImageMap>) -> Custom<Vec<u8>> {
 }
 
 fn init_image_map() -> HashMap<String, Vec<u8>> {
+    HashMap::from(
     [
         ("bB".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bB.png").to_vec()),
         ("bK".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/bK.png").to_vec()),
@@ -88,7 +89,7 @@ fn init_image_map() -> HashMap<String, Vec<u8>> {
         ("wP".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wP.png").to_vec()),
         ("wQ".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wQ.png").to_vec()),
         ("wR".to_string(), include_bytes!("../../static/img/chesspieces/wikipedia/wR.png").to_vec()),
-    ].iter().cloned().collect()
+    ])
 }
 
 pub async fn build_and_run_frontend(ps: ProgramState) -> Result<(), rocket::Error> {

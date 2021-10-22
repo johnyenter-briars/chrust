@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         VizType::WEB => {
             if build_and_run_frontend(program_state).await.is_err() {
-                panic!("Error while trying to start frontend! s");
+                panic!("Error while trying to start frontend!");
             }
             Ok(())
         }
