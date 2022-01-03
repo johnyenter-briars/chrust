@@ -1,0 +1,9 @@
+[debug]
+address = "127.0.0.1"
+port = 8080
+log_level = "normal"
+
+[release]
+address = "127.0.0.1"
+port = 8080
+log_level = "critical"

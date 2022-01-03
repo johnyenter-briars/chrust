@@ -2,7 +2,7 @@ class ChrustAPI {
     constructor(board) {
         this.chessBoard = board;
         this.hostname = window.location.hostname;
-        this.apiUrl = `http://${this.hostname}:8000`;
+        this.apiUrl = `http://${this.hostname}:8080/chrust`;
         this.currenlyInWebRequest = false;
     }
 

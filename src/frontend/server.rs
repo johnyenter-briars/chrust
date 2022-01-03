@@ -4,7 +4,7 @@ use crate::{
     game::chessgame::{is_valid, process_fen, valid_moves},
     state::programstate::ProgramState,
 };
-use rocket::{State, get, http::ContentType, post, response::content::{Css, Custom, Html, JavaScript}, routes};
+use rocket::{State, get, http::ContentType, post, response::{content::{Css, Custom, Html, JavaScript}, self}, routes};
 use std::{collections::HashMap, sync::Mutex};
 
 pub struct Settings {
@@ -100,14 +100,14 @@ pub async fn build_and_run_frontend(ps: ProgramState) -> Result<(), rocket::Erro
         .manage(ImageMap{
             map: init_image_map()
         })
-        .mount("/", routes![index])
-        .mount("/js", routes![javascript])
-        .mount("/css", routes![css])
+        .mount("/chrust", routes![index])
+        .mount("/chrust/js", routes![javascript])
+        .mount("/chrust/css", routes![css])
         .mount("/img", routes![chesspiece])
-        .mount("/api", routes![process])
-        .mount("/api", routes![possible])
-        .mount("/api", routes![validate])
-        .mount("/api", routes![settings])
+        .mount("/chrust/api", routes![process])
+        .mount("/chrust/api", routes![possible])
+        .mount("/chrust/api", routes![validate])
+        .mount("/chrust/api", routes![settings])
         .launch()
         .await
 }
