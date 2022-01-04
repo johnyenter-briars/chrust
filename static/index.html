@@ -5,73 +5,80 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta
-      name="description"
-      content="Online chess engine"
-    />
+  <meta name="description" content="Online chess engine" />
   <link rel="stylesheet" href="chrust/css/chrust.css">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
     integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Chrust</title>
 </head>
 
 <body>
-  <h1>Chrust: Chess + Rust <3</h1>
-  <h3>Try your hand at beating Rusty!</h3>
-  <div class="controls">
-    <button id="startBtn" onclick="resetBoard()">Reset Board</button>
-    <label>Current Move: <strong><p style="font-size:x-large;margin: unset;" id="current-mover">You</p></strong></label>
-  </div>
-  <div id="board" class="board"></div>
-  <div class="settings">
-    <h2>How to Play</h2>
-    <p>You will always play as white and Rusty will always play as black.</p>
-    <p>Drag and drop your pieces to make moves. After you make a move, Rusty will make his move. Even if he doesn't immediately move his piece, give him time! He's thinking.</p>
-    <p>You will know who's move it currently is by checking under the header: "Current Move" up near the top</p>
-    <p>Refresh the browser or click the "Reset Board" button to start a new game.</p>
+  <h1>Chrust: Chess + Rust <3 </h1>
+      <h3>Try your hand at beating Rusty!
+        <a href="https://github.com/johnyenter-briars/chrust">
+          <i class="fa fa-github" style="font-size:32px;color: black;"></i>
+        </a>
+      </h3>
+      <div class="controls">
+        <button id="startBtn" onclick="resetBoard()">Reset Board</button>
+        <label>Current Move: <strong>
+            <p style="font-size:x-large;margin: unset;" id="current-mover">You</p>
+          </strong></label>
+      </div>
+      <div id="board" class="board"></div>
+      <div class="settings">
+        <h2>How to Play</h2>
+        <p>You will always play as white and Rusty will always play as black.</p>
+        <p>Drag and drop your pieces to make moves. After you make a move, Rusty will make his move. Even if he doesn't
+          immediately move his piece, give him time! He's thinking.</p>
+        <p>You will know who's move it currently is by checking under the header: "Current Move" up near the top</p>
+        <p>Refresh the browser or click the "Reset Board" button to start a new game.</p>
 
 
-    <h2>Important to Note</h2>
-    <ul>
-      <li>
-        <strong>Rusty will keep playing even after the game is over! Rusty doesn't know anything about how to win the game. He just wants your most valuable pieces!</strong>
-      </li>
-      <li>
-        <strong>There is no castling funtionality built into the game.</strong>
-      </li>
-      <li>
-        <strong>There will be some visual bugs if you try to make a move while Rusty is still thinking.</strong>
-      </li>
-    </ul>
+        <h2>Important to Note</h2>
+        <ul>
+          <li>
+            <strong>Rusty will keep playing even after the game is over! Rusty doesn't know anything about how to win
+              the game. He just wants your most valuable pieces!</strong>
+          </li>
+          <li>
+            <strong>There is no castling funtionality built into the game.</strong>
+          </li>
+          <li>
+            <strong>There will be some visual bugs if you try to make a move while Rusty is still thinking.</strong>
+          </li>
+        </ul>
 
 
 
-  </div>
-  <div class="settings">
-    <div class="setting">
-      <h4>Tick Speed</h4>
-      <p id="tick_speed"></p>
-    </div>
-    <div class="setting">
-      <h4>Num Plies</h4>
-      <p id="num_plies"></p>
-    </div>
-    <div class="setting">
-      <h4>Human Plays</h4>
-      <p id="human_plays"></p>
-    </div>
-    <div class="setting">
-      <h4>Visualization Type</h4>
-      <p id="viz_type"></p>
-    </div>
-  </div>
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-    integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
-    crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
-    integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
-    crossorigin="anonymous"></script>
-  <script type="text/javascript" src="chrust/js/chrust.js"></script>
+      </div>
+      <div class="settings">
+        <div class="setting">
+          <h4>Tick Speed</h4>
+          <p id="tick_speed"></p>
+        </div>
+        <div class="setting">
+          <h4>Num Plies</h4>
+          <p id="num_plies"></p>
+        </div>
+        <div class="setting">
+          <h4>Human Plays</h4>
+          <p id="human_plays"></p>
+        </div>
+        <div class="setting">
+          <h4>Visualization Type</h4>
+          <p id="viz_type"></p>
+        </div>
+      </div>
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+        crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+        integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+        crossorigin="anonymous"></script>
+      <script type="text/javascript" src="chrust/js/chrust.js"></script>
 
 </body>
 
