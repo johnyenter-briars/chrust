@@ -1,5 +1,4 @@
 use super::{
-    cors::CORS,
     responses::{SettingsResponse, ValidateResponse},
 };
 use crate::{
@@ -138,10 +137,7 @@ fn init_image_map() -> HashMap<String, Vec<u8>> {
 }
 
 pub async fn build_and_run_frontend(ps: ProgramState) -> Result<(), rocket::Error> {
-    let cors = CORS {};
-
     rocket::build()
-        .attach(cors)
         .manage(Settings {
             program_state: Mutex::from(ps),
         })
