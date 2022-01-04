@@ -151,7 +151,7 @@ pub async fn build_and_run_frontend(ps: ProgramState) -> Result<(), rocket::Erro
         .mount("/chrust", routes![index])
         .mount("/chrust/js", routes![javascript])
         .mount("/chrust/css", routes![css])
-        .mount("/chrust/img", routes![chesspiece])
+        .mount("/img", routes![chesspiece])
         .mount("/chrust/api", routes![process])
         .mount("/chrust/api", routes![possible])
         .mount("/chrust/api", routes![validate])
