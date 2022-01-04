@@ -4,7 +4,7 @@ use board::{cell::color::Color, chessboard::Board};
 
 mod player;
 use player::aiplayer::AIPlayer;
-use player::humanplayer::{HumanPlayer, self};
+use player::humanplayer::{HumanPlayer};
 
 mod game;
 use game::chessgame::ChessGame;
