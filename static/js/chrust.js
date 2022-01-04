@@ -2,7 +2,10 @@ class ChrustAPI {
     constructor(board) {
         this.chessBoard = board;
         this.hostname = window.location.hostname;
-        this.apiUrl = `http://${this.hostname}/chrust`;
+        this.apiUrl = this.hostname === '127.0.0.1' 
+                    ? `http://${this.hostname}:8080/chrust` : 
+                      `http://${this.hostname}/chrust`;
+
         this.currenlyInWebRequest = false;
     }
 
@@ -115,7 +118,7 @@ var onSnapEnd = function () {
 };
 
 function notifyMove(aiMove) {
-    document.getElementById("current-mover").textContent = aiMove ? "rusty" : "you";
+    document.getElementById("current-mover").textContent = aiMove ? "Rusty" : "You";
 }
 
 var onMouseoverSquare = async (square, piece) => {
