@@ -61,8 +61,8 @@ pub fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
 
     let program_state = ProgramState {
         viz_type: match viz_type {
-            "TERM" => VizType::TERM,
-            "WEB" => VizType::WEB,
+            "TERM" => VizType::Term,
+            "WEB" => VizType::Web,
             _ => {
                 return Err(Box::from(
                     "You must pass in a vaid argument for the -v flag!",

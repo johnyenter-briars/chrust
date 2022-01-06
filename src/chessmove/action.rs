@@ -29,7 +29,7 @@ pub struct AIAction<'a> {
 
 impl<'a> Action<'a> for HumanAction<'a> {
     fn get_piece_(&self) -> &ChessPiece {
-        &self.piece_move.chess_piece
+        self.piece_move.chess_piece
     }
 
     fn get_x(&self) -> char {
@@ -43,7 +43,7 @@ impl<'a> Action<'a> for HumanAction<'a> {
 
 impl<'a> Action<'a> for AIAction<'a> {
     fn get_piece_(&self) -> &ChessPiece {
-        &self.piece_move.chess_piece
+        self.piece_move.chess_piece
     }
 
     fn get_x(&self) -> char {

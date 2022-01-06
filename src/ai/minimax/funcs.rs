@@ -89,13 +89,13 @@ fn min_value(board: &Board, depth: u32, alpha: i32, mut beta: i32) -> i32 {
 //     }
 // }
 
-fn minimax_decision_max<'a>(
-    board: &'a Board,
+fn minimax_decision_max(
+    board: &Board,
     color: Color,
     max_depth: u32,
     alpha: i32,
     beta: i32,
-) -> Result<(PieceMove<'a>, i32), Box<dyn Error>> {
+) -> Result<(PieceMove, i32), Box<dyn Error>> {
     let mut good_actions = Vec::new();
 
     for action in board.all_possible_moves(color)? {
@@ -113,11 +113,11 @@ fn minimax_decision_max<'a>(
     }
 }
 
-pub fn max_decision<'a>(
-    board: &'a Board,
+pub fn max_decision(
+    board: &Board,
     color: Color,
     max_depth: u32,
-) -> Result<PieceMove<'a>, Box<dyn std::error::Error>> {
+) -> Result<PieceMove, Box<dyn std::error::Error>> {
     let start = Instant::now();
     let (max_decision, _) = minimax_decision_max(board, color, max_depth, -1000000, 1000000)?;
     let duration = start.elapsed();

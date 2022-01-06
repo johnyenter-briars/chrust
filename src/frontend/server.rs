@@ -37,7 +37,7 @@ pub async fn process(fen: String, settings: &State<Settings>) -> String {
 
 #[get("/possible/<fen>/<location>")]
 pub async fn possible(fen: String, location: String) -> MoveOptionsResponse {
-    let options = valid_moves(fen, location).unwrap_or(vec![]);
+    let options = valid_moves(fen, location).unwrap_or_default();
     MoveOptionsResponse { options }
 }
 
