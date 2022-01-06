@@ -121,8 +121,6 @@ impl PieceType {
                     //TODO - this could be more expressive i think
                     if friendly_occupied(possible_position, target_piece.color, board) {
                         continue;
-                    } else if enemy_occupied(possible_position, target_piece.color, board) {
-                        possible_coordinates.push(possible_position);
                     } else {
                         possible_coordinates.push(possible_position);
                     }

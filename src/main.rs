@@ -53,12 +53,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     match program_state.viz_type {
-        VizType::TERM => {
+        VizType::Term => {
             let winner = game.start_game()?;
             println!("Winner: {}", &winner);
             Ok(())
         }
-        VizType::WEB => {
+        VizType::Web => {
             if build_and_run_frontend(program_state).await.is_err() {
                 panic!("Error while trying to start frontend!");
             }

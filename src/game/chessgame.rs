@@ -156,7 +156,7 @@ impl ChessGame {
                 .possible_moves_human(current_position, &self.human_player)
             {
                 Ok(choices) => {
-                    if choices.len() < 1 {
+                    if choices.is_empty() {
                         println!("That piece can't go anywhere!");
                         return Ok(false);
                     }
@@ -199,16 +199,16 @@ impl ChessGame {
 
                 let coord_choices = self.board.possible_moves_human(from, &self.human_player)?;
 
-                if coord_choices.len() < 1 {
+                if coord_choices.is_empty() {
                     //that piece can't go anywhere - try to get another one
                     continue;
                 }
 
-                let to = coord_choices
+                let to = *coord_choices
                     .choose(&mut rand::thread_rng())
                     .ok_or("There was an error while trying to get a choice randomly")?;
 
-                break (from.clone(), to.clone());
+                break (from, to);
             };
 
             (from, to)
@@ -219,14 +219,14 @@ impl ChessGame {
         Ok(true)
     }
 
-    fn user_of_color(&self, color: Color) -> Box<&dyn ChessPlayer> {
+    fn user_of_color(&self, color: Color) -> &dyn ChessPlayer {
         match (
             self.human_player.color == color,
             self.ai_player.color == color,
         ) {
             (true, true) => panic!("Players with the same color?"),
-            (true, false) => Box::new(&self.human_player),
-            (false, true) => Box::new(&self.ai_player),
+            (true, false) => &self.human_player,
+            (false, true) => &self.ai_player,
             (false, false) => panic!("Players with the same color?"),
         }
     }

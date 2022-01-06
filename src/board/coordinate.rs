@@ -19,7 +19,7 @@ impl Coordinate {
                 .chars()
                 .into_iter()
                 .any(|ele| ele == self.x)
-            && !board.test_cell_at(*self).is_none()
+            && board.test_cell_at(*self).is_some()
     }
 
     pub fn up_by(&self, ammount: i32) -> Self {

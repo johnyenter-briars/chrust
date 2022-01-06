@@ -36,7 +36,7 @@ impl Board {
     pub fn print_to_screen(&self, configuration_name: String) {
         println!("---------------------------{}", configuration_name);
         for row in  &self.squares {
-            if let Some(first_cell) = row.into_iter().next() {
+            if let Some(first_cell) = row.iter().next() {
                 print!("{}|", first_cell.y);
             }
             for cell in row {
@@ -46,11 +46,11 @@ impl Board {
                     print!("   |");
                 }
             }
-            println!("");
+            println!();
         }
         print!(" ");
         "abcdefgh".to_string().chars().into_iter().for_each(|int| print!("  {} ", int));
-        println!("");
+        println!();
     }
 
     pub fn piece(&self, x: char, y: i32) -> core::result::Result<&ChessPiece, Box<dyn Error>> {
@@ -100,7 +100,7 @@ impl Board {
             let coord_choices = self.possible_moves(current_position, color)?;
 
             let mut possible_moves_for_piece: Vec<PieceMove> = 
-                coord_choices.iter().map(|coord | PieceMove::new(&piece_at_position, current_position, coord.clone())).collect();
+                coord_choices.iter().map(|coord | PieceMove::new(piece_at_position, current_position, *coord)).collect();
 
             
             possible_moves.append(&mut possible_moves_for_piece);
@@ -120,7 +120,7 @@ impl Board {
         for row in  self.squares.iter_mut() {
             for cell in row {
                 if cell.x == x && cell.y == y {
-                    cell.space = Option::from(None);
+                    cell.space = None;
                 }
             }
         }
@@ -153,9 +153,7 @@ impl Board {
     pub fn piece_specific(&self, color: Color, piece_type: PieceType) -> Option<&ChessPiece>{
         let pieces = self.pieces_of_color(color);
 
-        let piece = pieces.into_iter().find(|x| x.piece_type == piece_type);
-        
-        piece
+        pieces.into_iter().find(|x| x.piece_type == piece_type)
     }
 
 
@@ -266,7 +264,7 @@ impl Board {
             if num_empty_squares != 0 {
                 fen.push_str(&num_empty_squares.to_string());
             }
-            fen.push_str("/");
+            fen.push('/');
         }
 
         fen[0..fen.len()-1].to_string()
