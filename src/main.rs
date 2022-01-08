@@ -1,33 +1,10 @@
-mod board;
-
-use board::{cell::color::Color, chessboard::Board};
-
-mod player;
-use player::aiplayer::AIPlayer;
-use player::humanplayer::{HumanPlayer};
-
-mod game;
-use game::chessgame::ChessGame;
-
-use crate::frontend::server::build_and_run_frontend;
-
-mod chessmove;
-
-mod ai;
-
-mod state;
-use state::programstate::get_args;
-use state::viztype::VizType;
-
-mod frontend;
-
-mod ext;
-
-#[macro_use]
-extern crate serde_derive;
-extern crate serde_json;
-
-extern crate clap;
+use chrust::{
+    board::{cell::color::Color, chessboard::Board},
+    frontend::server::build_and_run_frontend,
+    game::chessgame::ChessGame,
+    player::{aiplayer::AIPlayer, humanplayer::HumanPlayer},
+    state::{programstate::get_args, viztype::VizType},
+};
 
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
