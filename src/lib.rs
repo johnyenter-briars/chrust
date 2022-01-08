@@ -1,14 +1,16 @@
+pub mod ai;
 pub mod board;
-pub mod player;
-pub mod game;
-mod chessmove;
-mod ai;
-pub mod state;
+pub mod chessmove;
+pub mod ext;
 pub mod frontend;
-mod ext;
+pub mod game;
+pub mod player;
+pub mod state;
 
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
 
+
 extern crate clap;
+

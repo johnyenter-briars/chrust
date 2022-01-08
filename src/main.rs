@@ -1,10 +1,10 @@
-use chrust::board::{cell::color::Color, chessboard::Board};
-use chrust::player::aiplayer::AIPlayer;
-use chrust::player::humanplayer::{HumanPlayer};
-use chrust::game::chessgame::ChessGame;
-use chrust::frontend::server::build_and_run_frontend;
-use chrust::state::programstate::get_args;
-use chrust::state::viztype::VizType;
+use chrust::{
+    board::{cell::color::Color, chessboard::Board},
+    frontend::server::build_and_run_frontend,
+    game::chessgame::ChessGame,
+    player::{aiplayer::AIPlayer, humanplayer::HumanPlayer},
+    state::{programstate::get_args, viztype::VizType},
+};
 
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
