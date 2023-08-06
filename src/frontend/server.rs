@@ -2,12 +2,14 @@ use super::responses::{SettingsResponse, ValidateResponse};
 use crate::{
     frontend::responses::MoveOptionsResponse,
     game::chessgame::{is_valid, process_fen, valid_moves},
-    state::programstate::ProgramState,
+    state::programstate::{self, ProgramState},
 };
 use actix_web::web;
 use actix_web::{get, post, HttpResponse};
 use actix_web::{middleware::Logger, App, HttpServer};
+use actix_web::{Responder, Result};
 use futures::future::ok;
+use serde::Serialize;
 use std::{collections::HashMap, sync::Mutex};
 
 pub struct Settings {
@@ -18,30 +20,30 @@ pub struct ImageMap {
     map: HashMap<String, Vec<u8>>,
 }
 
-// #[post("/process/<fen>")]
-// pub async fn process(fen: String, settings: web::Data<Settings>) -> String {
-//     let program_state = *settings.program_state.lock().unwrap();
-//     let returned_fen = match process_fen(fen, program_state.num_plies) {
-//         Ok(f) => f,
-//         Err(e) => panic!("paniced because! {}", e),
-//     };
-//     returned_fen
-// }
-
-#[get("/possible/{fen}/{location}")]
-pub async fn possible(fen: String, location: String) -> HttpResponse {
-    let options = valid_moves(fen, location).unwrap_or_default();
-    MoveOptionsResponse::ok(options)
+#[post("/process/{fen}")]
+pub async fn process(fen: web::Path<String>, settings: web::Data<Settings>) -> String {
+    let program_state = *settings.program_state.lock().unwrap();
+    let returned_fen = match process_fen(fen.to_string(), program_state.num_plies) {
+        Ok(f) => f,
+        Err(e) => panic!("paniced because! {}", e),
+    };
+    returned_fen
 }
 
-#[get("/validate/<current_fen>/<current_location>/<possible_location>")]
-pub async fn validate(
-    current_fen: String,
-    current_location: String,
-    possible_location: String,
-) -> HttpResponse {
-    let is_valid = is_valid(current_fen, current_location, possible_location).unwrap_or(false);
-    return ValidateResponse::ok(is_valid);
+#[get("/possible/{fen}/{location}")]
+pub async fn possible(query: web::Path<(String, String)>) -> Result<impl Responder> {
+    let options = valid_moves(query.0.to_string(), query.1.to_string())?;
+    Ok(web::Json(MoveOptionsResponse { options }))
+}
+
+#[get("/validate/{current_fen}/{current_location}/{possible_location}")]
+pub async fn validate(query: web::Path<(String, String, String)>) -> Result<impl Responder> {
+    let is_valid = is_valid(
+        query.0.to_string(),
+        query.1.to_string(),
+        query.2.to_string(),
+    )?;
+    Ok(web::Json(ValidateResponse { is_valid }))
 }
 
 // #[get("/settings")]
@@ -130,18 +132,21 @@ fn init_image_map() -> HashMap<String, Vec<u8>> {
     ])
 }
 
-pub async fn build_and_run_frontend(ps: ProgramState) -> std::io::Result<()> {
+pub async fn build_and_run_frontend(program_state: ProgramState) -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    // let app_state = web::Data::new(AppState {
-    //     cal_connector: Mutex::new(cal_connector),
-    // });
+    let app_state = web::Data::new(Settings {
+        program_state: Mutex::new(program_state),
+    });
 
     HttpServer::new(move || {
         App::new().service(
             web::scope("/chrust/api")
                 .service(possible)
-                .wrap(Logger::default()),
+                .service(process)
+                .service(validate)
+                .wrap(Logger::default())
+                .app_data(app_state.clone()),
         )
     })
     .bind(("0.0.0.0".to_string(), 8083))?
