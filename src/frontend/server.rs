@@ -8,19 +8,19 @@ use actix_web::web;
 use actix_web::{get, post, HttpResponse};
 use actix_web::{middleware::Logger, App, HttpServer};
 use actix_web::{Responder, Result};
-use futures::future::ok;
-use serde::Serialize;
 use std::{collections::HashMap, sync::Mutex};
 
 pub struct Settings {
     program_state: Mutex<ProgramState>,
+    image_map: Mutex<HashMap<String, Vec<u8>>>,
 }
 
-pub struct ImageMap {
-    map: HashMap<String, Vec<u8>>,
-}
+// #[derive(Debug, Clone, Serialize, Deserialize)]
+// pub struct ImageMap {
+//     map: HashMap<String, Vec<u8>>,
+// }
 
-#[post("/process/{fen}")]
+#[post("/api/process/{fen}")]
 pub async fn process(fen: web::Path<String>, settings: web::Data<Settings>) -> String {
     let program_state = *settings.program_state.lock().unwrap();
     let returned_fen = match process_fen(fen.to_string(), program_state.num_plies) {
@@ -30,13 +30,13 @@ pub async fn process(fen: web::Path<String>, settings: web::Data<Settings>) -> S
     returned_fen
 }
 
-#[get("/possible/{fen}/{location}")]
+#[get("/api/possible/{fen}/{location}")]
 pub async fn possible(query: web::Path<(String, String)>) -> Result<impl Responder> {
     let options = valid_moves(query.0.to_string(), query.1.to_string())?;
     Ok(web::Json(MoveOptionsResponse { options }))
 }
 
-#[get("/validate/{current_fen}/{current_location}/{possible_location}")]
+#[get("/api/validate/{current_fen}/{current_location}/{possible_location}")]
 pub async fn validate(query: web::Path<(String, String, String)>) -> Result<impl Responder> {
     let is_valid = is_valid(
         query.0.to_string(),
@@ -58,26 +58,33 @@ pub async fn validate(query: web::Path<(String, String, String)>) -> Result<impl
 //     Html(include_str!("../../static/index.html"))
 // }
 
-// #[get("/chrust.js")]
-// fn javascript() -> JavaScript<&'static str> {
-//     JavaScript(include_str!("../../static/js/chrust.js"))
-// }
+#[get("/chrust.js")]
+async fn javascript() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("text/javascript")
+        .body(include_str!("../../static/js/chrust.js"))
+}
 
-// #[get("/chrust.css")]
-// fn css() -> Css<&'static str> {
-//     Css(include_str!("../../static/css/chrust.css"))
-// }
+#[get("/chrust.css")]
+async fn css() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("text/css")
+        .body(include_str!("../../static/css/chrust.css"))
+}
 
 // /img/chesspieces/wikipedia/wB.png
-// #[get("/chesspieces/wikipedia/<piece>")]
-// fn chesspiece(piece: String, image_map: web::Data<ImageMap>) -> Custom<Vec<u8>> {
-//     let byte_vec = match image_map.map.get(&piece.replace(".png", "")) {
-//         Some(byte_vec) => byte_vec,
-//         None => panic!("Unable to find the piece image in the image_map!"),
-//     };
+#[get("/chesspieces/wikipedia/{piece}")]
+async fn chesspiece(piece: web::Path<String>, settings: web::Data<Settings>) -> HttpResponse {
+    let image_map = settings.image_map.lock().unwrap().clone();
+    let byte_vec = match image_map.get(&piece.replace(".png", "")) {
+        Some(byte_vec) => byte_vec,
+        None => panic!("Unable to find the piece image in the image_map!"),
+    };
+    // let idk = include_bytes!("../../static/img/chesspieces/wikipedia/bB.png");
+    HttpResponse::Ok().content_type("image/png").body(byte_vec.to_owned())
 
-//     Custom(ContentType::PNG, byte_vec.clone())
-// }
+    // Ok(NamedFile::)
+}
 
 fn init_image_map() -> HashMap<String, Vec<u8>> {
     HashMap::from([
@@ -137,14 +144,18 @@ pub async fn build_and_run_frontend(program_state: ProgramState) -> std::io::Res
 
     let app_state = web::Data::new(Settings {
         program_state: Mutex::new(program_state),
+        image_map: Mutex::new(init_image_map()),
     });
 
     HttpServer::new(move || {
         App::new().service(
-            web::scope("/chrust/api")
+            web::scope("/chrust")
                 .service(possible)
                 .service(process)
                 .service(validate)
+                .service(css)
+                .service(javascript)
+                .service(chesspiece)
                 .wrap(Logger::default())
                 .app_data(app_state.clone()),
         )
