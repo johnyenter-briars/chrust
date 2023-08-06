@@ -20,44 +20,48 @@ pub fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
                 .short('z')
                 .long("visualization_mode")
                 .value_name("TERM|WEB")
-                .about("Sets the method of visualization for the app")
                 .takes_value(true)
-                .default_value("WEB")
+                .default_value("WEB"),
         )
         .arg(
             Arg::new("hplay")
                 .short('h')
                 .long("human_plays")
                 .value_name("true|false")
-                .about("Sets whether or not the human player will play the game. If false, the human player makes random decisions")
                 .takes_value(true)
-                .default_value("true")
+                .default_value("true"),
         )
         .arg(
             Arg::new("tick")
                 .short('t')
                 .long("tick_speed")
                 .value_name("positive integer")
-                .about("Sets the interval between moves. (Milliseconds)")
                 .takes_value(true)
-                .default_value("1000")
+                .default_value("1000"),
         )
         .arg(
             Arg::new("plies")
                 .short('p')
                 .long("num_plies")
                 .value_name("positive integer")
-                .about("Number of turns into the future the AI will look ahead.")
                 .takes_value(true)
-                .default_value("3")
+                .default_value("3"),
         )
         .get_matches();
 
     //this is horrible and i'm sorry
-    let viz_type = matches.value_of("viz").ok_or("unable to parse arguments :(")?;
-    let human_plays = matches.value_of("hplay").ok_or("unable to parse arguments :(")?;
-    let tick_speed = matches.value_of("tick").ok_or("unable to parse arguments :(")?;
-    let num_plies = matches.value_of("plies").ok_or("unable to parse arguments :(")?;
+    let viz_type = matches
+        .value_of("viz")
+        .ok_or("unable to parse arguments :(")?;
+    let human_plays = matches
+        .value_of("hplay")
+        .ok_or("unable to parse arguments :(")?;
+    let tick_speed = matches
+        .value_of("tick")
+        .ok_or("unable to parse arguments :(")?;
+    let num_plies = matches
+        .value_of("plies")
+        .ok_or("unable to parse arguments :(")?;
 
     let program_state = ProgramState {
         viz_type: match viz_type {

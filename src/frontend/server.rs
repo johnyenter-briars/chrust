@@ -1,20 +1,13 @@
-use super::{
-    responses::{SettingsResponse, ValidateResponse},
-};
+use super::responses::{SettingsResponse, ValidateResponse};
 use crate::{
     frontend::responses::MoveOptionsResponse,
     game::chessgame::{is_valid, process_fen, valid_moves},
     state::programstate::ProgramState,
 };
-use rocket::{
-    get,
-    http::ContentType,
-    post,
-    response::{
-        content::{Css, Custom, Html, JavaScript},
-    },
-    routes, State,
-};
+use actix_web::web;
+use actix_web::{get, post, HttpResponse};
+use actix_web::{middleware::Logger, App, HttpServer};
+use futures::future::ok;
 use std::{collections::HashMap, sync::Mutex};
 
 pub struct Settings {
@@ -25,20 +18,20 @@ pub struct ImageMap {
     map: HashMap<String, Vec<u8>>,
 }
 
-#[post("/process/<fen>")]
-pub async fn process(fen: String, settings: &State<Settings>) -> String {
-    let program_state = *settings.program_state.lock().unwrap();
-    let returned_fen = match process_fen(fen, program_state.num_plies) {
-        Ok(f) => f,
-        Err(e) => panic!("paniced because! {}", e),
-    };
-    returned_fen
-}
+// #[post("/process/<fen>")]
+// pub async fn process(fen: String, settings: web::Data<Settings>) -> String {
+//     let program_state = *settings.program_state.lock().unwrap();
+//     let returned_fen = match process_fen(fen, program_state.num_plies) {
+//         Ok(f) => f,
+//         Err(e) => panic!("paniced because! {}", e),
+//     };
+//     returned_fen
+// }
 
-#[get("/possible/<fen>/<location>")]
-pub async fn possible(fen: String, location: String) -> MoveOptionsResponse {
+#[get("/possible/{fen}/{location}")]
+pub async fn possible(fen: String, location: String) -> HttpResponse {
     let options = valid_moves(fen, location).unwrap_or_default();
-    MoveOptionsResponse { options }
+    MoveOptionsResponse::ok(options)
 }
 
 #[get("/validate/<current_fen>/<current_location>/<possible_location>")]
@@ -46,42 +39,43 @@ pub async fn validate(
     current_fen: String,
     current_location: String,
     possible_location: String,
-) -> ValidateResponse {
+) -> HttpResponse {
     let is_valid = is_valid(current_fen, current_location, possible_location).unwrap_or(false);
-    ValidateResponse { is_valid }
+    return ValidateResponse::ok(is_valid);
 }
 
-#[get("/settings")]
-pub async fn settings(settings: &State<Settings>) -> SettingsResponse {
-    let program_state = *settings.program_state.lock().unwrap();
-    SettingsResponse { program_state }
-}
+// #[get("/settings")]
+// pub async fn settings(settings: web::Data<Settings>) -> HttpResponse {
+//     let program_state = *settings.program_state.lock().unwrap();
+//     let idk = SettingsResponse { program_state };
+//     return idk::ok();
+// }
 
-#[get("/")]
-fn index() -> Html<&'static str> {
-    Html(include_str!("../../static/index.html"))
-}
+// #[get("/")]
+// fn index() -> Html<&'static str> {
+//     Html(include_str!("../../static/index.html"))
+// }
 
-#[get("/chrust.js")]
-fn javascript() -> JavaScript<&'static str> {
-    JavaScript(include_str!("../../static/js/chrust.js"))
-}
+// #[get("/chrust.js")]
+// fn javascript() -> JavaScript<&'static str> {
+//     JavaScript(include_str!("../../static/js/chrust.js"))
+// }
 
-#[get("/chrust.css")]
-fn css() -> Css<&'static str> {
-    Css(include_str!("../../static/css/chrust.css"))
-}
+// #[get("/chrust.css")]
+// fn css() -> Css<&'static str> {
+//     Css(include_str!("../../static/css/chrust.css"))
+// }
 
 // /img/chesspieces/wikipedia/wB.png
-#[get("/chesspieces/wikipedia/<piece>")]
-fn chesspiece(piece: String, image_map: &State<ImageMap>) -> Custom<Vec<u8>> {
-    let byte_vec = match image_map.map.get(&piece.replace(".png", "")) {
-        Some(byte_vec) => byte_vec,
-        None => panic!("Unable to find the piece image in the image_map!"),
-    };
+// #[get("/chesspieces/wikipedia/<piece>")]
+// fn chesspiece(piece: String, image_map: web::Data<ImageMap>) -> Custom<Vec<u8>> {
+//     let byte_vec = match image_map.map.get(&piece.replace(".png", "")) {
+//         Some(byte_vec) => byte_vec,
+//         None => panic!("Unable to find the piece image in the image_map!"),
+//     };
 
-    Custom(ContentType::PNG, byte_vec.clone())
-}
+//     Custom(ContentType::PNG, byte_vec.clone())
+// }
 
 fn init_image_map() -> HashMap<String, Vec<u8>> {
     HashMap::from([
@@ -136,22 +130,21 @@ fn init_image_map() -> HashMap<String, Vec<u8>> {
     ])
 }
 
-pub async fn build_and_run_frontend(ps: ProgramState) -> Result<(), rocket::Error> {
-    rocket::build()
-        .manage(Settings {
-            program_state: Mutex::from(ps),
-        })
-        .manage(ImageMap {
-            map: init_image_map(),
-        })
-        .mount("/chrust", routes![index])
-        .mount("/chrust/js", routes![javascript])
-        .mount("/chrust/css", routes![css])
-        .mount("/img", routes![chesspiece])
-        .mount("/chrust/api", routes![process])
-        .mount("/chrust/api", routes![possible])
-        .mount("/chrust/api", routes![validate])
-        .mount("/chrust/api", routes![settings])
-        .launch()
-        .await
+pub async fn build_and_run_frontend(ps: ProgramState) -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
+    // let app_state = web::Data::new(AppState {
+    //     cal_connector: Mutex::new(cal_connector),
+    // });
+
+    HttpServer::new(move || {
+        App::new().service(
+            web::scope("/chrust/api")
+                .service(possible)
+                .wrap(Logger::default()),
+        )
+    })
+    .bind(("0.0.0.0".to_string(), 8083))?
+    .run()
+    .await
 }
