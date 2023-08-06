@@ -11,7 +11,7 @@ use crate::player::humanplayer::*;
 
 extern crate rand;
 
-use chrono::format;
+
 // use rand::thread_rng;
 use rand::seq::SliceRandom;
 
@@ -274,10 +274,10 @@ pub fn is_valid(
     let board_section = fen
         .split(' ')
         .next()
-        .expect(&format!("Fen is improperly formatted: {}", fen));
+        .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
     let board = Board::load_from_fen(board_section.to_string())
-        .expect(&format!("Unable to load board from fen: {}", fen));
+        .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     let current_position = current_location.to_coord();
 
@@ -299,10 +299,10 @@ pub fn valid_moves(
     let board_section = fen
         .split(' ')
         .next()
-        .expect(&format!("Fen is improperly formatted: {}", fen));
+        .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
     let board = Board::load_from_fen(board_section.to_string())
-        .expect(&format!("Unable to load board from fen: {}", fen));
+        .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     if location.as_str().len() != 2 {
         return Err(Box::from("Invalid format for location string"));

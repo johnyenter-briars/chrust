@@ -17,7 +17,6 @@ impl Coordinate {
             && "abcdefgh"
                 .to_string()
                 .chars()
-                .into_iter()
                 .any(|ele| ele == self.x)
             && board.test_cell_at(*self).is_some()
     }

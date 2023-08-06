@@ -1,8 +1,8 @@
-use super::responses::{SettingsResponse, ValidateResponse};
+use super::responses::{ValidateResponse};
 use crate::{
     frontend::responses::MoveOptionsResponse,
     game::chessgame::{is_valid, process_fen, valid_moves},
-    state::programstate::{self, ProgramState},
+    state::programstate::{ProgramState},
 };
 use actix_web::web;
 use actix_web::{get, post, HttpResponse};
