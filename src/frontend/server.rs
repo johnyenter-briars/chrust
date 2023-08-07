@@ -46,7 +46,7 @@ pub async fn validate(query: web::Path<(String, String, String)>) -> Result<impl
     Ok(web::Json(ValidateResponse { is_valid }))
 }
 
-#[get("/settings")]
+#[get("/api/settings")]
 async fn settings(settings: web::Data<Settings>) -> Result<impl Responder> {
     let program_state = *settings.program_state.lock().unwrap();
     Ok(web::Json(SettingsResponse { program_state }))
