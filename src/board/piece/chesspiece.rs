@@ -1,4 +1,4 @@
-use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate};
+use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate};
 
 use super::achesspiece::AChessPiece;
 

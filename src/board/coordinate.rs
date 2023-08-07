@@ -1,4 +1,4 @@
-use super::chessboard::Board;
+use super::chessboard::ChessBoard;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Coordinate {
@@ -12,7 +12,7 @@ impl Coordinate {
         Coordinate { x, y }
     }
 
-    pub fn is_valid(&self, board: &Board) -> bool {
+    pub fn is_valid(&self, board: &ChessBoard) -> bool {
         (1..9).any(|ele| ele == self.y)
             && "abcdefgh"
                 .to_string()

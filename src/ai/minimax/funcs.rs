@@ -114,10 +114,10 @@
 //     // }
 // }
 
-use crate::{board::{chessboard::Board, color::Color}, chessmove::piecemove::PieceMove};
+use crate::{board::{chessboard::ChessBoard, color::Color}, chessmove::piecemove::PieceMove};
 
 pub fn max_decision(
-    board: &Board,
+    board: &ChessBoard,
     color: Color,
     max_depth: u32,
 ) -> Result<PieceMove, Box<dyn std::error::Error>> {

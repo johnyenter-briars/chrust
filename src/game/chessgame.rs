@@ -1,6 +1,6 @@
 use crate::ai::minimax::funcs::max_decision;
 // use crate::ai::minimax::boardstate::BoardState;
-use crate::board::chessboard::Board;
+use crate::board::chessboard::ChessBoard;
 use crate::board::color::Color;
 use crate::board::coordinate::Coordinate;
 use crate::board::piecetype::PieceType;
@@ -25,7 +25,7 @@ use crate::ext::stringext::ToCoord;
 pub struct ChessGame {
     pub human_player: HumanPlayer,
     pub ai_player: AIPlayer,
-    pub board: Board,
+    pub board: ChessBoard,
     // pub history: Vec<&'a (dyn Action<'a> + Sync)>,
     human_plays: bool,
     tick_speed: u64, //milli
@@ -41,7 +41,7 @@ impl ChessGame {
     pub fn new(
         human_player: HumanPlayer,
         ai_player: AIPlayer,
-        board: Board,
+        board: ChessBoard,
         human_plays: bool,
         tick_speed: u64,
     ) -> Self {
@@ -254,7 +254,7 @@ pub fn process_fen(fen: String, num_plies: u32) -> Result<String, Box<dyn Error>
     let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
     let board =
-        Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+        ChessBoard::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
     let ai_move = max_decision(&board, Color::Black, num_plies)?;
 
@@ -275,7 +275,7 @@ pub fn is_valid(
         .next()
         .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
-    let board = Board::load_from_fen(board_section.to_string())
+    let board = ChessBoard::load_from_fen(board_section.to_string())
         .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     let current_position = current_location.to_coord();
@@ -300,7 +300,7 @@ pub fn valid_moves(
         .next()
         .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
-    let board = Board::load_from_fen(board_section.to_string())
+    let board = ChessBoard::load_from_fen(board_section.to_string())
         .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     if location.as_str().len() != 2 {

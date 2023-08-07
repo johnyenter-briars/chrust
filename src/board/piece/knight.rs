@@ -1,4 +1,4 @@
-use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate, piecetype::PieceType};
+use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
 
 use super::{achesspiece::AChessPiece, friendly_occupied};
 
@@ -10,7 +10,7 @@ pub struct Knight {
 }
 
 impl AChessPiece for Knight {
-    fn available_moves(&self, board: &Board) -> Vec<Coordinate> {
+    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
         let possible_directions = vec![

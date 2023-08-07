@@ -1,4 +1,4 @@
-use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate, piecetype::PieceType};
+use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
 
 use super::{
     achesspiece::AChessPiece, down_by, enemy_occupied, friendly_occupied,
@@ -13,7 +13,7 @@ pub struct Rook {
 }
 
 impl AChessPiece for Rook {
-    fn available_moves(&self, board: &Board) -> Vec<Coordinate> {
+    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         /*Algorithm:
             For each direction a rook can move in:
                 iterate up starting at the target piece in a diagonal line, if we hit an enemy, add that position, but dont go any further. If we hit a friendly piece, stop - dont add that position

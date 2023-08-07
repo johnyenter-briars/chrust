@@ -1,4 +1,4 @@
-use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate, piecetype::PieceType};
+use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
 
 use super::{
     achesspiece::AChessPiece, diagonal_down_left_by,
@@ -14,7 +14,7 @@ pub struct Queen {
 }
 
 impl AChessPiece for Queen {
-    fn available_moves(&self, board: &Board) -> Vec<Coordinate> {
+    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
         let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![

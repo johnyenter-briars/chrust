@@ -1,11 +1,11 @@
 use std::fmt::Debug;
 
-use crate::board::{chessboard::Board, coordinate::Coordinate, piecetype::PieceType, color::Color};
+use crate::board::{chessboard::ChessBoard, coordinate::Coordinate, piecetype::PieceType, color::Color};
 
 pub trait AChessPiece : Debug {
     fn available_moves(
         &self,
-        board: &Board,
+        board: &ChessBoard,
     ) -> Vec<Coordinate>;
     fn fen_code(&self) -> &str;
     fn str(&self) -> &str;

@@ -1,5 +1,5 @@
 use crate::board::{
-    chessboard::Board,
+    chessboard::ChessBoard,
     color::{self, Color},
     coordinate::Coordinate,
     piecetype::PieceType,
@@ -15,7 +15,7 @@ pub struct Pawn {
 }
 
 impl AChessPiece for Pawn {
-    fn available_moves(&self, board: &Board) -> Vec<Coordinate> {
+    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         //pawns can only move one or two spaces (depending on turn num)
         let possible_coordinates = match (self.color, self.current_position.y) {
             (Color::White, 2) => vec![
