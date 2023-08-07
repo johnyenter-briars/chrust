@@ -1,5 +1,5 @@
 use chrust::{
- board::{cell::color::Color, chessboard::Board},
+ board::{chessboard::Board, color::Color},
     frontend::server::build_and_run_frontend,
     game::chessgame::ChessGame,
     player::{aiplayer::AIPlayer, humanplayer::HumanPlayer},

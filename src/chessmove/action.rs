@@ -1,7 +1,6 @@
 use super::piecemove::*;
 use crate::{
-    board::cell::chesspiece::ChessPiece,
-    player::{aiplayer::AIPlayer, humanplayer::HumanPlayer},
+    player::{aiplayer::AIPlayer, humanplayer::HumanPlayer}, board::piece::chesspiece::ChessPiece,
 };
 
 pub trait Action<'a> {

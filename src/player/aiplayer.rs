@@ -1,4 +1,4 @@
-use crate::board::cell::color::Color;
+use crate::board::color::Color;
 
 use super::chessplayer::ChessPlayer;
 

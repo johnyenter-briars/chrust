@@ -1,9 +1,9 @@
-// use crate::ai::minimax::boardstate::BoardState;
 use crate::ai::minimax::funcs::max_decision;
-use crate::board::cell::color::Color;
-use crate::board::cell::piecetype::PieceType;
+// use crate::ai::minimax::boardstate::BoardState;
 use crate::board::chessboard::Board;
+use crate::board::color::Color;
 use crate::board::coordinate::Coordinate;
+use crate::board::piecetype::PieceType;
 // use crate::chessmove::piecemove::Move;
 use crate::player::aiplayer::*;
 use crate::player::chessplayer::ChessPlayer;

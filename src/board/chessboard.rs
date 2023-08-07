@@ -1,17 +1,21 @@
 extern crate serde_derive;
 extern crate serde_json;
 
-use crate::board::cell::Cell;
-use crate::board::cell::piecetype::PieceType;
-use crate::chessmove::piecemove::{PieceMove};
+use crate::chessmove::piecemove::PieceMove;
+// use crate::board::cell::piecetype::PieceType;
+// use crate::chessmove::piecemove::{PieceMove};
 use crate::player::humanplayer::HumanPlayer;
 use std::error::Error;
 use core::result::Result;
 
-use crate::board::cell::chesspiece::ChessPiece;
-use crate::board::cell::color::Color;
+// use crate::board::cell::chesspiece::ChessPiece;
 
+use super::cell::Cell;
+use super::color::Color;
 use super::coordinate::Coordinate;
+use super::piece::chesspiece::ChessPiece;
+use super::piece::achesspiece::AChessPiece;
+use super::piecetype::PieceType;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Board {
@@ -76,7 +80,7 @@ impl Board {
             return Err(Box::from("Thats not your piece!"));
         }
          
-        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self))
+        Ok(target_piece.available_moves(target_piece, current_position, self))
     }
 
     pub fn possible_moves(&self, current_position: Coordinate, color: Color) -> Result<Vec<Coordinate>, Box<dyn Error>> {
@@ -86,7 +90,7 @@ impl Board {
             return Err(Box::from("Thats not your piece!"));
         }
          
-        Ok(target_piece.piece_type.available_moves(target_piece, current_position, self))
+        Ok(target_piece.available_moves(target_piece, current_position, self))
     }
 
     pub fn all_possible_moves(&self, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
@@ -154,7 +158,8 @@ impl Board {
     pub fn piece_specific(&self, color: Color, piece_type: PieceType) -> Option<&ChessPiece>{
         let pieces = self.pieces_of_color(color);
 
-        pieces.into_iter().find(|x| x.piece_type == piece_type)
+        // pieces.into_iter().find(|x| x.piece_type == piece_type)
+        todo!()
     }
 
 
@@ -162,7 +167,6 @@ impl Board {
         //1: get the reference to the piece we're going to movmute
         let mut target_piece: ChessPiece = ChessPiece {
             color: Color::Black,
-            piece_type: PieceType::Bishop
         };
         for cell in self.all_cells(){
             if cell.x == from.x && cell.y == from.y {
@@ -273,19 +277,20 @@ impl Board {
 }
 
 fn piece_from_fen_char(c: char) -> Result<ChessPiece, Box<dyn std::error::Error>> {
-    match c {
-        'p' => Ok(ChessPiece{piece_type: PieceType::Pawn, color: Color::Black}),
-        'r' => Ok(ChessPiece{piece_type: PieceType::Rook, color: Color::Black}),
-        'n' => Ok(ChessPiece{piece_type: PieceType::Knight, color: Color::Black}),
-        'b' => Ok(ChessPiece{piece_type: PieceType::Bishop, color: Color::Black}),
-        'k' => Ok(ChessPiece{piece_type: PieceType::King, color: Color::Black}),
-        'q' => Ok(ChessPiece{piece_type: PieceType::Queen, color: Color::Black}),
-        'P' => Ok(ChessPiece{piece_type: PieceType::Pawn, color: Color::White}),
-        'R' => Ok(ChessPiece{piece_type: PieceType::Rook, color: Color::White}),
-        'N' => Ok(ChessPiece{piece_type: PieceType::Knight, color: Color::White}),
-        'B' => Ok(ChessPiece{piece_type: PieceType::Bishop, color: Color::White}),
-        'K' => Ok(ChessPiece{piece_type: PieceType::King, color: Color::White}),
-        'Q' => Ok(ChessPiece{piece_type: PieceType::Queen, color: Color::White}),
-        _ => Err(Box::from("Invalid char: {}")),
-    }
+    todo!()
+    // match c {
+    //     'p' => Ok(ChessPiece{piece_type: PieceType::Pawn, color: Color::Black}),
+    //     'r' => Ok(ChessPiece{piece_type: PieceType::Rook, color: Color::Black}),
+    //     'n' => Ok(ChessPiece{piece_type: PieceType::Knight, color: Color::Black}),
+    //     'b' => Ok(ChessPiece{piece_type: PieceType::Bishop, color: Color::Black}),
+    //     'k' => Ok(ChessPiece{piece_type: PieceType::King, color: Color::Black}),
+    //     'q' => Ok(ChessPiece{piece_type: PieceType::Queen, color: Color::Black}),
+    //     'P' => Ok(ChessPiece{piece_type: PieceType::Pawn, color: Color::White}),
+    //     'R' => Ok(ChessPiece{piece_type: PieceType::Rook, color: Color::White}),
+    //     'N' => Ok(ChessPiece{piece_type: PieceType::Knight, color: Color::White}),
+    //     'B' => Ok(ChessPiece{piece_type: PieceType::Bishop, color: Color::White}),
+    //     'K' => Ok(ChessPiece{piece_type: PieceType::King, color: Color::White}),
+    //     'Q' => Ok(ChessPiece{piece_type: PieceType::Queen, color: Color::White}),
+    //     _ => Err(Box::from("Invalid char: {}")),
+    // }
 }
