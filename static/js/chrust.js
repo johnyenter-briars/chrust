@@ -2,9 +2,9 @@ class ChrustAPI {
     constructor(board) {
         this.chessBoard = board;
         this.hostname = window.location.hostname;
-        this.apiUrl = this.hostname === '127.0.0.1' 
-                    ? `http://${this.hostname}:8080/chrust` : 
-                      `http://${this.hostname}/chrust`;
+        this.apiUrl = this.hostname === '127.0.0.1' || this.hostname === '0.0.0.0' || this.hostname === '192.168.0.4'
+            ? `http://${this.hostname}:8083/chrust` :
+            `http://${this.hostname}/chrust`;
 
         this.currenlyInWebRequest = false;
     }
@@ -195,7 +195,7 @@ function resetBoard() {
 
 const refreshSettings = async () => {
     var result = await chrustAPI.getCurrentSettings();
-    for(key in result){
+    for (key in result) {
         document.getElementById(key).textContent = result[key];
     }
 }

@@ -1,54 +1,69 @@
-use std::io::Cursor;
+
+
+use actix_web::HttpResponse;
+use actix_web::http::header::ContentType;
 
 use crate::board::coordinate::Coordinate;
 use crate::state::programstate::ProgramState;
-use rocket::http::ContentType;
-use rocket::request::Request;
-use rocket::response;
-use rocket::response::Responder;
-use rocket::response::Response;
 
 #[derive(Serialize, Deserialize)]
 pub struct MoveOptionsResponse {
     pub options: Vec<Coordinate>,
 }
+impl MoveOptionsResponse {
+    pub fn ok(options: Vec<Coordinate>) -> HttpResponse {
+        HttpResponse::Ok().content_type(ContentType::json()).body(
+            MoveOptionsResponse  {
+                options
+            }
+            .as_serde_string(),
+        )
+    }
 
-impl<'r> Responder<'r, 'static> for MoveOptionsResponse {
-    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
-        let response_string = serde_json::to_string(&self).unwrap();
-        Response::build()
-            .header(ContentType::JSON)
-            .sized_body(response_string.len(), Cursor::new(response_string))
-            .ok()
+    pub fn as_serde_string(self) -> String {
+        serde_json::to_string(&self).expect("Unable to parse response object!")
     }
 }
+
 
 #[derive(Serialize, Deserialize)]
 pub struct ValidateResponse {
     pub is_valid: bool,
 }
 
-impl<'r> Responder<'r, 'static> for ValidateResponse {
-    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
-        let response_string = serde_json::to_string(&self).unwrap();
-        Response::build()
-            .header(ContentType::JSON)
-            .sized_body(response_string.len(), Cursor::new(response_string))
-            .ok()
+impl ValidateResponse {
+    pub fn ok(is_valid: bool) -> HttpResponse {
+        HttpResponse::Ok().content_type(ContentType::json()).body(
+            ValidateResponse {
+                is_valid
+            }
+            .as_serde_string(),
+        )
+    }
+
+    pub fn as_serde_string(self) -> String {
+        serde_json::to_string(&self).expect("Unable to parse response object!")
     }
 }
+
+impl SettingsResponse {
+    pub fn ok(program_state: ProgramState) -> HttpResponse {
+        HttpResponse::Ok().content_type(ContentType::json()).body(
+            SettingsResponse  {
+                program_state
+            }
+            .as_serde_string(),
+        )
+    }
+
+    pub fn as_serde_string(self) -> String {
+        serde_json::to_string(&self).expect("Unable to parse response object!")
+    }
+}
+
 
 #[derive(Serialize, Deserialize)]
 pub struct SettingsResponse {
     pub program_state: ProgramState
 }
 
-impl<'r> Responder<'r, 'static> for SettingsResponse {
-    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
-        let response_string = serde_json::to_string(&self).unwrap();
-        Response::build()
-            .header(ContentType::JSON)
-            .sized_body(response_string.len(), Cursor::new(response_string))
-            .ok()
-    }
-}

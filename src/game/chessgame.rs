@@ -11,6 +11,7 @@ use crate::player::humanplayer::*;
 
 extern crate rand;
 
+
 // use rand::thread_rng;
 use rand::seq::SliceRandom;
 
@@ -266,17 +267,17 @@ pub fn process_fen(fen: String, num_plies: u32) -> Result<String, Box<dyn Error>
 }
 
 pub fn is_valid(
-    current_fen: String,
+    fen: String,
     current_location: String,
     possible_location: String,
 ) -> Result<bool, Box<dyn std::error::Error>> {
-    let board_section = current_fen
+    let board_section = fen
         .split(' ')
         .next()
-        .expect("Fen is improperly formatted!");
+        .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
-    let board =
-        Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+    let board = Board::load_from_fen(board_section.to_string())
+        .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     let current_position = current_location.to_coord();
 
@@ -295,10 +296,13 @@ pub fn valid_moves(
     fen: String,
     location: String,
 ) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
-    let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
+    let board_section = fen
+        .split(' ')
+        .next()
+        .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
-    let board =
-        Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+    let board = Board::load_from_fen(board_section.to_string())
+        .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     if location.as_str().len() != 2 {
         return Err(Box::from("Invalid format for location string"));

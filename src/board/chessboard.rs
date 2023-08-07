@@ -49,10 +49,11 @@ impl Board {
             println!();
         }
         print!(" ");
-        "abcdefgh".to_string().chars().into_iter().for_each(|int| print!("  {} ", int));
+        "abcdefgh".to_string().chars().for_each(|int| print!("  {} ", int));
         println!();
     }
 
+    // Returns the chess piece at a given position
     pub fn piece(&self, x: char, y: i32) -> core::result::Result<&ChessPiece, Box<dyn Error>> {
         for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
@@ -216,10 +217,10 @@ impl Board {
         Ok(board)
     }
     
-    // assumes the game section of the fen has been taken out
+    /// Creates a `Board` object from a Fen string. NOTE: assumes the game section of the fen has been removed
     pub fn load_from_fen(fen: String) -> Result<Board, Box<dyn std::error::Error>> {
         let mut board = Board::load_from_file("empty_board")?;
-        let sections: Vec<Vec<char>> = fen.split('/').into_iter().map(|s| s.to_string().chars().collect()).collect();
+        let sections: Vec<Vec<char>> = fen.split('/').map(|s| s.to_string().chars().collect()).collect();
 
         let mut cells = board.all_cells_mut();
         let mut cell_iter = cells.iter_mut();

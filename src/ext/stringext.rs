@@ -5,6 +5,7 @@ pub trait ToCoord {
 }
 
 impl ToCoord for std::string::String {
+    /// Returns a `Coordinate` object equal to the string representation of 'a7'
     fn to_coord(&self) -> Coordinate {
         let mut chars = self.chars();
         let x: char = chars.next().unwrap();

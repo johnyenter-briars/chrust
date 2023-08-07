@@ -79,7 +79,7 @@ impl PieceType {
                     vec![up_by, down_by, left_by, right_by];
 
                 for direction_func in possible_directions {
-                    for position in (1..9).into_iter() {
+                    for position in 1..9 {
                         let possible_position = direction_func(current_position, position);
 
                         if !possible_position.is_valid(board) {
@@ -143,7 +143,7 @@ impl PieceType {
                 ];
 
                 for direction_func in possible_directions {
-                    for position in (1..9).into_iter() {
+                    for position in 1..9 {
                         let possible_position = direction_func(current_position, position);
 
                         if !possible_position.is_valid(board) {
@@ -181,7 +181,7 @@ impl PieceType {
                 ];
 
                 for direction_func in possible_directions {
-                    for position in (1..9).into_iter() {
+                    for position in 1..9 {
                         let possible_position = direction_func(current_position, position);
 
                         if !possible_position.is_valid(board) {
@@ -216,7 +216,7 @@ impl PieceType {
                 ];
 
                 for direction_func in possible_directions {
-                    for position in (1..2).into_iter() {
+                    for position in 1..2 {
                         let possible_position = direction_func(current_position, position);
 
                         if !possible_position.is_valid(board) {
