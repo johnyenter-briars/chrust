@@ -77,12 +77,11 @@ impl ChessBoard {
         &self,
         x: char,
         y: i32,
-    ) -> core::result::Result<Box<&dyn AChessPiece>, Box<dyn Error>> {
+    ) -> core::result::Result<&Box<dyn AChessPiece>, Box<dyn Error>> {
         for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
                 if let Some(piece_ref) = &cell.space {
-                    todo!()
-                    // return Ok(piece_ref);
+                    return Ok(piece_ref);
                 } else {
                     return Err(Box::from(format!("You tried to get a piece at a space that didnt have one - did you mean to do that? x:{},y:{}", x, y)));
                 }
@@ -361,7 +360,8 @@ impl ChessBoard {
                     let cell = cell_iter
                         .next()
                         .expect("The iterator really shouldnt be empty :(");
-                    cell.space.get_or_insert(piece_from_fen_char(c)?);
+                    cell.space
+                        .get_or_insert(piece_from_fen_char(c, cell.x, cell.y)?);
                 }
             }
         }
@@ -398,67 +398,71 @@ impl ChessBoard {
     }
 }
 
-fn piece_from_fen_char(c: char) -> Result<Box<dyn AChessPiece>, Box<dyn std::error::Error>> {
+fn piece_from_fen_char(
+    c: char,
+    x: char,
+    y: i32,
+) -> Result<Box<dyn AChessPiece>, Box<dyn std::error::Error>> {
     match c {
         'p' => Ok(Box::from(Pawn {
             piece_type: PieceType::Pawn,
             color: Color::Black,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'r' => Ok(Box::from(Rook {
             piece_type: PieceType::Rook,
             color: Color::Black,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'n' => Ok(Box::from(Knight {
             piece_type: PieceType::Knight,
             color: Color::Black,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'b' => Ok(Box::from(Bishop {
             piece_type: PieceType::Bishop,
             color: Color::Black,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'k' => Ok(Box::from(King {
             piece_type: PieceType::King,
             color: Color::Black,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'q' => Ok(Box::from(Queen {
             piece_type: PieceType::Queen,
             color: Color::Black,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'P' => Ok(Box::from(Pawn {
             piece_type: PieceType::Pawn,
             color: Color::White,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'R' => Ok(Box::from(Rook {
             piece_type: PieceType::Rook,
             color: Color::White,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'N' => Ok(Box::from(Knight {
             piece_type: PieceType::Knight,
             color: Color::White,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'B' => Ok(Box::from(Bishop {
             piece_type: PieceType::Bishop,
             color: Color::White,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'K' => Ok(Box::from(King {
             piece_type: PieceType::King,
             color: Color::White,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         'Q' => Ok(Box::from(Queen {
             piece_type: PieceType::Queen,
             color: Color::White,
-            current_position: Coordinate { x: 'z', y: -1 },
+            current_position: Coordinate { x, y },
         })),
         _ => Err(Box::from("Invalid char: {}")),
     }

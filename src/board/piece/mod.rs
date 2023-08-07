@@ -12,29 +12,25 @@ pub mod knight;
 fn enemy_occupied(coordinate: Coordinate, current_piece_color: Color, board: &ChessBoard) -> bool {
     let cell = board.test_cell_at(coordinate);
 
-    todo!()
-
-    // match cell {
-    //     Some(c) => match c.space {
-    //         Some(piece) => piece.color != current_piece_color,
-    //         None => false,
-    //     },
-    //     None => false,
-    // }
+    match cell {
+        Some(c) => match &c.space {
+            Some(piece) => piece.color() != current_piece_color,
+            None => false,
+        },
+        None => false,
+    }
 }
 
 fn friendly_occupied(coordinate: Coordinate, current_piece_color: Color, board: &ChessBoard) -> bool {
     let cell = board.test_cell_at(coordinate);
 
-    todo!()
-
-    // match cell {
-    //     Some(c) => match c.space {
-    //         Some(piece) => piece.color == current_piece_color,
-    //         None => false,
-    //     },
-    //     None => false,
-    // }
+    match cell {
+        Some(c) => match &c.space {
+            Some(piece) => piece.color() == current_piece_color,
+            None => false,
+        },
+        None => false,
+    }
 }
 
 fn up_by(coordinate: Coordinate, ammount: i32) -> Coordinate {

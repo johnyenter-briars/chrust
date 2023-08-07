@@ -11,8 +11,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let program_state = get_args()?;
 
     let board = ChessBoard::load_from_file("game_start")?;
-    println!("{:?}", board);
-    return Ok(());
 
     let human_player = HumanPlayer {
         name: "kasparov".to_string(),
