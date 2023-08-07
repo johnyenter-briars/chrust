@@ -8,8 +8,6 @@ pub struct Bishop(ChessPiece);
 impl AChessPiece for Bishop {
     fn available_moves(
         &self,
-        target_piece: &ChessPiece,
-        current_position: Coordinate,
         board: &Board,
     ) -> Vec<Coordinate> {
         /*Algorithm:
@@ -27,15 +25,15 @@ impl AChessPiece for Bishop {
 
         for direction_func in possible_directions {
             for position in 1..9 {
-                let possible_position = direction_func(current_position, position);
+                let possible_position = direction_func(self.0.current_position, position);
 
                 if !possible_position.is_valid(board) {
                     continue;
                 };
 
-                if friendly_occupied(possible_position, target_piece.color, board) {
+                if friendly_occupied(possible_position, self.0.color, board) {
                     break;
-                } else if enemy_occupied(possible_position, target_piece.color, board) {
+                } else if enemy_occupied(possible_position, self.0.color, board) {
                     possible_coordinates.push(possible_position);
                     break;
                 } else {

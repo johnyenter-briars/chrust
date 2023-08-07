@@ -8,21 +8,19 @@ pub struct Knight(ChessPiece);
 impl AChessPiece for Knight {
     fn available_moves(
         &self,
-        target_piece: &ChessPiece,
-        current_position: Coordinate,
         board: &Board,
     ) -> Vec<Coordinate> {
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
         let possible_directions = vec![
-            current_position.up_by(1).left_by(2),
-            current_position.up_by(2).left_by(1),
-            current_position.up_by(2).right_by(1),
-            current_position.up_by(1).right_by(2),
-            current_position.down_by(1).right_by(2),
-            current_position.down_by(2).right_by(1),
-            current_position.down_by(2).left_by(1),
-            current_position.down_by(1).left_by(2),
+            self.0.current_position.up_by(1).left_by(2),
+            self.0.current_position.up_by(2).left_by(1),
+            self.0.current_position.up_by(2).right_by(1),
+            self.0.current_position.up_by(1).right_by(2),
+            self.0.current_position.down_by(1).right_by(2),
+            self.0.current_position.down_by(2).right_by(1),
+            self.0.current_position.down_by(2).left_by(1),
+            self.0.current_position.down_by(1).left_by(2),
         ];
 
         for possible_position in possible_directions {
@@ -31,7 +29,7 @@ impl AChessPiece for Knight {
             };
 
             //TODO - this could be more expressive i think
-            if friendly_occupied(possible_position, target_piece.color, board) {
+            if friendly_occupied(possible_position, self.0.color, board) {
                 continue;
             } else {
                 possible_coordinates.push(possible_position);

@@ -80,7 +80,7 @@ impl Board {
             return Err(Box::from("Thats not your piece!"));
         }
          
-        Ok(target_piece.available_moves(target_piece, current_position, self))
+        Ok(target_piece.available_moves(self))
     }
 
     pub fn possible_moves(&self, current_position: Coordinate, color: Color) -> Result<Vec<Coordinate>, Box<dyn Error>> {
@@ -90,7 +90,7 @@ impl Board {
             return Err(Box::from("Thats not your piece!"));
         }
          
-        Ok(target_piece.available_moves(target_piece, current_position, self))
+        Ok(target_piece.available_moves(self))
     }
 
     pub fn all_possible_moves(&self, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
@@ -164,9 +164,10 @@ impl Board {
 
 
     pub fn move_piece(&mut self, from: Coordinate, to: Coordinate){
-        //1: get the reference to the piece we're going to movmute
+        //1: get the reference to the piece we're going to move
         let mut target_piece: ChessPiece = ChessPiece {
             color: Color::Black,
+            current_position: Coordinate { x: 'a', y: 10 }
         };
         for cell in self.all_cells(){
             if cell.x == from.x && cell.y == from.y {

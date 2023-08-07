@@ -1,17 +1,15 @@
 use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate};
 
-use super::{achesspiece::AChessPiece, chesspiece::ChessPiece, friendly_occupied, enemy_occupied, up_by, down_by, left_by, right_by};
+use super::{
+    achesspiece::AChessPiece, chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied,
+    left_by, right_by, up_by,
+};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Rook(ChessPiece);
 
 impl AChessPiece for Rook {
-    fn available_moves(
-        &self,
-        target_piece: &ChessPiece,
-        current_position: Coordinate,
-        board: &Board,
-    ) -> Vec<Coordinate> {
+    fn available_moves(&self, board: &Board) -> Vec<Coordinate> {
         /*Algorithm:
             For each direction a rook can move in:
                 iterate up starting at the target piece in a diagonal line, if we hit an enemy, add that position, but dont go any further. If we hit a friendly piece, stop - dont add that position
@@ -23,15 +21,15 @@ impl AChessPiece for Rook {
 
         for direction_func in possible_directions {
             for position in 1..9 {
-                let possible_position = direction_func(current_position, position);
+                let possible_position = direction_func(self.0.current_position, position);
 
                 if !possible_position.is_valid(board) {
                     continue;
                 };
 
-                if friendly_occupied(possible_position, target_piece.color, board) {
+                if friendly_occupied(possible_position, self.0.color, board) {
                     break;
-                } else if enemy_occupied(possible_position, target_piece.color, board) {
+                } else if enemy_occupied(possible_position, self.0.color, board) {
                     possible_coordinates.push(possible_position);
                     break;
                 } else {
