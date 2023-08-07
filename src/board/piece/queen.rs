@@ -1,9 +1,9 @@
 use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate};
 
-use super::{achesspiece::AChessPiece, chesspiece::ChessPiece};
+use super::{achesspiece::AChessPiece, chesspiece::ChessPiece, enemy_occupied, friendly_occupied, diagonal_down_left_by, diagonal_down_right_by, diagonal_up_right_by, diagonal_up_left_by, right_by, left_by, down_by, up_by};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct Queen(ChessPiece); 
+pub struct Queen(ChessPiece);
 
 impl AChessPiece for Queen {
     fn available_moves(
@@ -12,43 +12,50 @@ impl AChessPiece for Queen {
         current_position: Coordinate,
         board: &Board,
     ) -> Vec<Coordinate> {
-        vec![]
+        let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+
+        let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![
+            up_by,
+            down_by,
+            left_by,
+            right_by,
+            diagonal_up_left_by,
+            diagonal_up_right_by,
+            diagonal_down_right_by,
+            diagonal_down_left_by,
+        ];
+
+        for direction_func in possible_directions {
+            for position in 1..9 {
+                let possible_position = direction_func(current_position, position);
+
+                if !possible_position.is_valid(board) {
+                    continue;
+                };
+
+                if friendly_occupied(possible_position, target_piece.color, board) {
+                    break;
+                } else if enemy_occupied(possible_position, target_piece.color, board) {
+                    possible_coordinates.push(possible_position);
+                    break;
+                } else {
+                    possible_coordinates.push(possible_position);
+                }
+            }
+        }
+
+        possible_coordinates
     }
     fn str(&self) -> &str {
-        todo!()
-        // match (self.piece_type, self.color) {
-        //     (PieceType::Pawn, Color::White) => "\u{2659}",
-        //     (PieceType::Pawn, Color::Black) => "\u{265F}",
-        //     (PieceType::Rook, Color::White) => "\u{2656}",
-        //     (PieceType::Rook, Color::Black) => "\u{265C}",
-        //     (PieceType::Knight, Color::White) => "\u{2658}",
-        //     (PieceType::Knight, Color::Black) => "\u{265E}",
-        //     (PieceType::Bishop, Color::White) => "\u{2657}",
-        //     (PieceType::Bishop, Color::Black) => "\u{265D}",
-        //     (PieceType::Queen, Color::White) => "\u{2655}",
-        //     (PieceType::Queen, Color::Black) => "\u{265B}",
-        //     (PieceType::King, Color::White) => "\u{2654}",
-        //     (PieceType::King, Color::Black) => "\u{265A}",
-        // }
+        match self.0.color {
+            Color::White => "\u{2655}",
+            Color::Black => "\u{265B}",
+        }
     }
     fn fen_code(&self) -> &str {
-        todo!()
-        // match (self.piece_type, self.color) {
-        //     (PieceType::Pawn, Color::White) => "P",
-        //     (PieceType::Pawn, Color::Black) => "p",
-        //     (PieceType::Rook, Color::White) => "R",
-        //     (PieceType::Rook, Color::Black) => "r",
-        //     (PieceType::Knight, Color::White) => "N",
-        //     (PieceType::Knight, Color::Black) => "n",
-        //     (PieceType::Bishop, Color::White) => "B",
-        //     (PieceType::Bishop, Color::Black) => "b",
-        //     (PieceType::Queen, Color::White) => "Q",
-        //     (PieceType::Queen, Color::Black) => "q",
-        //     (PieceType::King, Color::White) => "K",
-        //     (PieceType::King, Color::Black) => "k",
-        // }
+        match self.0.color {
+            Color::White => "Q",
+            Color::Black => "q",
+        }
     }
 }
-
-
-

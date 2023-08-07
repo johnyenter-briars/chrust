@@ -1,9 +1,9 @@
-use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate};
+use crate::board::{chessboard::Board, color::{Color, self}, coordinate::Coordinate};
 
-use super::{achesspiece::AChessPiece, chesspiece::ChessPiece};
+use super::{achesspiece::AChessPiece, chesspiece::ChessPiece, enemy_occupied};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct Pawn(ChessPiece); 
+pub struct Pawn(ChessPiece);
 
 impl AChessPiece for Pawn {
     fn available_moves(
@@ -12,40 +12,62 @@ impl AChessPiece for Pawn {
         current_position: Coordinate,
         board: &Board,
     ) -> Vec<Coordinate> {
-        vec![]
+        //pawns can only move one or two spaces (depending on turn num)
+        let possible_coordinates = match (target_piece.color, current_position.y) {
+            (Color::White, 2) => vec![current_position.up_by(1), current_position.up_by(2)],
+            (Color::Black, 7) => {
+                vec![current_position.down_by(1), current_position.down_by(2)]
+            }
+            (Color::White, _) => vec![current_position.up_by(1)],
+            (Color::Black, _) => vec![current_position.down_by(1)],
+        };
+
+        //only include the ones where the enemy is NOT in front of
+        let mut possible_coordinates: Vec<Coordinate> = possible_coordinates
+            .into_iter()
+            .filter(|coord| !enemy_occupied(coord.to_owned(), target_piece.color, board))
+            .map(|coord| coord.to_owned())
+            .collect();
+
+        //Pawns can move diagonally if there's an enemy there
+        let possible_enemy_positions: Vec<Coordinate> =
+            if target_piece.color == color::Color::White {
+                vec![
+                    current_position.diagonal_up_right_by(1),
+                    current_position.diagonal_up_left_by(1),
+                ]
+            } else {
+                vec![
+                    current_position.diagonal_down_left_by(1),
+                    current_position.diagonal_down_right_by(1),
+                ]
+            }
+            .into_iter()
+            .filter(|coord| coord.is_valid(board)) //filter out the ones that arent valid (i.e, diagonal left might be off the map)
+            .collect();
+
+        for coord in possible_enemy_positions {
+            if enemy_occupied(coord, target_piece.color, board) {
+                possible_coordinates.push(coord)
+            };
+        }
+
+        //only return the coordinates that are valid spaces (on the board)
+        possible_coordinates
+            .into_iter()
+            .filter(|coord| coord.is_valid(board))
+            .collect()
     }
     fn str(&self) -> &str {
-        todo!()
-        // match (self.piece_type, self.color) {
-        //     (PieceType::Pawn, Color::White) => "\u{2659}",
-        //     (PieceType::Pawn, Color::Black) => "\u{265F}",
-        //     (PieceType::Rook, Color::White) => "\u{2656}",
-        //     (PieceType::Rook, Color::Black) => "\u{265C}",
-        //     (PieceType::Knight, Color::White) => "\u{2658}",
-        //     (PieceType::Knight, Color::Black) => "\u{265E}",
-        //     (PieceType::Bishop, Color::White) => "\u{2657}",
-        //     (PieceType::Bishop, Color::Black) => "\u{265D}",
-        //     (PieceType::Queen, Color::White) => "\u{2655}",
-        //     (PieceType::Queen, Color::Black) => "\u{265B}",
-        //     (PieceType::King, Color::White) => "\u{2654}",
-        //     (PieceType::King, Color::Black) => "\u{265A}",
-        // }
+        match self.0.color {
+            Color::White => "\u{2659}",
+            Color::Black => "\u{265F}",
+        }
     }
     fn fen_code(&self) -> &str {
-        todo!()
-        // match (self.piece_type, self.color) {
-        //     (PieceType::Pawn, Color::White) => "P",
-        //     (PieceType::Pawn, Color::Black) => "p",
-        //     (PieceType::Rook, Color::White) => "R",
-        //     (PieceType::Rook, Color::Black) => "r",
-        //     (PieceType::Knight, Color::White) => "N",
-        //     (PieceType::Knight, Color::Black) => "n",
-        //     (PieceType::Bishop, Color::White) => "B",
-        //     (PieceType::Bishop, Color::Black) => "b",
-        //     (PieceType::Queen, Color::White) => "Q",
-        //     (PieceType::Queen, Color::Black) => "q",
-        //     (PieceType::King, Color::White) => "K",
-        //     (PieceType::King, Color::Black) => "k",
-        // }
+        match self.0.color {
+            Color::White => "P",
+            Color::Black => "p",
+        }
     }
 }
