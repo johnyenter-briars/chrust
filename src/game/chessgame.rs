@@ -115,9 +115,8 @@ impl ChessGame {
     pub fn ai_moves(&mut self) -> Result<bool, Box<dyn Error>> {
         println!("ai moving");
 
-        let board = self.board.clone();
-
-        let ai_move = max_decision(&board, self.ai_player.color, 2)?;
+        todo!("i'm scared about this one");
+        let ai_move = max_decision(&self.board, self.ai_player.color, 2)?;
 
         self.board.move_piece(ai_move.from, ai_move.to);
 
@@ -261,7 +260,7 @@ pub fn process_fen(fen: String, num_plies: u32) -> Result<String, Box<dyn Error>
 
     let new_board = board.apply_action(&ai_move);
 
-    new_board.print_to_screen("ai move".to_string());
+    // new_board.print_to_screen("ai move".to_string());
 
     Ok(new_board.board_fen_section())
 }
@@ -310,7 +309,7 @@ pub fn valid_moves(
 
     let current_position = location.to_coord();
 
-    if board.piece(current_position.x, current_position.y)?.color == Color::Black {
+    if board.piece(current_position.x, current_position.y)?.color() == Color::Black {
         return Ok(vec![]);
     }
 

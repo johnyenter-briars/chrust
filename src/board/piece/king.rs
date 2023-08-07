@@ -1,15 +1,20 @@
-use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate};
+use crate::board::{chessboard::Board, color::Color, coordinate::Coordinate, piecetype::PieceType};
 
-use super::{achesspiece::AChessPiece, chesspiece::ChessPiece, friendly_occupied, enemy_occupied, diagonal_down_left_by, diagonal_down_right_by, diagonal_up_right_by, diagonal_up_left_by, right_by, left_by, down_by, up_by};
+use super::{
+    achesspiece::AChessPiece, diagonal_down_left_by,
+    diagonal_down_right_by, diagonal_up_left_by, diagonal_up_right_by, down_by, enemy_occupied,
+    friendly_occupied, left_by, right_by, up_by,
+};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct King(ChessPiece);
+pub struct King {
+    pub color: Color,
+    pub current_position: Coordinate,
+    pub piece_type: PieceType,
+}
 
 impl AChessPiece for King {
-    fn available_moves(
-        &self,
-        board: &Board,
-    ) -> Vec<Coordinate> {
+    fn available_moves(&self, board: &Board) -> Vec<Coordinate> {
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
         let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![
@@ -25,15 +30,15 @@ impl AChessPiece for King {
 
         for direction_func in possible_directions {
             for position in 1..2 {
-                let possible_position = direction_func(self.0.current_position, position);
+                let possible_position = direction_func(self.current_position, position);
 
                 if !possible_position.is_valid(board) {
                     continue;
                 };
 
-                if friendly_occupied(possible_position, self.0.color, board) {
+                if friendly_occupied(possible_position, self.color, board) {
                     break;
-                } else if enemy_occupied(possible_position, self.0.color, board) {
+                } else if enemy_occupied(possible_position, self.color, board) {
                     possible_coordinates.push(possible_position);
                     break;
                 } else {
@@ -45,15 +50,24 @@ impl AChessPiece for King {
         possible_coordinates
     }
     fn str(&self) -> &str {
-        match self.0.color {
+        match self.color {
             Color::White => "\u{2654}",
             Color::Black => "\u{265A}",
         }
     }
     fn fen_code(&self) -> &str {
-        match self.0.color {
+        match self.color {
             Color::White => "K",
             Color::Black => "k",
         }
+    }
+    fn piece_type(&self) -> PieceType {
+        self.piece_type
+    }
+    fn coordinate(&self) -> Coordinate {
+        self.current_position
+    }
+    fn color(&self) -> Color {
+        self.color
     }
 }

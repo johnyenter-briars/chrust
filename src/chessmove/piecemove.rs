@@ -1,15 +1,15 @@
-use crate::board::{piece::chesspiece::ChessPiece, coordinate::Coordinate};
+use crate::board::{coordinate::Coordinate, piece::achesspiece::AChessPiece};
 
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct PieceMove<'a> {
-    pub chess_piece: &'a ChessPiece,
+    pub chess_piece: &'a dyn AChessPiece,
     pub from: Coordinate,
     pub to: Coordinate,
 }
 
 impl<'a> PieceMove<'a> {
-    pub fn new(chess_piece: &'a ChessPiece, from: Coordinate, to: Coordinate) -> Self {
+    pub fn new(chess_piece: &'a dyn AChessPiece, from: Coordinate, to: Coordinate) -> Self {
         PieceMove {
             chess_piece,
             from,

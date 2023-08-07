@@ -2,48 +2,53 @@ use crate::board::{
     chessboard::Board,
     color::{self, Color},
     coordinate::Coordinate,
+    piecetype::PieceType,
 };
 
-use super::{achesspiece::AChessPiece, chesspiece::ChessPiece, enemy_occupied};
+use super::{achesspiece::AChessPiece, enemy_occupied};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct Pawn(ChessPiece);
+pub struct Pawn {
+    pub color: Color,
+    pub current_position: Coordinate,
+    pub piece_type: PieceType,
+}
 
 impl AChessPiece for Pawn {
     fn available_moves(&self, board: &Board) -> Vec<Coordinate> {
         //pawns can only move one or two spaces (depending on turn num)
-        let possible_coordinates = match (self.0.color, self.0.current_position.y) {
+        let possible_coordinates = match (self.color, self.current_position.y) {
             (Color::White, 2) => vec![
-                self.0.current_position.up_by(1),
-                self.0.current_position.up_by(2),
+                self.current_position.up_by(1),
+                self.current_position.up_by(2),
             ],
             (Color::Black, 7) => {
                 vec![
-                    self.0.current_position.down_by(1),
-                    self.0.current_position.down_by(2),
+                    self.current_position.down_by(1),
+                    self.current_position.down_by(2),
                 ]
             }
-            (Color::White, _) => vec![self.0.current_position.up_by(1)],
-            (Color::Black, _) => vec![self.0.current_position.down_by(1)],
+            (Color::White, _) => vec![self.current_position.up_by(1)],
+            (Color::Black, _) => vec![self.current_position.down_by(1)],
         };
 
         //only include the ones where the enemy is NOT in front of
         let mut possible_coordinates: Vec<Coordinate> = possible_coordinates
             .into_iter()
-            .filter(|coord| !enemy_occupied(coord.to_owned(), self.0.color, board))
+            .filter(|coord| !enemy_occupied(coord.to_owned(), self.color, board))
             .map(|coord| coord.to_owned())
             .collect();
 
         //Pawns can move diagonally if there's an enemy there
-        let possible_enemy_positions: Vec<Coordinate> = if self.0.color == color::Color::White {
+        let possible_enemy_positions: Vec<Coordinate> = if self.color == color::Color::White {
             vec![
-                self.0.current_position.diagonal_up_right_by(1),
-                self.0.current_position.diagonal_up_left_by(1),
+                self.current_position.diagonal_up_right_by(1),
+                self.current_position.diagonal_up_left_by(1),
             ]
         } else {
             vec![
-                self.0.current_position.diagonal_down_left_by(1),
-                self.0.current_position.diagonal_down_right_by(1),
+                self.current_position.diagonal_down_left_by(1),
+                self.current_position.diagonal_down_right_by(1),
             ]
         }
         .into_iter()
@@ -51,7 +56,7 @@ impl AChessPiece for Pawn {
         .collect();
 
         for coord in possible_enemy_positions {
-            if enemy_occupied(coord, self.0.color, board) {
+            if enemy_occupied(coord, self.color, board) {
                 possible_coordinates.push(coord)
             };
         }
@@ -63,15 +68,24 @@ impl AChessPiece for Pawn {
             .collect()
     }
     fn str(&self) -> &str {
-        match self.0.color {
+        match self.color {
             Color::White => "\u{2659}",
             Color::Black => "\u{265F}",
         }
     }
     fn fen_code(&self) -> &str {
-        match self.0.color {
+        match self.color {
             Color::White => "P",
             Color::Black => "p",
         }
+    }
+    fn piece_type(&self) -> PieceType {
+        self.piece_type
+    }
+    fn coordinate(&self) -> Coordinate {
+        self.current_position
+    }
+    fn color(&self) -> Color {
+        self.color
     }
 }

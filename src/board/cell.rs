@@ -1,9 +1,8 @@
-use super::{piece::chesspiece::ChessPiece, color::Color};
+use super::{piece::{achesspiece::AChessPiece}, color::Color};
 
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Cell {
-    pub space: Option<ChessPiece>,
+    pub space: Option<Box<dyn AChessPiece>>,
     pub color: Color,
     pub x: char,
     pub y: i32,
