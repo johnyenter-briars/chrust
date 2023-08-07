@@ -1,8 +1,8 @@
-use super::responses::{ValidateResponse};
+use super::responses::ValidateResponse;
 use crate::{
-    frontend::responses::MoveOptionsResponse,
+    frontend::responses::{MoveOptionsResponse, SettingsResponse},
     game::chessgame::{is_valid, process_fen, valid_moves},
-    state::programstate::{ProgramState},
+    state::programstate::ProgramState,
 };
 use actix_web::web;
 use actix_web::{get, post, HttpResponse};
@@ -21,8 +21,8 @@ pub struct Settings {
 // }
 
 #[post("/api/process/{fen}")]
-pub async fn process(fen: web::Path<String>, settings: web::Data<Settings>) -> String {
-    let program_state = *settings.program_state.lock().unwrap();
+pub async fn process(fen: web::Path<String>, s: web::Data<Settings>) -> String {
+    let program_state = *s.program_state.lock().unwrap();
     let returned_fen = match process_fen(fen.to_string(), program_state.num_plies) {
         Ok(f) => f,
         Err(e) => panic!("paniced because! {}", e),
@@ -46,26 +46,27 @@ pub async fn validate(query: web::Path<(String, String, String)>) -> Result<impl
     Ok(web::Json(ValidateResponse { is_valid }))
 }
 
-// #[get("/settings")]
-// pub async fn settings(settings: web::Data<Settings>) -> HttpResponse {
-//     let program_state = *settings.program_state.lock().unwrap();
-//     let idk = SettingsResponse { program_state };
-//     return idk::ok();
-// }
+#[get("/settings")]
+async fn settings(settings: web::Data<Settings>) -> Result<impl Responder> {
+    let program_state = *settings.program_state.lock().unwrap();
+    Ok(web::Json(SettingsResponse { program_state }))
+}
 
-// #[get("/")]
-// fn index() -> Html<&'static str> {
-//     Html(include_str!("../../static/index.html"))
-// }
+#[get("/")]
+async fn index() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(include_str!("../../static/index.html"))
+}
 
-#[get("/chrust.js")]
+#[get("js/chrust.js")]
 async fn javascript() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/javascript")
         .body(include_str!("../../static/js/chrust.js"))
 }
 
-#[get("/chrust.css")]
+#[get("css/chrust.css")]
 async fn css() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/css")
@@ -73,15 +74,17 @@ async fn css() -> HttpResponse {
 }
 
 // /img/chesspieces/wikipedia/wB.png
-#[get("/chesspieces/wikipedia/{piece}")]
-async fn chesspiece(piece: web::Path<String>, settings: web::Data<Settings>) -> HttpResponse {
-    let image_map = settings.image_map.lock().unwrap().clone();
+#[get("img/chesspieces/wikipedia/{piece}")]
+async fn chesspiece(piece: web::Path<String>, s: web::Data<Settings>) -> HttpResponse {
+    let image_map = s.image_map.lock().unwrap().clone();
     let byte_vec = match image_map.get(&piece.replace(".png", "")) {
         Some(byte_vec) => byte_vec,
         None => panic!("Unable to find the piece image in the image_map!"),
     };
     // let idk = include_bytes!("../../static/img/chesspieces/wikipedia/bB.png");
-    HttpResponse::Ok().content_type("image/png").body(byte_vec.to_owned())
+    HttpResponse::Ok()
+        .content_type("image/png")
+        .body(byte_vec.to_owned())
 
     // Ok(NamedFile::)
 }
@@ -155,7 +158,9 @@ pub async fn build_and_run_frontend(program_state: ProgramState) -> std::io::Res
                 .service(validate)
                 .service(css)
                 .service(javascript)
+                .service(index)
                 .service(chesspiece)
+                .service(settings)
                 .wrap(Logger::default())
                 .app_data(app_state.clone()),
         )
