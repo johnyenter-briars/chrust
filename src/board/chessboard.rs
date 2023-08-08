@@ -3,6 +3,7 @@ extern crate serde_json;
 
 use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
+use crate::ChrustResult;
 // use crate::board::cell::piecetype::PieceType;
 // use crate::chessmove::piecemove::{PieceMove};
 use crate::player::humanplayer::HumanPlayer;
@@ -16,8 +17,8 @@ use std::vec;
 use super::cell::Cell;
 use super::color::Color;
 use super::coordinate::Coordinate;
-use super::piece::chesspiece::ChessPiece;
 use super::piece::bishop::Bishop;
+use super::piece::chesspiece::ChessPiece;
 use super::piece::king::King;
 use super::piece::knight::Knight;
 use super::piece::queen::Queen;
@@ -73,11 +74,7 @@ impl ChessBoard {
     }
 
     // Returns the chess piece at a given position
-    pub fn piece(
-        &self,
-        x: char,
-        y: i32,
-    ) -> core::result::Result<&Box<dyn ChessPiece>, Box<dyn Error>> {
+    pub fn piece(&self, x: char, y: i32) -> ChrustResult<&Box<dyn ChessPiece>> {
         for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
                 if let Some(piece_ref) = &cell.space {
@@ -95,7 +92,7 @@ impl ChessBoard {
         &self,
         current_position: Coordinate,
         human_player: &HumanPlayer,
-    ) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+    ) -> ChrustResult<Vec<Coordinate>> {
         let target_piece = self.piece(current_position.x, current_position.y)?;
 
         if target_piece.color() != human_player.color {
@@ -109,7 +106,7 @@ impl ChessBoard {
         &self,
         current_position: Coordinate,
         color: Color,
-    ) -> Result<Vec<Coordinate>, Box<dyn Error>> {
+    ) -> ChrustResult<Vec<Coordinate>> {
         let target_piece = self.piece(current_position.x, current_position.y)?;
 
         if target_piece.color() != color {
@@ -119,7 +116,7 @@ impl ChessBoard {
         Ok(target_piece.available_moves(self))
     }
 
-    pub fn all_possible_moves(&self, color: Color) -> Result<Vec<PieceMove>, Box<dyn Error>> {
+    pub fn all_possible_moves(&self, color: Color) -> ChrustResult<Vec<PieceMove>> {
         let cells = self.cells_with_pieces_with_color(color);
 
         let mut possible_moves: Vec<PieceMove> = Vec::new();
@@ -140,12 +137,16 @@ impl ChessBoard {
         Ok(possible_moves)
     }
 
-    pub fn apply_action(&self, action: &PieceMove) -> ChessBoard {
+    pub fn export_fen(&self) -> String {
+        "idk".to_string()
+    }
+
+    pub fn apply_action(&self, action: &PieceMove) -> ChrustResult<ChessBoard> {
         //by jove i hope this doesnt have unexpected side affects
-        // let new_board: &mut Board = self.clone();
-        // new_board.move_piece(action.from, action.to);
-        // *new_board
-        todo!("just create a new board object")
+        let fen = self.export_fen();
+        let mut new_board = ChessBoard::load_from_fen(fen)?;
+        new_board.move_piece(action.from, action.to);
+        Ok(new_board)
     }
 
     fn space_to_empty(&mut self, x: char, y: i32) {
@@ -234,7 +235,7 @@ impl ChessBoard {
         self.space_to_empty(from.x, from.y);
     }
 
-    pub fn load_empty_board() -> Result<ChessBoard, Box<dyn std::error::Error>> {
+    pub fn load_empty_board() -> ChrustResult<ChessBoard> {
         let board = ChessBoard {
             squares: vec![
                 vec![
@@ -324,7 +325,7 @@ impl ChessBoard {
         Ok(board)
     }
 
-    pub fn load_from_file(board_name: &str) -> Result<ChessBoard, Box<dyn std::error::Error>> {
+    pub fn load_from_file(board_name: &str) -> ChrustResult<ChessBoard> {
         let board_string = match board_name {
             "game_start" => include_str!("../../boards/game_start.fen"),
             "empty_board" => include_str!("../../boards/empty_board.fen"),
@@ -337,7 +338,7 @@ impl ChessBoard {
     }
 
     /// Creates a `Board` object from a Fen string. NOTE: assumes the game section of the fen has been removed
-    pub fn load_from_fen(fen: String) -> Result<ChessBoard, Box<dyn std::error::Error>> {
+    pub fn load_from_fen(fen: String) -> ChrustResult<ChessBoard> {
         let mut board = ChessBoard::load_empty_board()?;
         let sections: Vec<Vec<char>> = fen
             .split('/')
@@ -402,7 +403,7 @@ fn piece_from_fen_char(
     c: char,
     x: char,
     y: i32,
-) -> Result<Box<dyn ChessPiece>, Box<dyn std::error::Error>> {
+) -> ChrustResult<Box<dyn ChessPiece>> {
     match c {
         'p' => Ok(Box::from(Pawn {
             piece_type: PieceType::Pawn,

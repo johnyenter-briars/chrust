@@ -7,65 +7,66 @@ use crate::{
     ai::minimax::evaluate::evaluate,
     board::{chessboard::ChessBoard, color::Color},
     chessmove::piecemove::PieceMove,
+    ChrustResult,
 };
 
-// fn max_value(board: &ChessBoard, depth: u32, mut alpha: i32, beta: i32) -> i32 {
-//     if depth == 0 {
-//         return evaluate(board);
-//     }
+fn max_value(board: &ChessBoard, depth: u32, mut alpha: i32, beta: i32) -> ChrustResult<i32> {
+    if depth == 0 {
+        return Ok(evaluate(board));
+    }
 
-//     let mut best_value = -1000000;
+    let mut best_value = -1000000;
 
-//     let moves = match board.all_possible_moves(Color::Black) {
-//         Ok(mvs) => mvs,
-//         Err(e) => panic!(
-//             "Unable to get the possible moves from current board state: {:?}",
-//             e
-//         ),
-//     };
+    let moves = match board.all_possible_moves(Color::Black) {
+        Ok(mvs) => mvs,
+        Err(e) => panic!(
+            "Unable to get the possible moves from current board state: {:?}",
+            e
+        ),
+    };
 
-//     for action in moves {
-//         best_value = cmp::max(
-//             best_value,
-//             min_value(&board.apply_action(&action), depth - 1, alpha, beta),
-//         );
-//         alpha = cmp::max(alpha, best_value);
-//         if beta <= alpha {
-//             return best_value;
-//         }
-//     }
+    for action in moves {
+        best_value = cmp::max(
+            best_value,
+            min_value(&board.apply_action(&action)?, depth - 1, alpha, beta)?,
+        );
+        alpha = cmp::max(alpha, best_value);
+        if beta <= alpha {
+            return Ok(best_value);
+        }
+    }
 
-//     best_value
-// }
+    Ok(best_value)
+}
 
-// fn min_value(board: &ChessBoard, depth: u32, alpha: i32, mut beta: i32) -> i32 {
-//     if depth == 0 {
-//         return evaluate(board);
-//     }
+fn min_value(board: &ChessBoard, depth: u32, alpha: i32, mut beta: i32) -> ChrustResult<i32> {
+    if depth == 0 {
+        return Ok(evaluate(board));
+    }
 
-//     let mut best_value = 1000000;
+    let mut best_value = 1000000;
 
-//     let moves = match board.all_possible_moves(Color::White) {
-//         Ok(mvs) => mvs,
-//         Err(e) => panic!(
-//             "Unable to get the possible moves from current board state: {:?}",
-//             e
-//         ),
-//     };
+    let moves = match board.all_possible_moves(Color::White) {
+        Ok(mvs) => mvs,
+        Err(e) => panic!(
+            "Unable to get the possible moves from current board state: {:?}",
+            e
+        ),
+    };
 
-//     for action in moves {
-//         best_value = cmp::min(
-//             best_value,
-//             max_value(&board.apply_action(&action), depth - 1, alpha, beta),
-//         );
-//         beta = cmp::min(beta, best_value);
-//         if beta <= alpha {
-//             return best_value;
-//         }
-//     }
+    for action in moves {
+        best_value = cmp::min(
+            best_value,
+            max_value(&board.apply_action(&action)?, depth - 1, alpha, beta)?,
+        );
+        beta = cmp::min(beta, best_value);
+        if beta <= alpha {
+            return Ok(best_value);
+        }
+    }
 
-//     best_value
-// }
+    Ok(best_value)
+}
 
 // fn minimax_decision_min<'a>(
 //     board: &'a ChessBoard,
@@ -86,39 +87,34 @@ use crate::{
 //     }
 // }
 
-// fn minimax_decision_max(
-//     board: &ChessBoard,
-//     color: Color,
-//     max_depth: u32,
-//     alpha: i32,
-//     beta: i32,
-// ) -> Result<(PieceMove, i32), Box<dyn Error>> {
-//     let mut good_actions = Vec::new();
-
-//     for action in board.all_possible_moves(color)? {
-//         good_actions.push((
-//             action,
-//             min_value(&board.apply_action(&action), max_depth, alpha, beta),
-//         ));
-//     }
-
-//     let max_action = good_actions.into_iter().max_by(|x, y| x.1.cmp(&y.1));
-
-//     match max_action {
-//         Some(action) => Ok(action),
-//         None => Err(Box::from("Minimax was unable to find a max decision!")),
-//     }
-// }
-
-pub fn max_decision(
+fn minimax_decision_max(
     board: &ChessBoard,
     color: Color,
     max_depth: u32,
-) -> Result<PieceMove, Box<dyn std::error::Error>> {
+    alpha: i32,
+    beta: i32,
+) -> ChrustResult<(PieceMove, i32)> {
+    let mut good_actions = Vec::new();
+
+    for action in board.all_possible_moves(color)? {
+        good_actions.push((
+            action,
+            min_value(&board.apply_action(&action)?, max_depth, alpha, beta)?,
+        ));
+    }
+
+    let max_action = good_actions.into_iter().max_by(|x, y| x.1.cmp(&y.1));
+
+    match max_action {
+        Some(action) => Ok(action),
+        None => Err(Box::from("Minimax was unable to find a max decision!")),
+    }
+}
+
+pub fn max_decision(board: &ChessBoard, color: Color, max_depth: u32) -> ChrustResult<PieceMove> {
     let start = Instant::now();
-    todo!();
-    // let (max_decision, _) = minimax_decision_max(board, color, max_depth, -1000000, 1000000)?;
-    // let duration = start.elapsed();
-    // println!("Time to determine move: {:?}", duration);
-    // Ok(max_decision)
+    let (max_decision, _) = minimax_decision_max(board, color, max_depth, -1000000, 1000000)?;
+    let duration = start.elapsed();
+    println!("Time to determine move: {:?}", duration);
+    Ok(max_decision)
 }

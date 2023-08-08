@@ -1,3 +1,4 @@
+use crate::ChrustResult;
 use crate::ai::minimax::funcs::max_decision;
 // use crate::ai::minimax::boardstate::BoardState;
 use crate::board::chessboard::ChessBoard;
@@ -73,7 +74,7 @@ impl ChessGame {
         }
     }
 
-    pub fn start_game(&mut self) -> Result<String, Box<dyn Error>> {
+    pub fn start_game(&mut self) -> ChrustResult<String> {
         self.print_to_screen("Initial".to_string());
 
         let mut turn_num: u32 = 1;
@@ -112,7 +113,7 @@ impl ChessGame {
         Ok(winner)
     }
 
-    pub fn ai_moves(&mut self) -> Result<bool, Box<dyn Error>> {
+    pub fn ai_moves(&mut self) -> ChrustResult<bool> {
         println!("ai moving");
 
         todo!("i'm scared about this one");
@@ -126,7 +127,7 @@ impl ChessGame {
         Ok(true)
     }
 
-    pub fn human_moves(&mut self) -> Result<bool, Box<dyn Error>> {
+    pub fn human_moves(&mut self) -> ChrustResult<bool> {
         println!("Human moving!");
 
         let (from, to) = if self.human_plays {
@@ -250,7 +251,7 @@ impl ChessGame {
     }
 }
 
-pub fn process_fen(fen: String, num_plies: u32) -> Result<String, Box<dyn Error>> {
+pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
     let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
     let board =
@@ -258,7 +259,7 @@ pub fn process_fen(fen: String, num_plies: u32) -> Result<String, Box<dyn Error>
 
     let ai_move = max_decision(&board, Color::Black, num_plies)?;
 
-    let new_board = board.apply_action(&ai_move);
+    let new_board = board.apply_action(&ai_move)?;
 
     // new_board.print_to_screen("ai move".to_string());
 
@@ -269,7 +270,7 @@ pub fn is_valid(
     fen: String,
     current_location: String,
     possible_location: String,
-) -> Result<bool, Box<dyn std::error::Error>> {
+) -> ChrustResult<bool> {
     let board_section = fen
         .split(' ')
         .next()
@@ -294,7 +295,7 @@ pub fn is_valid(
 pub fn valid_moves(
     fen: String,
     location: String,
-) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
+) -> ChrustResult<Vec<Coordinate>> {
     let board_section = fen
         .split(' ')
         .next()

@@ -1,5 +1,7 @@
 use clap::{App, Arg};
 
+use crate::ChrustResult;
+
 use super::viztype::VizType;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -10,7 +12,7 @@ pub struct ProgramState {
     pub num_plies: u32,
 }
 
-pub fn get_args() -> Result<ProgramState, Box<dyn std::error::Error>> {
+pub fn get_args() -> ChrustResult<ProgramState> {
     let matches = App::new("Chrust")
         .version("0.2.0")
         .author("John YB. <jyenterbriars@gmail.com>")
