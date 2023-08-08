@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use crate::board::{chessboard::ChessBoard, coordinate::Coordinate, piecetype::PieceType, color::Color};
 
-pub trait AChessPiece : Debug {
+pub trait ChessPiece : Debug {
     fn available_moves(
         &self,
         board: &ChessBoard,

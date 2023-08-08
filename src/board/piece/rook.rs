@@ -1,7 +1,7 @@
 use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
 
 use super::{
-    achesspiece::AChessPiece, down_by, enemy_occupied, friendly_occupied,
+    chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied,
     left_by, right_by, up_by,
 };
 
@@ -12,7 +12,7 @@ pub struct Rook {
     pub piece_type: PieceType,
 }
 
-impl AChessPiece for Rook {
+impl ChessPiece for Rook {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         /*Algorithm:
             For each direction a rook can move in:

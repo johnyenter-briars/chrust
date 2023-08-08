@@ -1,7 +1,7 @@
 use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
 
 use super::{
-    achesspiece::AChessPiece, diagonal_down_left_by,
+    chesspiece::ChessPiece, diagonal_down_left_by,
     diagonal_down_right_by, diagonal_up_left_by, diagonal_up_right_by, down_by, enemy_occupied,
     friendly_occupied, left_by, right_by, up_by,
 };
@@ -13,7 +13,7 @@ pub struct King {
     pub piece_type: PieceType,
 }
 
-impl AChessPiece for King {
+impl ChessPiece for King {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 

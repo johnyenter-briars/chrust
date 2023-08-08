@@ -1,7 +1,7 @@
 use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
 
 use super::{
-    achesspiece::AChessPiece, diagonal_down_left_by,
+    chesspiece::ChessPiece, diagonal_down_left_by,
     diagonal_down_right_by, diagonal_up_left_by, diagonal_up_right_by, enemy_occupied,
     friendly_occupied,
 };
@@ -13,7 +13,7 @@ pub struct Bishop {
     pub piece_type: PieceType,
 }
 
-impl AChessPiece for Bishop {
+impl ChessPiece for Bishop {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         /*Algorithm:
             For each direction a bishop can move in:

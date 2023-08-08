@@ -1,5 +1,5 @@
 use crate::board::{
-    chessboard::ChessBoard, color::Color, piece::achesspiece::AChessPiece, piecetype::PieceType,
+    chessboard::ChessBoard, color::Color, piece::chesspiece::ChessPiece, piecetype::PieceType,
 };
 
 //NOTE: this evaluation function assumes that the WHITE is the MIN player and BLACK is the MAX player
@@ -32,7 +32,7 @@ fn piece_value(piece_type: PieceType) -> i32 {
     }
 }
 
-fn piece_position_score(p: &Box<dyn AChessPiece>, x: char, y: i32) -> i32 {
+fn piece_position_score(p: &Box<dyn ChessPiece>, x: char, y: i32) -> i32 {
     let vector = piece_eval_vector(p.piece_type(), p.color());
     vector[char_to_int(x) as usize][y as usize - 1] as i32
 }

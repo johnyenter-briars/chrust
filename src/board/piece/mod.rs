@@ -1,7 +1,7 @@
 use super::{coordinate::Coordinate, color::Color, chessboard::ChessBoard};
 
 pub mod pawn;
-pub mod achesspiece;
+pub mod chesspiece;
 pub mod king;
 pub mod queen;
 pub mod bishop;

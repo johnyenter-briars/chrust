@@ -5,7 +5,7 @@ use crate::board::{
     piecetype::PieceType,
 };
 
-use super::{achesspiece::AChessPiece, enemy_occupied};
+use super::{chesspiece::ChessPiece, enemy_occupied};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Pawn {
@@ -14,7 +14,7 @@ pub struct Pawn {
     pub piece_type: PieceType,
 }
 
-impl AChessPiece for Pawn {
+impl ChessPiece for Pawn {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         //pawns can only move one or two spaces (depending on turn num)
         let possible_coordinates = match (self.color, self.current_position.y) {

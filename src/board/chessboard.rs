@@ -16,7 +16,7 @@ use std::vec;
 use super::cell::Cell;
 use super::color::Color;
 use super::coordinate::Coordinate;
-use super::piece::achesspiece::AChessPiece;
+use super::piece::chesspiece::ChessPiece;
 use super::piece::bishop::Bishop;
 use super::piece::king::King;
 use super::piece::knight::Knight;
@@ -77,7 +77,7 @@ impl ChessBoard {
         &self,
         x: char,
         y: i32,
-    ) -> core::result::Result<&Box<dyn AChessPiece>, Box<dyn Error>> {
+    ) -> core::result::Result<&Box<dyn ChessPiece>, Box<dyn Error>> {
         for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
                 if let Some(piece_ref) = &cell.space {
@@ -158,7 +158,7 @@ impl ChessBoard {
         }
     }
 
-    pub fn pieces_of_color(&self, color: Color) -> Vec<Box<dyn AChessPiece>> {
+    pub fn pieces_of_color(&self, color: Color) -> Vec<Box<dyn ChessPiece>> {
         // let mut pieces: Vec<&ChessPiece> = Vec::new();
         // for cell in self.all_cells() {
         //     if let Some(piece_ref) = &cell.space {
@@ -187,7 +187,7 @@ impl ChessBoard {
         &self,
         color: Color,
         piece_type: PieceType,
-    ) -> Option<Box<&dyn AChessPiece>> {
+    ) -> Option<Box<&dyn ChessPiece>> {
         let pieces = self.pieces_of_color(color);
 
         // pieces.into_iter().find(|x| x.piece_type == piece_type)
@@ -402,7 +402,7 @@ fn piece_from_fen_char(
     c: char,
     x: char,
     y: i32,
-) -> Result<Box<dyn AChessPiece>, Box<dyn std::error::Error>> {
+) -> Result<Box<dyn ChessPiece>, Box<dyn std::error::Error>> {
     match c {
         'p' => Ok(Box::from(Pawn {
             piece_type: PieceType::Pawn,

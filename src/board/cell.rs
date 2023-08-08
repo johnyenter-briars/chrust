@@ -1,16 +1,16 @@
-use super::{piece::{achesspiece::AChessPiece}, color::Color};
+use super::{piece::{chesspiece::ChessPiece}, color::Color};
 
 
 #[derive(Debug)]
 pub struct Cell {
-    pub space: Option<Box<dyn AChessPiece>>,
+    pub space: Option<Box<dyn ChessPiece>>,
     pub color: Color,
     pub x: char,
     pub y: i32,
 }
 
 impl Cell {
-    pub fn new(x: char, y: i32, color: Color, space: Option<Box<dyn AChessPiece>>) -> Self {
+    pub fn new(x: char, y: i32, color: Color, space: Option<Box<dyn ChessPiece>>) -> Self {
         Cell { x, y, color, space }
     }
 }
