@@ -43,7 +43,7 @@ impl ChessBoard {
         self.squares
             .iter_mut()
             .flatten()
-            .map(|c| RefCell::new(c))
+            .map(RefCell::new)
             .collect()
     }
 
@@ -171,10 +171,10 @@ impl ChessBoard {
 
     pub fn apply_action(&self, action: &PieceMove) -> ChrustResult<ChessBoard> {
         let fen = self.board_fen_section();
-        self.print_to_screen(&"request");
+        self.print_to_screen("request");
         let mut new_board = ChessBoard::load_from_fen(fen)?;
         new_board.move_piece(action.from, action.to);
-        new_board.print_to_screen(&"response");
+        new_board.print_to_screen("response");
         panic!("stopping here");
         Ok(new_board)
     }
@@ -182,8 +182,7 @@ impl ChessBoard {
     pub fn pieces_of_color(&self, color: Color) -> Vec<&Box<dyn ChessPiece>> {
         self.all_cells()
             .iter()
-            .map(|c| &c.space)
-            .flatten()
+            .flat_map(|c| &c.space)
             .filter(|c| c.color() == color)
             .collect::<Vec<&Box<dyn ChessPiece>>>()
     }

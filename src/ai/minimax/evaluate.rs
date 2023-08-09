@@ -9,7 +9,7 @@ pub fn evaluate(board: &ChessBoard) -> i32 {
         .iter()
         .map(|c| match &c.space {
             Some(p) => {
-                let abs_value = piece_value(p.piece_type()) + piece_position_score(&p, c.x, c.y);
+                let abs_value = piece_value(p.piece_type()) + piece_position_score(p, c.x, c.y);
                 if p.color() == Color::White {
                     -abs_value
                 } else {
