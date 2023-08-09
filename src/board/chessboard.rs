@@ -135,47 +135,12 @@ impl ChessBoard {
         Ok(possible_moves)
     }
 
-    // pub fn export_fen(&self) -> String {
-    //     let cells = self.all_cells();
-    //     let mut fen = String::new();
-    //     let mut empty_count = 0;
-
-    //     for cell in cells.iter() {
-    //         match &cell.space {
-    //             Some(piece) => {
-    //                 if empty_count > 0 {
-    //                     fen.push_str(&empty_count.to_string());
-    //                     empty_count = 0;
-    //                 }
-    //                 let fen_code = piece.fen_code();
-    //                 fen.push_str(fen_code);
-    //             }
-    //             None => {
-    //                 empty_count += 1;
-    //             }
-    //         }
-
-    //         if cell.x == 'h' {
-    //             if empty_count > 0 {
-    //                 fen.push_str(&empty_count.to_string());
-    //             }
-    //             if cell.y > 1 {
-    //                 fen.push('/');
-    //             }
-    //             empty_count = 0;
-    //         }
-    //     }
-
-    //     fen
-    // }
-
     pub fn apply_action(&self, action: &PieceMove) -> ChrustResult<ChessBoard> {
         let fen = self.board_fen_section();
-        self.print_to_screen("request");
+        // self.print_to_screen("request");
         let mut new_board = ChessBoard::load_from_fen(fen)?;
         new_board.move_piece(action.from, action.to);
-        new_board.print_to_screen("response");
-        panic!("stopping here");
+        // new_board.print_to_screen("response");
         Ok(new_board)
     }
 

@@ -256,7 +256,7 @@ pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
 
     let new_board = board.apply_action(&ai_move)?;
 
-    // new_board.print_to_screen("ai move".to_string());
+    new_board.print_to_screen("ai move");
 
     Ok(new_board.board_fen_section())
 }
