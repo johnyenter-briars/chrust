@@ -1,4 +1,6 @@
-use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
+use crate::board::{
+    chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType,
+};
 
 use super::{chesspiece::ChessPiece, friendly_occupied};
 

@@ -1,9 +1,10 @@
-use crate::board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType};
+use crate::board::{
+    chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType,
+};
 
 use super::{
-    chesspiece::ChessPiece, diagonal_down_left_by,
-    diagonal_down_right_by, diagonal_up_left_by, diagonal_up_right_by, enemy_occupied,
-    friendly_occupied,
+    chesspiece::ChessPiece, diagonal_down_left_by, diagonal_down_right_by, diagonal_up_left_by,
+    diagonal_up_right_by, enemy_occupied, friendly_occupied,
 };
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]

@@ -1,19 +1,15 @@
-use crate::ChrustResult;
 use crate::ai::minimax::funcs::max_decision;
-// use crate::ai::minimax::boardstate::BoardState;
 use crate::board::chessboard::ChessBoard;
 use crate::board::color::Color;
 use crate::board::coordinate::Coordinate;
 use crate::board::piecetype::PieceType;
-// use crate::chessmove::piecemove::Move;
 use crate::player::aiplayer::*;
 use crate::player::chessplayer::ChessPlayer;
 use crate::player::humanplayer::*;
+use crate::ChrustResult;
 
 extern crate rand;
 
-
-// use rand::thread_rng;
 use rand::seq::SliceRandom;
 
 use std::error::Error;
@@ -246,7 +242,7 @@ impl ChessGame {
     }
 
     fn print_to_screen(&mut self, configuration_name: String) {
-        self.board.print_to_screen(configuration_name);
+        self.board.print_to_screen(&configuration_name);
         println!("{}", self.fen());
     }
 }
@@ -292,10 +288,7 @@ pub fn is_valid(
     Ok(valid_move)
 }
 
-pub fn valid_moves(
-    fen: String,
-    location: String,
-) -> ChrustResult<Vec<Coordinate>> {
+pub fn valid_moves(fen: String, location: String) -> ChrustResult<Vec<Coordinate>> {
     let board_section = fen
         .split(' ')
         .next()

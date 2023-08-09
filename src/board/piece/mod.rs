@@ -1,12 +1,12 @@
-use super::{coordinate::Coordinate, color::Color, chessboard::ChessBoard};
+use super::{chessboard::ChessBoard, color::Color, coordinate::Coordinate};
 
-pub mod pawn;
+pub mod bishop;
 pub mod chesspiece;
 pub mod king;
-pub mod queen;
-pub mod bishop;
-pub mod rook;
 pub mod knight;
+pub mod pawn;
+pub mod queen;
+pub mod rook;
 
 fn enemy_occupied(coordinate: Coordinate, current_piece_color: Color, board: &ChessBoard) -> bool {
     let cell = board.test_cell_at(coordinate);
@@ -20,7 +20,11 @@ fn enemy_occupied(coordinate: Coordinate, current_piece_color: Color, board: &Ch
     }
 }
 
-fn friendly_occupied(coordinate: Coordinate, current_piece_color: Color, board: &ChessBoard) -> bool {
+fn friendly_occupied(
+    coordinate: Coordinate,
+    current_piece_color: Color,
+    board: &ChessBoard,
+) -> bool {
     let cell = board.test_cell_at(coordinate);
 
     match cell {

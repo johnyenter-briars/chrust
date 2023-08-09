@@ -14,10 +14,7 @@ impl Coordinate {
 
     pub fn is_valid(&self, board: &ChessBoard) -> bool {
         (1..9).any(|ele| ele == self.y)
-            && "abcdefgh"
-                .to_string()
-                .chars()
-                .any(|ele| ele == self.x)
+            && "abcdefgh".to_string().chars().any(|ele| ele == self.x)
             && board.test_cell_at(*self).is_some()
     }
 

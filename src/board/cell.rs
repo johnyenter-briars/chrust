@@ -1,5 +1,4 @@
-use super::{piece::{chesspiece::ChessPiece}, color::Color};
-
+use super::{color::Color, piece::chesspiece::ChessPiece};
 
 #[derive(Debug)]
 pub struct Cell {
