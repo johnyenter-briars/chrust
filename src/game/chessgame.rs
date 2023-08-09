@@ -112,7 +112,6 @@ impl ChessGame {
     pub fn ai_moves(&mut self) -> ChrustResult<bool> {
         println!("ai moving");
 
-        todo!("i'm scared about this one");
         let ai_move = max_decision(&self.board, self.ai_player.color, 2)?;
 
         self.board.move_piece(ai_move.from, ai_move.to);

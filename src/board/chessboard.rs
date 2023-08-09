@@ -1,18 +1,5 @@
 extern crate serde_derive;
 extern crate serde_json;
-
-use crate::board::piece::pawn::Pawn;
-use crate::chessmove::piecemove::PieceMove;
-use crate::ChrustResult;
-// use crate::board::cell::piecetype::PieceType;
-// use crate::chessmove::piecemove::{PieceMove};
-use crate::player::humanplayer::HumanPlayer;
-use std::borrow::BorrowMut;
-use std::cell::RefCell;
-use std::vec;
-
-// use crate::board::cell::chesspiece::ChessPiece;
-
 use super::cell::Cell;
 use super::color::Color;
 use super::coordinate::Coordinate;
@@ -23,7 +10,11 @@ use super::piece::knight::Knight;
 use super::piece::queen::Queen;
 use super::piece::rook::Rook;
 use super::piecetype::PieceType;
-// use super::piecetype::PieceType;
+use crate::board::piece::pawn::Pawn;
+use crate::chessmove::piecemove::PieceMove;
+use crate::player::humanplayer::HumanPlayer;
+use crate::ChrustResult;
+use std::cell::RefCell;
 
 #[derive(Debug)]
 pub struct ChessBoard {
@@ -188,17 +179,13 @@ impl ChessBoard {
         Ok(new_board)
     }
 
-    pub fn pieces_of_color(&self, color: Color) -> Vec<Box<dyn ChessPiece>> {
-        // let mut pieces: Vec<&ChessPiece> = Vec::new();
-        // for cell in self.all_cells() {
-        //     if let Some(piece_ref) = &cell.space {
-        //         if piece_ref.color == color {
-        //             pieces.push(piece_ref);
-        //         }
-        //     }
-        // }
-        // pieces
-        todo!()
+    pub fn pieces_of_color(&self, color: Color) -> Vec<&Box<dyn ChessPiece>> {
+        self.all_cells()
+            .iter()
+            .map(|c| &c.space)
+            .flatten()
+            .filter(|c| c.color() == color)
+            .collect::<Vec<&Box<dyn ChessPiece>>>()
     }
 
     pub fn cells_with_pieces_with_color(&self, color: Color) -> Vec<&Cell> {
@@ -217,10 +204,10 @@ impl ChessBoard {
         &self,
         color: Color,
         piece_type: PieceType,
-    ) -> Option<Box<&dyn ChessPiece>> {
-        let pieces = self.pieces_of_color(color);
-        todo!();
-        // pieces.into_iter().find(|x| x.piece_type() == piece_type)
+    ) -> Option<&Box<dyn ChessPiece>> {
+        self.pieces_of_color(color)
+            .into_iter()
+            .find(|x| x.piece_type() == piece_type)
     }
 
     pub fn move_piece(&mut self, from: Coordinate, to: Coordinate) {
@@ -231,57 +218,17 @@ impl ChessBoard {
             .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y);
 
         if let Some(from_index) = from_index {
-            // Extract the target cell using the index
-            // let target_cell = &cells[from_index];
-
-            // Find the target cell index
             let to_index = cells
                 .iter()
                 .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y);
 
             if let Some(to_index) = to_index {
-                // Swap the chess pieces
                 let one = &mut cells[from_index].borrow_mut().space;
                 let two = &mut cells[to_index].borrow_mut().space;
                 std::mem::swap(one, two);
-                // if let (Some(one), Some(two)) = () {}
                 *one = None;
             }
         }
-
-        //1: get the reference to the piece we're going to move
-        // let cells: Vec<&mut Cell> = self.all_cells_mut();
-        // let binding: Vec<&&mut Cell> = cells
-        //     .iter()
-        //     .filter(|c| c.x == from.x && c.y == from.y)
-        //     // .map(|c| c.space.expect("This space should not be empty!"))
-        //     .collect::<Vec<&&mut Cell>>();
-
-        // let target_cell: &&&mut Cell = binding
-        //     .first()
-        //     .expect("There should be a space at the 'from' location");
-
-        // // let foo = *target_piece;
-
-        // //2: move the reference to the stop we're moving to
-        // for cell in &cells {
-        //     if cell.x == to.x && cell.y == to.y {
-        //         //we can safely assume there is NO piece at this location
-        //         //since the from x and y are given to us by the set of possible moves
-        //         //calculated ahead of time
-
-        //         // cell.space = Some(foo);
-        //         // std::mem::swap(&mut cell.space, &mut target_cell.space);
-        //         std::mem::swap(&mut cell.space, &mut target_cell.space);
-        //     }
-        // }
-
-        //3: set the current cell to nothing
-        // self.space_to_empty(from.x, from.y);
-    }
-    fn swap_pieces(cell1: &mut Cell, cell2: &mut Cell) {
-        // Swap the chess pieces in the cells
-        std::mem::swap(&mut cell1.space, &mut cell2.space);
     }
 
     pub fn load_empty_board() -> ChrustResult<ChessBoard> {
