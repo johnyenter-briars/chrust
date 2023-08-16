@@ -95,7 +95,6 @@ fn minimax_decision_max(
 ) -> ChrustResult<(PieceMove, i32)> {
     let mut good_actions = Vec::new();
 
-    let foo = board.all_possible_moves(color)?;
     for action in board.all_possible_moves(color)? {
         good_actions.push((
             action,

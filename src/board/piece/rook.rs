@@ -15,10 +15,6 @@ pub struct Rook {
 
 impl ChessPiece for Rook {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        /*Algorithm:
-            For each direction a rook can move in:
-                iterate up starting at the target piece in a diagonal line, if we hit an enemy, add that position, but dont go any further. If we hit a friendly piece, stop - dont add that position
-        */
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
         let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> =

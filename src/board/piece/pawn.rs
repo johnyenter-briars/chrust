@@ -5,7 +5,7 @@ use crate::board::{
     piecetype::PieceType,
 };
 
-use super::{chesspiece::ChessPiece, enemy_occupied};
+use super::{chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, up_by};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Pawn {
@@ -16,30 +16,35 @@ pub struct Pawn {
 
 impl ChessPiece for Pawn {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        //pawns can only move one or two spaces (depending on turn num)
-        let possible_coordinates = match (self.color, self.current_position.y) {
-            (Color::White, 2) => vec![
-                self.current_position.up_by(1),
-                self.current_position.up_by(2),
-            ],
-            (Color::Black, 7) => {
-                vec![
-                    self.current_position.down_by(1),
-                    self.current_position.down_by(2),
-                ]
-            }
-            (Color::White, _) => vec![self.current_position.up_by(1)],
-            (Color::Black, _) => vec![self.current_position.down_by(1)],
+        let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+
+        let target_direction: fn(Coordinate, i32) -> Coordinate = match self.color {
+            Color::White => up_by,
+            Color::Black => down_by,
         };
 
-        //only include the ones where the enemy is NOT in front of
-        let mut possible_coordinates: Vec<Coordinate> = possible_coordinates
-            .into_iter()
-            .filter(|coord| !enemy_occupied(coord.to_owned(), self.color, board))
-            .map(|coord| coord.to_owned())
-            .collect();
+        let num_moves_possible = match (self.color, self.current_position.y) {
+            (Color::White, 2) => 2,
+            (Color::Black, 7) => 2,
+            _ => 1,
+        };
 
-        //Pawns can move diagonally if there's an enemy there
+        for position in 1..num_moves_possible + 1 {
+            let possible_position = target_direction(self.current_position, position);
+
+            if !possible_position.is_valid(board) {
+                continue;
+            };
+
+            if friendly_occupied(possible_position, self.color, board) {
+                break;
+            } else if enemy_occupied(possible_position, self.color, board) {
+                possible_coordinates.push(possible_position);
+                break;
+            } else {
+                possible_coordinates.push(possible_position);
+            }
+        }
         let possible_enemy_positions: Vec<Coordinate> = if self.color == color::Color::White {
             vec![
                 self.current_position.diagonal_up_right_by(1),
@@ -61,11 +66,7 @@ impl ChessPiece for Pawn {
             };
         }
 
-        //only return the coordinates that are valid spaces (on the board)
         possible_coordinates
-            .into_iter()
-            .filter(|coord| coord.is_valid(board))
-            .collect()
     }
     fn str(&self) -> &str {
         match self.color {
