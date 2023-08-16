@@ -1,5 +1,5 @@
 use chrust::{
- board::{cell::color::Color, chessboard::Board},
+ board::{chessboard::ChessBoard, color::Color},
     frontend::server::build_and_run_frontend,
     game::chessgame::ChessGame,
     player::{aiplayer::AIPlayer, humanplayer::HumanPlayer},
@@ -10,7 +10,7 @@ use chrust::{
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let program_state = get_args()?;
 
-    let board = Board::load_from_file("game_start")?;
+    let board = ChessBoard::load_from_file("game_start")?;
 
     let human_player = HumanPlayer {
         name: "kasparov".to_string(),

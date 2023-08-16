@@ -1,18 +1,15 @@
-// use crate::ai::minimax::boardstate::BoardState;
 use crate::ai::minimax::funcs::max_decision;
-use crate::board::cell::color::Color;
-use crate::board::cell::piecetype::PieceType;
-use crate::board::chessboard::Board;
+use crate::board::chessboard::ChessBoard;
+use crate::board::color::Color;
 use crate::board::coordinate::Coordinate;
-// use crate::chessmove::piecemove::Move;
+use crate::board::piecetype::PieceType;
 use crate::player::aiplayer::*;
 use crate::player::chessplayer::ChessPlayer;
 use crate::player::humanplayer::*;
+use crate::ChrustResult;
 
 extern crate rand;
 
-
-// use rand::thread_rng;
 use rand::seq::SliceRandom;
 
 use std::error::Error;
@@ -25,7 +22,7 @@ use crate::ext::stringext::ToCoord;
 pub struct ChessGame {
     pub human_player: HumanPlayer,
     pub ai_player: AIPlayer,
-    pub board: Board,
+    pub board: ChessBoard,
     // pub history: Vec<&'a (dyn Action<'a> + Sync)>,
     human_plays: bool,
     tick_speed: u64, //milli
@@ -41,7 +38,7 @@ impl ChessGame {
     pub fn new(
         human_player: HumanPlayer,
         ai_player: AIPlayer,
-        board: Board,
+        board: ChessBoard,
         human_plays: bool,
         tick_speed: u64,
     ) -> Self {
@@ -73,7 +70,7 @@ impl ChessGame {
         }
     }
 
-    pub fn start_game(&mut self) -> Result<String, Box<dyn Error>> {
+    pub fn start_game(&mut self) -> ChrustResult<String> {
         self.print_to_screen("Initial".to_string());
 
         let mut turn_num: u32 = 1;
@@ -112,12 +109,10 @@ impl ChessGame {
         Ok(winner)
     }
 
-    pub fn ai_moves(&mut self) -> Result<bool, Box<dyn Error>> {
+    pub fn ai_moves(&mut self) -> ChrustResult<bool> {
         println!("ai moving");
 
-        let board = self.board.clone();
-
-        let ai_move = max_decision(&board, self.ai_player.color, 2)?;
+        let ai_move = max_decision(&self.board, self.ai_player.color, 2)?;
 
         self.board.move_piece(ai_move.from, ai_move.to);
 
@@ -127,7 +122,7 @@ impl ChessGame {
         Ok(true)
     }
 
-    pub fn human_moves(&mut self) -> Result<bool, Box<dyn Error>> {
+    pub fn human_moves(&mut self) -> ChrustResult<bool> {
         println!("Human moving!");
 
         let (from, to) = if self.human_plays {
@@ -246,22 +241,22 @@ impl ChessGame {
     }
 
     fn print_to_screen(&mut self, configuration_name: String) {
-        self.board.print_to_screen(configuration_name);
+        self.board.print_to_screen(&configuration_name);
         println!("{}", self.fen());
     }
 }
 
-pub fn process_fen(fen: String, num_plies: u32) -> Result<String, Box<dyn Error>> {
+pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
     let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
     let board =
-        Board::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+        ChessBoard::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
 
     let ai_move = max_decision(&board, Color::Black, num_plies)?;
 
-    let new_board = board.apply_action(&ai_move);
+    let new_board = board.apply_action(&ai_move)?;
 
-    new_board.print_to_screen("ai move".to_string());
+    new_board.print_to_screen("ai move");
 
     Ok(new_board.board_fen_section())
 }
@@ -270,13 +265,13 @@ pub fn is_valid(
     fen: String,
     current_location: String,
     possible_location: String,
-) -> Result<bool, Box<dyn std::error::Error>> {
+) -> ChrustResult<bool> {
     let board_section = fen
         .split(' ')
         .next()
         .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
-    let board = Board::load_from_fen(board_section.to_string())
+    let board = ChessBoard::load_from_fen(board_section.to_string())
         .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     let current_position = current_location.to_coord();
@@ -292,16 +287,13 @@ pub fn is_valid(
     Ok(valid_move)
 }
 
-pub fn valid_moves(
-    fen: String,
-    location: String,
-) -> Result<Vec<Coordinate>, Box<dyn std::error::Error>> {
+pub fn valid_moves(fen: String, location: String) -> ChrustResult<Vec<Coordinate>> {
     let board_section = fen
         .split(' ')
         .next()
         .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
-    let board = Board::load_from_fen(board_section.to_string())
+    let board = ChessBoard::load_from_fen(board_section.to_string())
         .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     if location.as_str().len() != 2 {
@@ -310,7 +302,7 @@ pub fn valid_moves(
 
     let current_position = location.to_coord();
 
-    if board.piece(current_position.x, current_position.y)?.color == Color::Black {
+    if board.piece(current_position.x, current_position.y)?.color() == Color::Black {
         return Ok(vec![]);
     }
 

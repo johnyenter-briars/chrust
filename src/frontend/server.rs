@@ -15,11 +15,6 @@ pub struct Settings {
     image_map: Mutex<HashMap<String, Vec<u8>>>,
 }
 
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// pub struct ImageMap {
-//     map: HashMap<String, Vec<u8>>,
-// }
-
 #[post("/api/process/{fen}")]
 pub async fn process(fen: web::Path<String>, s: web::Data<Settings>) -> String {
     let program_state = *s.program_state.lock().unwrap();

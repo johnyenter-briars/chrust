@@ -1,5 +1,6 @@
+use crate::board::color::Color;
+
 use super::chessplayer::ChessPlayer;
-use crate::board::cell::color::Color;
 
 #[derive(Debug)]
 pub struct HumanPlayer {

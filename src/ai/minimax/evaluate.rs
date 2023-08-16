@@ -1,17 +1,16 @@
 use crate::board::{
-    cell::{chesspiece::ChessPiece, color::Color, piecetype::PieceType},
-    chessboard::Board,
+    chessboard::ChessBoard, color::Color, piece::chesspiece::ChessPiece, piecetype::PieceType,
 };
 
 //NOTE: this evaluation function assumes that the WHITE is the MIN player and BLACK is the MAX player
-pub fn evaluate(board: &Board) -> i32 {
+pub fn evaluate(board: &ChessBoard) -> i32 {
     let cells = board.all_cells();
     cells
         .iter()
-        .map(|c| match c.space {
+        .map(|c| match &c.space {
             Some(p) => {
-                let abs_value = piece_value(p.piece_type) + piece_position_score(&p, c.x, c.y);
-                if p.color == Color::White {
+                let abs_value = piece_value(p.piece_type()) + piece_position_score(p, c.x, c.y);
+                if p.color() == Color::White {
                     -abs_value
                 } else {
                     abs_value
@@ -33,8 +32,8 @@ fn piece_value(piece_type: PieceType) -> i32 {
     }
 }
 
-fn piece_position_score(p: &ChessPiece, x: char, y: i32) -> i32 {
-    let vector = piece_eval_vector(p.piece_type, p.color);
+fn piece_position_score(p: &Box<dyn ChessPiece>, x: char, y: i32) -> i32 {
+    let vector = piece_eval_vector(p.piece_type(), p.color());
     vector[char_to_int(x) as usize][y as usize - 1] as i32
 }
 
