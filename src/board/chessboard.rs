@@ -1,6 +1,5 @@
 extern crate serde_derive;
 extern crate serde_json;
-use chrono::format;
 
 use super::cell::Cell;
 use super::color::Color;
@@ -16,7 +15,6 @@ use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::humanplayer::HumanPlayer;
 use crate::ChrustResult;
-use core::panic;
 use std::cell::RefCell;
 
 #[derive(Debug)]
@@ -29,6 +27,8 @@ pub struct ChessBoard {
     pub white_castle_kingside: bool,
     pub black_castle_queenside: bool,
     pub black_castle_kingside: bool,
+    pub half_move_clock: u32,
+    pub full_move_clock: u32,
 }
 
 impl ChessBoard {
@@ -211,6 +211,8 @@ impl ChessBoard {
         white_castle_kingside: bool,
         black_castle_queenside: bool,
         black_castle_kingside: bool,
+        half_move_clock: u32,
+        full_move_clock: u32,
     ) -> ChrustResult<ChessBoard> {
         let board = ChessBoard {
             squares: vec![
@@ -302,6 +304,8 @@ impl ChessBoard {
             white_castle_kingside,
             black_castle_queenside,
             black_castle_kingside,
+            half_move_clock,
+            full_move_clock,
         };
 
         Ok(board)
@@ -349,6 +353,16 @@ impl ChessBoard {
         let black_castle_kingside = castling_rights.contains('k');
         let black_castle_queenside = castling_rights.contains('q');
 
+        let half_move_clock = split
+            .get(4)
+            .expect(&format!("fen is improperly formatted! {}", fen))
+            .parse::<u32>()?;
+
+        let full_move_clock = split
+            .get(5)
+            .expect(&format!("fen is improperly formatted! {}", fen))
+            .parse::<u32>()?;
+
         let board_section = split
             .get(0)
             .expect(&format!("fen is improperly formatted! {}", fen));
@@ -360,6 +374,8 @@ impl ChessBoard {
             white_castle_kingside,
             black_castle_queenside,
             black_castle_kingside,
+            half_move_clock,
+            full_move_clock,
         )?;
 
         let sections: Vec<Vec<char>> = board_section
