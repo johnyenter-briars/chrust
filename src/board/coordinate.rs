@@ -8,6 +8,11 @@ pub struct Coordinate {
 
 //NO ERROR HANDLING - call is_valid if you want to test validity of a coordinate
 impl Coordinate {
+    pub fn eq(&self, x: char, y: i32) -> bool {
+        self.x == x && self.y == y
+    }
+
+
     pub fn new(x: char, y: i32) -> Self {
         Coordinate { x, y }
     }

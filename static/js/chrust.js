@@ -176,7 +176,7 @@ var onDrop = (source, target, piece, newPos, oldPos, orientation) => {
 
 var config = {
     draggable: true,
-    position: 'start',
+    position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     onDrop: onDrop,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,

@@ -249,8 +249,7 @@ impl ChessGame {
 pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
     let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
 
-    let board =
-        ChessBoard::load_from_fen(board_section.to_string()).expect("Unable to load board from ");
+    let board = ChessBoard::load_from_fen(board_section).expect("Unable to load board from ");
 
     let ai_move = max_decision(&board, Color::Black, num_plies)?;
 
@@ -271,7 +270,7 @@ pub fn is_valid(
         .next()
         .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
 
-    let board = ChessBoard::load_from_fen(board_section.to_string())
+    let board = ChessBoard::load_from_fen(board_section)
         .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     let current_position = current_location.to_coord();
@@ -288,12 +287,7 @@ pub fn is_valid(
 }
 
 pub fn valid_moves(fen: String, location: String) -> ChrustResult<Vec<Coordinate>> {
-    let board_section = fen
-        .split(' ')
-        .next()
-        .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
-
-    let board = ChessBoard::load_from_fen(board_section.to_string())
+    let board = ChessBoard::load_from_fen(&fen)
         .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
 
     if location.as_str().len() != 2 {

@@ -1,5 +1,7 @@
 extern crate serde_derive;
 extern crate serde_json;
+use chrono::format;
+
 use super::cell::Cell;
 use super::color::Color;
 use super::coordinate::Coordinate;
@@ -14,12 +16,19 @@ use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::humanplayer::HumanPlayer;
 use crate::ChrustResult;
+use core::panic;
 use std::cell::RefCell;
 
 #[derive(Debug)]
 pub struct ChessBoard {
     pub squares: Vec<Vec<Cell>>,
     pub board_size: i32,
+    pub fen: String,
+    pub turn_to_move: Color,
+    pub white_castle_queenside: bool,
+    pub white_castle_kingside: bool,
+    pub black_castle_queenside: bool,
+    pub black_castle_kingside: bool,
 }
 
 impl ChessBoard {
@@ -138,7 +147,7 @@ impl ChessBoard {
     pub fn apply_action(&self, action: &PieceMove) -> ChrustResult<ChessBoard> {
         let fen = self.board_fen_section();
         // self.print_to_screen("request");
-        let mut new_board = ChessBoard::load_from_fen(fen)?;
+        let mut new_board = ChessBoard::load_from_fen(&fen)?;
         new_board.move_piece(action.from, action.to);
         // new_board.print_to_screen("response");
         Ok(new_board)
@@ -195,7 +204,14 @@ impl ChessBoard {
         }
     }
 
-    pub fn load_empty_board() -> ChrustResult<ChessBoard> {
+    pub fn load_empty_board(
+        turn_to_move: Color,
+        fen: String,
+        white_castle_queenside: bool,
+        white_castle_kingside: bool,
+        black_castle_queenside: bool,
+        black_castle_kingside: bool,
+    ) -> ChrustResult<ChessBoard> {
         let board = ChessBoard {
             squares: vec![
                 vec![
@@ -280,6 +296,12 @@ impl ChessBoard {
                 ],
             ],
             board_size: 8,
+            fen,
+            turn_to_move,
+            white_castle_queenside,
+            white_castle_kingside,
+            black_castle_queenside,
+            black_castle_kingside,
         };
 
         Ok(board)
@@ -292,15 +314,55 @@ impl ChessBoard {
             _ => return Err(Box::from("Invalid option for board_name")),
         };
 
-        let board = ChessBoard::load_from_fen(board_string.to_string())?;
+        let board = ChessBoard::load_from_fen(board_string)?;
 
         Ok(board)
     }
 
-    /// Creates a `Board` object from a Fen string. NOTE: assumes the game section of the fen has been removed
-    pub fn load_from_fen(fen: String) -> ChrustResult<ChessBoard> {
-        let mut board = ChessBoard::load_empty_board()?;
-        let sections: Vec<Vec<char>> = fen
+    pub fn full_fen() -> String {
+        String::new()
+    }
+
+    pub fn load_from_fen(fen: &str) -> ChrustResult<ChessBoard> {
+        let split = fen.split(' ').collect::<Vec<&str>>();
+
+        let turn_to_move = match split
+            .get(1)
+            .expect(&format!("fen is improperly formatted! {}", fen))
+        {
+            &"w" => Color::White,
+            &"b" => Color::Black,
+            invalid_option => {
+                return Err(Box::from(format!(
+                    "Invalid option for 'turn to move': {}",
+                    invalid_option
+                )))
+            }
+        };
+
+        let castling_rights = split
+            .get(2)
+            .expect(&format!("fen is improperly formatted! {}", fen));
+
+        let white_castle_queenside = castling_rights.contains('Q');
+        let white_castle_kingside = castling_rights.contains('K');
+        let black_castle_kingside = castling_rights.contains('k');
+        let black_castle_queenside = castling_rights.contains('q');
+
+        let board_section = split
+            .get(0)
+            .expect(&format!("fen is improperly formatted! {}", fen));
+
+        let mut board = ChessBoard::load_empty_board(
+            turn_to_move,
+            fen.to_string(),
+            white_castle_queenside,
+            white_castle_kingside,
+            black_castle_queenside,
+            black_castle_kingside,
+        )?;
+
+        let sections: Vec<Vec<char>> = board_section
             .split('/')
             .map(|s| s.to_string().chars().collect())
             .collect();

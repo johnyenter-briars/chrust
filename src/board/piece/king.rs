@@ -48,6 +48,8 @@ impl ChessPiece for King {
             }
         }
 
+        // let current_fen = board.ge;
+
         possible_coordinates
     }
     fn str(&self) -> &str {
