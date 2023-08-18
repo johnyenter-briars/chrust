@@ -22,11 +22,11 @@ pub struct ChessBoard {
     pub squares: Vec<Vec<Cell>>,
     pub board_size: i32,
     pub fen: String,
-    pub turn_to_move: Color,
-    pub white_castle_queenside: bool,
+    pub side_to_move: Color,
     pub white_castle_kingside: bool,
-    pub black_castle_queenside: bool,
+    pub white_castle_queenside: bool,
     pub black_castle_kingside: bool,
+    pub black_castle_queenside: bool,
     pub en_passant_target: Option<Coordinate>,
     pub half_move_clock: u32,
     pub full_move_clock: u32,
@@ -136,7 +136,7 @@ impl ChessBoard {
 
             let mut possible_moves_for_piece: Vec<PieceMove> = coord_choices
                 .iter()
-                .map(|coord| PieceMove::new(piece_at_position, current_position, *coord))
+                .map(|coord| PieceMove::new(piece_at_position, current_position, *coord, color))
                 .collect();
 
             possible_moves.append(&mut possible_moves_for_piece);
@@ -146,10 +146,10 @@ impl ChessBoard {
     }
 
     pub fn apply_action(&self, action: &PieceMove) -> ChrustResult<ChessBoard> {
-        let fen = self.board_fen_section();
+        let fen = self.fen();
         // self.print_to_screen("request");
         let mut new_board = ChessBoard::load_from_fen(&fen)?;
-        new_board.move_piece(action.from, action.to);
+        new_board.move_piece(action.from, action.to, action.color_moving);
         // new_board.print_to_screen("response");
         Ok(new_board)
     }
@@ -184,7 +184,7 @@ impl ChessBoard {
             .find(|x| x.piece_type() == piece_type)
     }
 
-    pub fn move_piece(&mut self, from: Coordinate, to: Coordinate) {
+    pub fn move_piece(&mut self, from: Coordinate, to: Coordinate, color_moving: Color) {
         // let mut cells: Vec<&mut Cell> = self.all_cells_mut();
         let cells = self.all_cells_mut_refcell();
         let from_index = cells
@@ -203,10 +203,16 @@ impl ChessBoard {
                 *one = None;
             }
         }
+
+        // Update who's turn it is to move
+        self.side_to_move = match color_moving {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        };
     }
 
     pub fn load_empty_board(
-        turn_to_move: Color,
+        side_to_move: Color,
         fen: String,
         white_castle_queenside: bool,
         white_castle_kingside: bool,
@@ -301,7 +307,7 @@ impl ChessBoard {
             ],
             board_size: 8,
             fen,
-            turn_to_move,
+            side_to_move,
             white_castle_queenside,
             white_castle_kingside,
             black_castle_queenside,
@@ -363,10 +369,7 @@ impl ChessBoard {
             &"-" => None,
             s => {
                 let chars: Vec<char> = s.chars().collect();
-                let bar = chars[1];
-                println!("{:?}", bar);
-                let foo = chars[1] as u32 - '0' as u32;
-                Some(Coordinate::new(chars[0], foo)) //sometimes you gotta go maverick
+                Some(Coordinate::new(chars[0], chars[1] as u32 - '0' as u32)) //sometimes you gotta go maverick
             }
         };
 
@@ -426,7 +429,7 @@ impl ChessBoard {
         Ok(board)
     }
 
-    pub fn board_fen_section(&self) -> String {
+    pub fn fen(&self) -> String {
         let mut fen = "".to_string();
 
         //construct the piece position portion
@@ -451,7 +454,28 @@ impl ChessBoard {
             fen.push('/');
         }
 
-        fen[0..fen.len() - 1].to_string()
+        let board_section = fen[0..fen.len() - 1].to_string();
+
+        let en_passant_target = match self.en_passant_target {
+            Some(s) => format!("{}{}", s.x, s.y),
+            None => "-".to_string(),
+        };
+
+        format!(
+            "{} {} {}{}{}{} {} {} {}",
+            board_section,
+            match self.side_to_move {
+                Color::Black => "b",
+                Color::White => "w",
+            },
+            if self.white_castle_kingside { "K" } else { "" },
+            if self.white_castle_queenside { "Q" } else { "" },
+            if self.black_castle_kingside { "k" } else { "" },
+            if self.black_castle_queenside { "q" } else { "" },
+            en_passant_target,
+            self.half_move_clock,
+            self.full_move_clock
+        )
     }
 }
 

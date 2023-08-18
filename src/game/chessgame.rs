@@ -23,15 +23,8 @@ pub struct ChessGame {
     pub human_player: HumanPlayer,
     pub ai_player: AIPlayer,
     pub board: ChessBoard,
-    // pub history: Vec<&'a (dyn Action<'a> + Sync)>,
     human_plays: bool,
     tick_speed: u64, //milli
-
-    side_to_move: char,
-    castling_ability: String,
-    en_passant_target_square: String,
-    halfmove_clock: u32,
-    fullmove_counter: u32,
 }
 
 impl ChessGame {
@@ -46,15 +39,8 @@ impl ChessGame {
             human_player,
             ai_player,
             board,
-            // history: Vec::new(),
             human_plays,
             tick_speed,
-            side_to_move: 'w',
-            castling_ability: "KQkq".to_string(),
-            en_passant_target_square: "h3".to_string(),
-            halfmove_clock: 0,
-            fullmove_counter: 1,
-            // DecisionMaker{}
         }
     }
 
@@ -82,8 +68,6 @@ impl ChessGame {
                 continue;
             }
 
-            self.side_to_move = self.ai_player.color_abbr();
-
             if self.human_plays {
                 self.print_to_screen(format!("after ai turn {}", turn_num));
             } else {
@@ -94,8 +78,6 @@ impl ChessGame {
             if !self.ai_moves()? {
                 continue;
             }
-
-            self.side_to_move = self.human_player.color_abbr();
 
             self.print_to_screen(format!("after ai turn {}", turn_num));
 
@@ -114,10 +96,8 @@ impl ChessGame {
 
         let ai_move = max_decision(&self.board, self.ai_player.color, 2)?;
 
-        self.board.move_piece(ai_move.from, ai_move.to);
-
-        self.fullmove_counter += 1;
-        self.halfmove_clock += 1;
+        self.board
+            .move_piece(ai_move.from, ai_move.to, Color::Black);
 
         Ok(true)
     }
@@ -210,7 +190,7 @@ impl ChessGame {
             (from, to)
         };
 
-        self.board.move_piece(from, to);
+        self.board.move_piece(from, to, Color::White);
 
         Ok(true)
     }
@@ -227,29 +207,14 @@ impl ChessGame {
         }
     }
 
-    //for an explanation of this crazy algo check out: https://www.chessprogramming.org/Forsyth-Edwards_Notation
-    fn fen(&self) -> String {
-        format!(
-            "{} {} {} {} {} {}",
-            self.board.board_fen_section(), //board formatted
-            self.side_to_move,
-            self.castling_ability,
-            self.en_passant_target_square,
-            self.halfmove_clock,
-            self.fullmove_counter
-        )
-    }
-
     fn print_to_screen(&mut self, configuration_name: String) {
         self.board.print_to_screen(&configuration_name);
-        println!("{}", self.fen());
+        println!("{}", self.board.fen());
     }
 }
 
 pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
-    let board_section = fen.split(' ').next().expect("Fen is improperly formatted!");
-
-    let board = ChessBoard::load_from_fen(board_section).expect("Unable to load board from ");
+    let board = ChessBoard::load_from_fen(&fen)?;
 
     let ai_move = max_decision(&board, Color::Black, num_plies)?;
 
@@ -257,7 +222,7 @@ pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
 
     new_board.print_to_screen("ai move");
 
-    Ok(new_board.board_fen_section())
+    Ok(new_board.fen())
 }
 
 pub fn is_valid(
