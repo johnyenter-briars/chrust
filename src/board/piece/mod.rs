@@ -65,8 +65,5 @@ fn diagonal_down_left_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
 }
 
 fn diagonal_down_right_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
-    {
-        let ref this = coordinate;
-        Coordinate::new((this.x as u8 + ammount as u8) as char, this.y - ammount)
-    }
+    coordinate.diagonal_down_right_by(ammount)
 }

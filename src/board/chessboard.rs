@@ -341,7 +341,7 @@ impl ChessBoard {
 
         let turn_to_move = match split
             .get(1)
-            .expect(&format!("fen is improperly formatted! {}", fen))
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
         {
             &"w" => Color::White,
             &"b" => Color::Black,
@@ -355,7 +355,7 @@ impl ChessBoard {
 
         let castling_rights = split
             .get(2)
-            .expect(&format!("fen is improperly formatted! {}", fen));
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen));
 
         let white_castle_queenside = castling_rights.contains('Q');
         let white_castle_kingside = castling_rights.contains('K');
@@ -364,7 +364,7 @@ impl ChessBoard {
 
         let en_passant_target: Option<Coordinate> = match split
             .get(3)
-            .expect(&format!("fen is improperly formatted! {}", fen))
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
         {
             &"-" => None,
             s => {
@@ -375,17 +375,16 @@ impl ChessBoard {
 
         let half_move_clock = split
             .get(4)
-            .expect(&format!("fen is improperly formatted! {}", fen))
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
             .parse::<u32>()?;
 
         let full_move_clock = split
             .get(5)
-            .expect(&format!("fen is improperly formatted! {}", fen))
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
             .parse::<u32>()?;
 
-        let board_section = split
-            .get(0)
-            .expect(&format!("fen is improperly formatted! {}", fen));
+        let board_section = split.first()
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen));
 
         let mut board = ChessBoard::load_empty_board(
             turn_to_move,
