@@ -96,8 +96,8 @@ impl ChessGame {
 
         let ai_move = max_decision(&self.board, self.ai_player.color, 2)?;
 
-        self.board
-            .move_piece(ai_move.from, ai_move.to, Color::Black);
+        todo!();
+        // self.board.move_piece(&ai_move);
 
         Ok(true)
     }
@@ -190,7 +190,8 @@ impl ChessGame {
             (from, to)
         };
 
-        self.board.move_piece(from, to, Color::White);
+        todo!();
+        // self.board.move_piece(from, to, Color::White);
 
         Ok(true)
     }

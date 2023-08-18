@@ -15,6 +15,7 @@ use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::humanplayer::HumanPlayer;
 use crate::ChrustResult;
+use core::panic;
 use std::cell::RefCell;
 
 #[derive(Debug)]
@@ -149,7 +150,7 @@ impl ChessBoard {
         let fen = self.fen();
         // self.print_to_screen("request");
         let mut new_board = ChessBoard::load_from_fen(&fen)?;
-        new_board.move_piece(action.from, action.to, action.color_moving);
+        new_board.move_piece(action);
         // new_board.print_to_screen("response");
         Ok(new_board)
     }
@@ -184,8 +185,22 @@ impl ChessBoard {
             .find(|x| x.piece_type() == piece_type)
     }
 
-    pub fn move_piece(&mut self, from: Coordinate, to: Coordinate, color_moving: Color) {
-        // let mut cells: Vec<&mut Cell> = self.all_cells_mut();
+    pub fn move_piece(&mut self, action: &PieceMove) {
+        let from = action.from;
+        let to = action.to;
+
+        //check for en passent
+        self.en_passant_target = match (
+            action.chess_piece.piece_type(),
+            action.chess_piece.color(),
+            action.from.y,
+            action.to.y,
+        ) {
+            (PieceType::Pawn, Color::White, 2, 4) => Some(Coordinate::new(action.from.x, 3)),
+            (PieceType::Pawn, Color::Black, 7, 5) => Some(Coordinate::new(action.from.x, 6)),
+            _ => None,
+        };
+
         let cells = self.all_cells_mut_refcell();
         let from_index = cells
             .iter()
@@ -205,7 +220,7 @@ impl ChessBoard {
         }
 
         // Update who's turn it is to move
-        self.side_to_move = match color_moving {
+        self.side_to_move = match action.color_moving {
             Color::White => Color::Black,
             Color::Black => Color::White,
         };
@@ -383,7 +398,8 @@ impl ChessBoard {
             .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
             .parse::<u32>()?;
 
-        let board_section = split.first()
+        let board_section = split
+            .first()
             .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen));
 
         let mut board = ChessBoard::load_empty_board(
