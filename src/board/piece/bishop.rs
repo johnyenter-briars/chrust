@@ -16,13 +16,9 @@ pub struct Bishop {
 
 impl ChessPiece for Bishop {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        /*Algorithm:
-            For each direction a bishop can move in:
-                iterate up starting at the target piece in a diagonal line, if we hit an enemy, add that position, but dont go any further. If we hit a friendly piece, stop - dont add that position
-        */
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
-        let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![
+        let possible_directions: Vec<fn(Coordinate, u32) -> Coordinate> = vec![
             diagonal_up_left_by,
             diagonal_up_right_by,
             diagonal_down_right_by,

@@ -137,7 +137,7 @@ impl ChessGame {
             };
 
             println!("y:");
-            let y = match get_input::<i32>() {
+            let y = match get_input::<u32>() {
                 Ok(i) => i,
                 Err(_) => {
                     return Ok(false);

@@ -36,34 +36,37 @@ fn friendly_occupied(
     }
 }
 
-fn up_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+fn up_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
     coordinate.up_by(ammount)
 }
 
-fn down_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+fn down_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
     coordinate.down_by(ammount)
 }
 
-fn left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+fn left_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
     coordinate.left_by(ammount)
 }
 
-fn right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+fn right_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
     coordinate.right_by(ammount)
 }
 
-fn diagonal_up_left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+fn diagonal_up_left_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
     coordinate.diagonal_up_left_by(ammount)
 }
 
-fn diagonal_up_right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+fn diagonal_up_right_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
     coordinate.diagonal_up_right_by(ammount)
 }
 
-fn diagonal_down_left_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
+fn diagonal_down_left_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
     coordinate.diagonal_down_left_by(ammount)
 }
 
-fn diagonal_down_right_by(coordinate: Coordinate, ammount: i32) -> Coordinate {
-    coordinate.diagonal_down_right_by(ammount)
+fn diagonal_down_right_by(coordinate: Coordinate, ammount: u32) -> Coordinate {
+    {
+        let ref this = coordinate;
+        Coordinate::new((this.x as u8 + ammount as u8) as char, this.y - ammount)
+    }
 }

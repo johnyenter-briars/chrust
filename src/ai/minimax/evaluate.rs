@@ -32,7 +32,7 @@ fn piece_value(piece_type: PieceType) -> i32 {
     }
 }
 
-fn piece_position_score(p: &Box<dyn ChessPiece>, x: char, y: i32) -> i32 {
+fn piece_position_score(p: &Box<dyn ChessPiece>, x: char, y: u32) -> i32 {
     let vector = piece_eval_vector(p.piece_type(), p.color());
     vector[char_to_int(x) as usize][y as usize - 1] as i32
 }

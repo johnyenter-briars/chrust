@@ -27,6 +27,7 @@ pub struct ChessBoard {
     pub white_castle_kingside: bool,
     pub black_castle_queenside: bool,
     pub black_castle_kingside: bool,
+    pub en_passant_target: Option<Coordinate>,
     pub half_move_clock: u32,
     pub full_move_clock: u32,
 }
@@ -80,7 +81,7 @@ impl ChessBoard {
     }
 
     // Returns the chess piece at a given position
-    pub fn piece(&self, x: char, y: i32) -> ChrustResult<&Box<dyn ChessPiece>> {
+    pub fn piece(&self, x: char, y: u32) -> ChrustResult<&Box<dyn ChessPiece>> {
         for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
                 if let Some(piece_ref) = &cell.space {
@@ -211,6 +212,7 @@ impl ChessBoard {
         white_castle_kingside: bool,
         black_castle_queenside: bool,
         black_castle_kingside: bool,
+        en_passant_target: Option<Coordinate>,
         half_move_clock: u32,
         full_move_clock: u32,
     ) -> ChrustResult<ChessBoard> {
@@ -304,6 +306,7 @@ impl ChessBoard {
             white_castle_kingside,
             black_castle_queenside,
             black_castle_kingside,
+            en_passant_target,
             half_move_clock,
             full_move_clock,
         };
@@ -353,6 +356,20 @@ impl ChessBoard {
         let black_castle_kingside = castling_rights.contains('k');
         let black_castle_queenside = castling_rights.contains('q');
 
+        let en_passant_target: Option<Coordinate> = match split
+            .get(3)
+            .expect(&format!("fen is improperly formatted! {}", fen))
+        {
+            &"-" => None,
+            s => {
+                let chars: Vec<char> = s.chars().collect();
+                let bar = chars[1];
+                println!("{:?}", bar);
+                let foo = chars[1] as u32 - '0' as u32;
+                Some(Coordinate::new(chars[0], foo)) //sometimes you gotta go maverick
+            }
+        };
+
         let half_move_clock = split
             .get(4)
             .expect(&format!("fen is improperly formatted! {}", fen))
@@ -374,6 +391,7 @@ impl ChessBoard {
             white_castle_kingside,
             black_castle_queenside,
             black_castle_kingside,
+            en_passant_target,
             half_move_clock,
             full_move_clock,
         )?;
@@ -437,7 +455,7 @@ impl ChessBoard {
     }
 }
 
-fn piece_from_fen_char(c: char, x: char, y: i32) -> ChrustResult<Box<dyn ChessPiece>> {
+fn piece_from_fen_char(c: char, x: char, y: u32) -> ChrustResult<Box<dyn ChessPiece>> {
     match c {
         'p' => Ok(Box::from(Pawn {
             piece_type: PieceType::Pawn,

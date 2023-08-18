@@ -18,7 +18,7 @@ impl ChessPiece for Pawn {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
-        let target_direction: fn(Coordinate, i32) -> Coordinate = match self.color {
+        let target_direction: fn(Coordinate, u32) -> Coordinate = match self.color {
             Color::White => up_by,
             Color::Black => down_by,
         };
