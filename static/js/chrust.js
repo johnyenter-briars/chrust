@@ -14,10 +14,13 @@ class ChrustAPI {
     // API will return a fen with it's move in resposne
     // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
     processFen(enPassantTarget) {
+        var updatedRightHalfFen = this.rightHalfFen;
         if(enPassantTarget) {
-            this.rightHalfFen = this.rightHalfFen.replace('-', enPassantTarget);
+            var foo = updatedRightHalfFen.split(" ");
+            foo[2] = enPassantTarget;
+            updatedRightHalfFen = foo.join(" ");
         }
-        var updatedFen = setCharAt(this.rightHalfFen, 0, 'b');
+        var updatedFen = setCharAt(updatedRightHalfFen, 0, 'b');
         const fullFen = `${this.chessBoard.fen()} ${updatedFen}`;
         console.log("sending fen", fullFen);
         const url = `${this.apiUrl}/api/process/${encodeURIComponent(fullFen)}`;
