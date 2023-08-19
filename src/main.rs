@@ -1,9 +1,9 @@
 use chrust::{
- board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate},
+    board::{chessboard::ChessBoard, color::Color},
     frontend::server::build_and_run_frontend,
     game::chessgame::ChessGame,
     player::{aiplayer::AIPlayer, humanplayer::HumanPlayer},
-    state::{programstate::get_args, viztype::VizType}, chessmove::piecemove::PieceMove,
+    state::{programstate::get_args, viztype::VizType},
 };
 
 #[actix_web::main]

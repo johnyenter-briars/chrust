@@ -201,6 +201,7 @@ impl ChessBoard {
             _ => None,
         };
 
+        //actually move the piece
         let cells = self.all_cells_mut_refcell();
         let from_index = cells
             .iter()
@@ -224,6 +225,16 @@ impl ChessBoard {
             Color::White => Color::Black,
             Color::Black => Color::White,
         };
+
+        //TODO implement halfmove clock
+        self.half_move_clock = self.half_move_clock;
+
+        self.full_move_clock = match action.color_moving {
+            Color::White => self.full_move_clock,
+            Color::Black => self.full_move_clock + 1,
+        };
+
+        //check for castling rights
     }
 
     pub fn load_empty_board(

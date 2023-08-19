@@ -94,18 +94,17 @@ impl ChessGame {
     pub fn ai_moves(&mut self) -> ChrustResult<bool> {
         println!("ai moving");
 
-        let ai_move = max_decision(&self.board, self.ai_player.color, 2)?;
+        let _ = max_decision(&self.board, self.ai_player.color, 2)?;
 
-        todo!();
+        todo!("I don't care about this functionality anymore. Not implementing");
         // self.board.move_piece(&ai_move);
-
-        Ok(true)
+        //Ok(true)
     }
 
     pub fn human_moves(&mut self) -> ChrustResult<bool> {
         println!("Human moving!");
 
-        let (from, to) = if self.human_plays {
+        let (_, _) = if self.human_plays {
             println!("Select your piece!");
 
             println!("x:");
@@ -190,10 +189,9 @@ impl ChessGame {
             (from, to)
         };
 
-        todo!();
+        todo!("I don't care about this functionality anymore. Not implementing");
         // self.board.move_piece(from, to, Color::White);
-
-        Ok(true)
+        //Ok(true)
     }
 
     fn user_of_color(&self, color: Color) -> &dyn ChessPlayer {
@@ -231,13 +229,7 @@ pub fn is_valid(
     current_location: String,
     possible_location: String,
 ) -> ChrustResult<bool> {
-    let board_section = fen
-        .split(' ')
-        .next()
-        .unwrap_or_else(|| panic!("Fen is improperly formatted: {}", fen));
-
-    let board = ChessBoard::load_from_fen(board_section)
-        .unwrap_or_else(|_| panic!("Unable to load board from fen: {}", fen));
+    let board = ChessBoard::load_from_fen(&fen)?;
 
     let current_position = current_location.to_coord();
 
