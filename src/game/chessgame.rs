@@ -116,7 +116,7 @@ impl ChessGame {
             };
 
             println!("y:");
-            let y = match get_input::<u32>() {
+            let y = match get_input::<i32>() {
                 Ok(i) => i,
                 Err(_) => {
                     return Ok(false);
@@ -233,7 +233,8 @@ pub fn is_valid(
 
     let current_position = current_location.to_coord();
 
-    let possible_moves = board.possible_moves(current_position, Color::White)?;
+    let piece = board.piece(current_position.x, current_position.y)?;
+    let possible_moves = piece.available_moves(&board);
 
     let possible_position = possible_location.to_coord();
 
@@ -254,13 +255,12 @@ pub fn valid_moves(fen: String, location: String) -> ChrustResult<Vec<Coordinate
 
     let current_position = location.to_coord();
 
-    if board.piece(current_position.x, current_position.y)?.color() == Color::Black {
+    let piece = board.piece(current_position.x, current_position.y)?;
+    if piece.color() == Color::Black {
         return Ok(vec![]);
     }
 
-    let coords = board
-        .possible_moves(current_position, Color::White)
-        .expect("Unable to find the valid moves!");
+    let coords = piece.available_moves(&board);
 
     Ok(coords)
 }

@@ -82,7 +82,7 @@ impl ChessBoard {
     }
 
     // Returns the chess piece at a given position
-    pub fn piece(&self, x: char, y: u32) -> ChrustResult<&Box<dyn ChessPiece>> {
+    pub fn piece(&self, x: char, y: i32) -> ChrustResult<&Box<dyn ChessPiece>> {
         for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
                 if let Some(piece_ref) = &cell.space {
@@ -110,19 +110,19 @@ impl ChessBoard {
         Ok(target_piece.available_moves(self))
     }
 
-    pub fn possible_moves(
-        &self,
-        current_position: Coordinate,
-        color: Color,
-    ) -> ChrustResult<Vec<Coordinate>> {
-        let target_piece = self.piece(current_position.x, current_position.y)?;
+    // pub fn possible_moves(
+    //     &self,
+    //     current_position: Coordinate,
+    //     color: Color,
+    // ) -> ChrustResult<Vec<Coordinate>> {
+    //     let target_piece = self.piece(current_position.x, current_position.y)?;
 
-        if target_piece.color() != color {
-            return Err(Box::from("Thats not your piece!"));
-        }
+    //     if target_piece.color() != color {
+    //         return Err(Box::from("Thats not your piece!"));
+    //     }
 
-        Ok(target_piece.available_moves(self))
-    }
+    //     Ok(target_piece.available_moves(self))
+    // }
 
     pub fn all_possible_moves(&self, color: Color) -> ChrustResult<Vec<PieceMove>> {
         let cells = self.cells_with_pieces_with_color(color);
@@ -133,7 +133,7 @@ impl ChessBoard {
             let current_position = Coordinate::new(cell.x, cell.y);
             let piece_at_position = self.piece(current_position.x, current_position.y)?;
 
-            let coord_choices = self.possible_moves(current_position, color)?;
+            let coord_choices = piece_at_position.available_moves(self);
 
             let mut possible_moves_for_piece: Vec<PieceMove> = coord_choices
                 .iter()
@@ -150,7 +150,7 @@ impl ChessBoard {
         let fen = self.fen();
         // self.print_to_screen("request");
         let mut new_board = ChessBoard::load_from_fen(&fen)?;
-        new_board.move_piece(action);
+        new_board.move_piece(action)?;
         // new_board.print_to_screen("response");
         Ok(new_board)
     }
@@ -185,7 +185,7 @@ impl ChessBoard {
             .find(|x| x.piece_type() == piece_type)
     }
 
-    pub fn move_piece(&mut self, action: &PieceMove) {
+    pub fn move_piece(&mut self, action: &PieceMove) -> ChrustResult<()> {
         let from = action.from;
         let to = action.to;
 
@@ -205,19 +205,19 @@ impl ChessBoard {
         let cells = self.all_cells_mut_refcell();
         let from_index = cells
             .iter()
-            .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y);
+            .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y)
+            .expect(&format!("No from index: {:?}", from));
 
-        if let Some(from_index) = from_index {
-            let to_index = cells
-                .iter()
-                .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y);
+        let to_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y)
+            .expect(&format!("No to index: {:?}", to));
 
-            if let Some(to_index) = to_index {
-                let one = &mut cells[from_index].borrow_mut().space;
-                let two = &mut cells[to_index].borrow_mut().space;
-                std::mem::swap(one, two);
-                *one = None;
-            }
+        {
+            let one = &mut cells[from_index].borrow_mut().space;
+            let two = &mut cells[to_index].borrow_mut().space;
+            std::mem::swap(one, two);
+            *one = None;
         }
 
         // Update who's turn it is to move
@@ -235,6 +235,15 @@ impl ChessBoard {
         };
 
         //check for castling rights
+        self.update_castling_rights()?;
+
+        Ok(())
+    }
+
+    pub fn update_castling_rights(&mut self) -> ChrustResult<()> {
+        let cells = self.all_cells_mut_refcell();
+
+        Ok(())
     }
 
     pub fn load_empty_board(
@@ -395,7 +404,7 @@ impl ChessBoard {
             &"-" => None,
             s => {
                 let chars: Vec<char> = s.chars().collect();
-                Some(Coordinate::new(chars[0], chars[1] as u32 - '0' as u32)) //sometimes you gotta go maverick
+                Some(Coordinate::new(chars[0], chars[1] as i32 - '0' as i32)) //sometimes you gotta go maverick
             }
         };
 
@@ -505,7 +514,7 @@ impl ChessBoard {
     }
 }
 
-fn piece_from_fen_char(c: char, x: char, y: u32) -> ChrustResult<Box<dyn ChessPiece>> {
+fn piece_from_fen_char(c: char, x: char, y: i32) -> ChrustResult<Box<dyn ChessPiece>> {
     match c {
         'p' => Ok(Box::from(Pawn {
             piece_type: PieceType::Pawn,

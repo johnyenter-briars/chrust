@@ -17,7 +17,7 @@ impl ChessPiece for Rook {
     fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
         let mut possible_coordinates: Vec<Coordinate> = Vec::new();
 
-        let possible_directions: Vec<fn(Coordinate, u32) -> Coordinate> =
+        let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> =
             vec![up_by, down_by, left_by, right_by];
 
         for direction_func in possible_directions {
