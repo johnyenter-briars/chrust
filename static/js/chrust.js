@@ -20,6 +20,7 @@ class ChrustAPI {
             foo[2] = enPassantTarget;
             updatedRightHalfFen = foo.join(" ");
         }
+
         var updatedFen = setCharAt(updatedRightHalfFen, 0, 'b');
         const fullFen = `${this.chessBoard.fen()} ${updatedFen}`;
         console.log("sending fen", fullFen);
@@ -44,6 +45,7 @@ class ChrustAPI {
             const boardSectionFen = fenElements[0];
             const rightHalfOfFen = fenElements.splice(1, 5).join(" ");
             this.rightHalfFen = rightHalfOfFen;
+            console.log("new right half of fen", this.rightHalfFen);
             return responseFen;
         }
         ).then((fen) => {
@@ -213,7 +215,7 @@ const resetBoard = () => {
 
 const config = {
     draggable: true,
-    position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    position: 'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1',
     onDrop: onDrop,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,

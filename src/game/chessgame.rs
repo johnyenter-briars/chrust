@@ -215,7 +215,7 @@ impl ChessGame {
 pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
     let board = ChessBoard::load_from_fen(&fen)?;
 
-    let ai_move = max_decision(&board, Color::Black, num_plies)?;
+    let ai_move = max_decision(&board, Color::Black, 1)?;
 
     let new_board = board.apply_action(&ai_move)?;
 

@@ -27,9 +27,7 @@ pub async fn process(fen: web::Path<String>, s: web::Data<Settings>) -> String {
 
 #[get("/api/possible/{fen}/{location}")]
 pub async fn possible(query: web::Path<(String, String)>) -> Result<impl Responder> {
-    let foo = query.0.to_string();
-    let bar = query.1.to_string();
-    let options = valid_moves(foo, bar)?;
+    let options = valid_moves(query.0.to_string(), query.1.to_string())?;
     Ok(web::Json(MoveOptionsResponse { options }))
 }
 
