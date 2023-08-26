@@ -63,6 +63,11 @@ impl ChessPiece for Pawn {
             if enemy_occupied(coord, self.color, board) {
                 possible_coordinates.push(coord)
             };
+
+            if let Some(en_passent_target) = board.en_passant_target && 
+            en_passent_target.eq(coord) {
+
+            }
         }
 
         possible_coordinates
