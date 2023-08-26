@@ -39,7 +39,6 @@ impl ChessPiece for Pawn {
             if friendly_occupied(possible_position, self.color, board) {
                 break;
             } else if enemy_occupied(possible_position, self.color, board) {
-                possible_coordinates.push(possible_position);
                 break;
             } else {
                 possible_coordinates.push(possible_position);
