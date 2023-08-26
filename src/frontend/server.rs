@@ -1,5 +1,6 @@
 use super::responses::ValidateResponse;
 use crate::{
+    ext::stringext::ToCoord,
     frontend::responses::{MoveOptionsResponse, SettingsResponse},
     game::chessgame::{is_valid, process_fen, valid_moves},
     state::programstate::ProgramState,
@@ -15,10 +16,13 @@ pub struct Settings {
     image_map: Mutex<HashMap<String, Vec<u8>>>,
 }
 
-#[post("/api/process/{fen}")]
-pub async fn process(fen: web::Path<String>, s: web::Data<Settings>) -> String {
+#[post("/api/process/{fen}/{piece_coord}/{target_coord}")]
+pub async fn process(args: web::Path<(String, String, String)>, s: web::Data<Settings>) -> String {
+    let fen = &args.0;
+    let source = args.1.to_coord();
+    let target = args.2.to_coord();
     let program_state = *s.program_state.lock().unwrap();
-    let returned_fen = match process_fen(fen.to_string(), program_state.num_plies) {
+    let returned_fen = match process_fen(fen.to_string(), source, target, program_state.num_plies) {
         Ok(f) => f,
         Err(e) => panic!("paniced because! {}", e),
     };

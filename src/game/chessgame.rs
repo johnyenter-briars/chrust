@@ -3,6 +3,7 @@ use crate::board::chessboard::ChessBoard;
 use crate::board::color::Color;
 use crate::board::coordinate::Coordinate;
 use crate::board::piecetype::PieceType;
+use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
 use crate::player::chessplayer::ChessPlayer;
 use crate::player::humanplayer::*;
@@ -212,16 +213,31 @@ impl ChessGame {
     }
 }
 
-pub fn process_fen(fen: String, num_plies: u32) -> ChrustResult<String> {
-    let board = ChessBoard::load_from_fen(&fen)?;
+pub fn process_fen(
+    fen: String,
+    source: Coordinate,
+    target: Coordinate,
+    num_plies: u32,
+) -> ChrustResult<String> {
+    let board_before_white_action = ChessBoard::load_from_fen(&fen)?;
 
-    let ai_move = max_decision(&board, Color::Black, 1)?;
+    board_before_white_action.print_to_screen(&board_before_white_action.fen());
 
-    let new_board = board.apply_action(&ai_move)?;
+    let chess_piece = board_before_white_action.piece(source.x, source.y)?;
 
-    new_board.print_to_screen("ai move");
+    let action = &PieceMove::new(chess_piece, source, target, Color::White);
 
-    Ok(new_board.fen())
+    let board_after_white_action = board_before_white_action.apply_action(action)?;
+
+    board_after_white_action.print_to_screen(&board_after_white_action.fen());
+
+    let ai_move = max_decision(&board_after_white_action, Color::Black, num_plies)?;
+
+    let board_after_black_action = board_after_white_action.apply_action(&ai_move)?;
+
+    board_after_black_action.print_to_screen("ai move");
+
+    Ok(board_after_black_action.fen())
 }
 
 pub fn is_valid(

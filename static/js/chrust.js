@@ -7,24 +7,12 @@ class ChrustAPI {
             `http://${this.hostname}/chrust`;
 
         this.currenlyInWebRequest = false;
-        this.rightHalfFen = "w KQkq - 0 1"; //starging position
+        this.rightHalfFen = "w KQkq - 0 1"; //starting position
     }
 
-    // sends the fen of the current state to the API
-    // API will return a fen with it's move in resposne
-    // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
-    processFen(enPassantTarget) {
-        var updatedRightHalfFen = this.rightHalfFen;
-        if(enPassantTarget) {
-            var foo = updatedRightHalfFen.split(" ");
-            foo[2] = enPassantTarget;
-            updatedRightHalfFen = foo.join(" ");
-        }
-
-        var updatedFen = setCharAt(updatedRightHalfFen, 0, 'b');
-        const fullFen = `${this.chessBoard.fen()} ${updatedFen}`;
-        console.log("sending fen", fullFen);
-        const url = `${this.apiUrl}/api/process/${encodeURIComponent(fullFen)}`;
+    processFen(fen, pieceCoord, targetCoord) {
+        const fullFen = `${fen} ${this.rightHalfFen}`;
+        const url = `${this.apiUrl}/api/process/${encodeURIComponent(fullFen)}/${pieceCoord}/${targetCoord}`;
         notifyMove(true);
         this.currenlyInWebRequest = true;
         fetch(url,
@@ -40,7 +28,6 @@ class ChrustAPI {
 
         ).then(async (response) => {
             const responseFen = await response.text()
-            console.log("response fen", responseFen);
             const fenElements = responseFen.split(' ');
             const boardSectionFen = fenElements[0];
             const rightHalfOfFen = fenElements.splice(1, 5).join(" ");
@@ -124,6 +111,41 @@ class ChrustAPI {
     }
 }
 
+//chat-gpt did this
+function objectToFen(inputObject) {
+    const pieceMap = {
+        wP: 'P', wN: 'N', wB: 'B', wR: 'R', wQ: 'Q', wK: 'K',
+        bP: 'p', bN: 'n', bB: 'b', bR: 'r', bQ: 'q', bK: 'k'
+    };
+
+    let fen = '';
+    for (let rank = 8; rank >= 1; rank--) {
+        let emptySquares = 0;
+        for (let file = 97; file <= 104; file++) {
+            const square = String.fromCharCode(file) + rank;
+            if (inputObject.hasOwnProperty(square)) {
+                const piece = inputObject[square];
+                if (emptySquares > 0) {
+                    fen += emptySquares;
+                    emptySquares = 0;
+                }
+                fen += pieceMap[piece];
+            } else {
+                emptySquares++;
+            }
+        }
+        if (emptySquares > 0) {
+            fen += emptySquares;
+        }
+        if (rank > 1) {
+            fen += '/';
+        }
+    }
+
+
+    return fen;
+}
+
 const squareCache = {};
 
 const onSnapEnd = function () {
@@ -180,23 +202,13 @@ const onDrop = (source, target, piece, newPos, oldPos, orientation) => {
         return "snapback";
     }
 
-    var enPassant = null;
-    //check for en passant
-    if (piece == "wP") {
-        for (var i of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
-            if (newPos[`${i}2`] === undefined && oldPos[`${i}2`] !== undefined &&
-                newPos[`${i}4`] !== undefined && oldPos[`${i}4`] === undefined
-            ) {
-                enPassant = `${i}3`;
-            }
-        }
-    }
-
     if (!chrustAPI.isValid(source, target)) {
         return "snapback";
     }
 
-    window.setTimeout(() => chrustAPI.processFen(enPassant), 500);
+    const oldPositionFen = objectToFen(oldPos);
+
+    window.setTimeout(() => chrustAPI.processFen(oldPositionFen, source, target), 500);
 }
 
 //https://stackoverflow.com/questions/1431094/how-do-i-replace-a-character-at-a-particular-index-in-javascript
@@ -215,11 +227,12 @@ const resetBoard = () => {
 
 const config = {
     draggable: true,
-    position: 'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1',
+    position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     onDrop: onDrop,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,
 }
+
 const board = Chessboard('board', config)
 
 const chrustAPI = new ChrustAPI(board);
