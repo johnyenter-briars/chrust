@@ -21,15 +21,15 @@ use std::time::Duration;
 
 use crate::ext::stringext::ToCoord;
 
-pub struct ChessGame {
+pub struct ChessGame<'a> {
     pub human_player: HumanPlayer,
     pub ai_player: AIPlayer,
-    pub board: ChessBoard,
+    pub board: ChessBoard<'a>,
     human_plays: bool,
     tick_speed: u64, //milli
 }
 
-impl ChessGame {
+impl ChessGame<'_> {
     pub fn new(
         human_player: HumanPlayer,
         ai_player: AIPlayer,

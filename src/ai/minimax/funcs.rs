@@ -86,13 +86,13 @@ fn min_value(board: &ChessBoard, depth: u32, alpha: i32, mut beta: i32) -> Chrus
 //     }
 // }
 
-fn minimax_decision_max(
-    board: &ChessBoard,
+fn minimax_decision_max<'a>(
+    board: &'a ChessBoard<'a>,
     color: Color,
     max_depth: u32,
     alpha: i32,
     beta: i32,
-) -> ChrustResult<(PieceMove, i32)> {
+) -> ChrustResult<(PieceMove<'a>, i32)> {
     let mut good_actions = Vec::new();
 
     for action in board.all_possible_moves(color)? {
@@ -110,7 +110,7 @@ fn minimax_decision_max(
     }
 }
 
-pub fn max_decision(board: &ChessBoard, color: Color, max_depth: u32) -> ChrustResult<PieceMove> {
+pub fn max_decision<'a>(board: &'a ChessBoard<'a>, color: Color, max_depth: u32) -> ChrustResult<PieceMove<'a>> {
     let start = Instant::now();
     let (max_decision, _) = minimax_decision_max(board, color, max_depth, -1000000, 1000000)?;
     let duration = start.elapsed();

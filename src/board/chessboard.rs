@@ -19,8 +19,8 @@ use core::panic;
 use std::cell::RefCell;
 
 #[derive(Debug)]
-pub struct ChessBoard {
-    pub squares: Vec<Vec<Cell>>,
+pub struct ChessBoard<'a> {
+    pub squares: Vec<Vec<Cell<'a>>>,
     pub board_size: i32,
     pub fen: String,
     pub side_to_move: Color,
@@ -33,7 +33,7 @@ pub struct ChessBoard {
     pub full_move_clock: u32,
 }
 
-impl ChessBoard {
+impl<'a> ChessBoard<'a> {
     pub fn test_cell_at(&self, coordinate: Coordinate) -> Option<&Cell> {
         self.all_cells()
             .iter()
@@ -82,11 +82,11 @@ impl ChessBoard {
     }
 
     // Returns the chess piece at a given position
-    pub fn piece(&self, x: char, y: i32) -> ChrustResult<&Box<dyn ChessPiece>> {
+    pub fn piece(&self, x: char, y: i32) -> ChrustResult<&dyn ChessPiece> {
         for cell in self.all_cells() {
             if cell.x == x && cell.y == y {
                 if let Some(piece_ref) = &cell.space {
-                    return Ok(piece_ref);
+                    return Ok(*piece_ref);
                 } else {
                     return Err(Box::from(format!("You tried to get a piece at a space that didnt have one - did you mean to do that? x:{},y:{}", x, y)));
                 }
@@ -138,18 +138,19 @@ impl ChessBoard {
     pub fn apply_action(&self, action: &PieceMove) -> ChrustResult<ChessBoard> {
         let fen = self.fen();
         // self.print_to_screen("request");
-        let mut new_board = ChessBoard::load_from_fen(&fen)?;
+        let cloned_fen = fen.clone();
+        let mut new_board = ChessBoard::load_from_fen(&cloned_fen)?;
         new_board.move_piece(action)?;
         // new_board.print_to_screen("response");
         Ok(new_board)
     }
 
-    pub fn pieces_of_color(&self, color: Color) -> Vec<&Box<dyn ChessPiece>> {
+    pub fn pieces_of_color(&self, color: Color) -> Vec<&dyn ChessPiece> {
         self.all_cells()
             .iter()
-            .flat_map(|c| &c.space)
+            .flat_map(|c| c.space)
             .filter(|c| c.color() == color)
-            .collect::<Vec<&Box<dyn ChessPiece>>>()
+            .collect::<Vec<&dyn ChessPiece>>()
     }
 
     pub fn cells_with_pieces_with_color(&self, color: Color) -> Vec<&Cell> {
@@ -164,11 +165,7 @@ impl ChessBoard {
         cells
     }
 
-    pub fn piece_specific(
-        &self,
-        color: Color,
-        piece_type: PieceType,
-    ) -> Option<&Box<dyn ChessPiece>> {
+    pub fn piece_specific(&self, color: Color, piece_type: PieceType) -> Option<&dyn ChessPiece> {
         self.pieces_of_color(color)
             .into_iter()
             .find(|x| x.piece_type() == piece_type)
@@ -340,7 +337,7 @@ impl ChessBoard {
         en_passant_target: Option<Coordinate>,
         half_move_clock: u32,
         full_move_clock: u32,
-    ) -> ChrustResult<ChessBoard> {
+    ) -> ChrustResult<ChessBoard<'a>> {
         let board = ChessBoard {
             squares: vec![
                 vec![
@@ -598,68 +595,128 @@ impl ChessBoard {
     }
 }
 
-fn piece_from_fen_char(c: char, x: char, y: i32) -> ChrustResult<Box<dyn ChessPiece>> {
+fn piece_from_fen_char<'a>(c: char, x: char, y: i32) -> ChrustResult<&'a dyn ChessPiece> {
     match c {
-        'p' => Ok(Box::from(Pawn {
+        'p' => Ok(&Pawn {
             piece_type: PieceType::Pawn,
             color: Color::Black,
             current_position: Coordinate { x, y },
-        })),
-        'r' => Ok(Box::from(Rook {
+        }),
+        'r' => Ok(&Rook {
             piece_type: PieceType::Rook,
             color: Color::Black,
             current_position: Coordinate { x, y },
-        })),
-        'n' => Ok(Box::from(Knight {
+        }),
+        'n' => Ok(&Knight {
             piece_type: PieceType::Knight,
             color: Color::Black,
             current_position: Coordinate { x, y },
-        })),
-        'b' => Ok(Box::from(Bishop {
+        }),
+        'b' => Ok(&Bishop {
             piece_type: PieceType::Bishop,
             color: Color::Black,
             current_position: Coordinate { x, y },
-        })),
-        'k' => Ok(Box::from(King {
+        }),
+        'k' => Ok(&King {
             piece_type: PieceType::King,
             color: Color::Black,
             current_position: Coordinate { x, y },
-        })),
-        'q' => Ok(Box::from(Queen {
+        }),
+        'q' => Ok(&Queen {
             piece_type: PieceType::Queen,
             color: Color::Black,
             current_position: Coordinate { x, y },
-        })),
-        'P' => Ok(Box::from(Pawn {
+        }),
+        'P' => Ok(&Pawn {
             piece_type: PieceType::Pawn,
             color: Color::White,
             current_position: Coordinate { x, y },
-        })),
-        'R' => Ok(Box::from(Rook {
+        }),
+        'R' => Ok(&Rook {
             piece_type: PieceType::Rook,
             color: Color::White,
             current_position: Coordinate { x, y },
-        })),
-        'N' => Ok(Box::from(Knight {
+        }),
+        'N' => Ok(&Knight {
             piece_type: PieceType::Knight,
             color: Color::White,
             current_position: Coordinate { x, y },
-        })),
-        'B' => Ok(Box::from(Bishop {
+        }),
+        'B' => Ok(&Bishop {
             piece_type: PieceType::Bishop,
             color: Color::White,
             current_position: Coordinate { x, y },
-        })),
-        'K' => Ok(Box::from(King {
+        }),
+        'K' => Ok(&King {
             piece_type: PieceType::King,
             color: Color::White,
             current_position: Coordinate { x, y },
-        })),
-        'Q' => Ok(Box::from(Queen {
+        }),
+        'Q' => Ok(&Queen {
             piece_type: PieceType::Queen,
             color: Color::White,
             current_position: Coordinate { x, y },
-        })),
+        }),
+        // 'p' => Ok(Box::from(Pawn {
+        //     piece_type: PieceType::Pawn,
+        //     color: Color::Black,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'r' => Ok(Box::from(Rook {
+        //     piece_type: PieceType::Rook,
+        //     color: Color::Black,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'n' => Ok(Box::from(Knight {
+        //     piece_type: PieceType::Knight,
+        //     color: Color::Black,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'b' => Ok(Box::from(Bishop {
+        //     piece_type: PieceType::Bishop,
+        //     color: Color::Black,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'k' => Ok(Box::from(King {
+        //     piece_type: PieceType::King,
+        //     color: Color::Black,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'q' => Ok(Box::from(Queen {
+        //     piece_type: PieceType::Queen,
+        //     color: Color::Black,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'P' => Ok(Box::from(Pawn {
+        //     piece_type: PieceType::Pawn,
+        //     color: Color::White,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'R' => Ok(Box::from(Rook {
+        //     piece_type: PieceType::Rook,
+        //     color: Color::White,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'N' => Ok(Box::from(Knight {
+        //     piece_type: PieceType::Knight,
+        //     color: Color::White,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'B' => Ok(Box::from(Bishop {
+        //     piece_type: PieceType::Bishop,
+        //     color: Color::White,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'K' => Ok(Box::from(King {
+        //     piece_type: PieceType::King,
+        //     color: Color::White,
+        //     current_position: Coordinate { x, y },
+        // })),
+        // 'Q' => Ok(Box::from(Queen {
+        //     piece_type: PieceType::Queen,
+        //     color: Color::White,
+        //     current_position: Coordinate { x, y },
+        // })),
         _ => Err(Box::from("Invalid char: {}")),
     }
 }

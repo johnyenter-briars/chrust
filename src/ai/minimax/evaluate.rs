@@ -7,7 +7,7 @@ pub fn evaluate(board: &ChessBoard) -> i32 {
     let cells = board.all_cells();
     cells
         .iter()
-        .map(|c| match &c.space {
+        .map(|c| match c.space {
             Some(p) => {
                 let abs_value = piece_value(p.piece_type()) + piece_position_score(p, c.x, c.y);
                 if p.color() == Color::White {
@@ -32,7 +32,7 @@ fn piece_value(piece_type: PieceType) -> i32 {
     }
 }
 
-fn piece_position_score(p: &Box<dyn ChessPiece>, x: char, y: i32) -> i32 {
+fn piece_position_score(p: &dyn ChessPiece, x: char, y: i32) -> i32 {
     let vector = piece_eval_vector(p.piece_type(), p.color());
     vector[char_to_int(x) as usize][y as usize - 1] as i32
 }
