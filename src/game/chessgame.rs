@@ -241,7 +241,7 @@ pub fn process_fen(
 
     board_after_white_action.print_to_screen(&board_after_white_action.fen());
 
-    let ai_move = max_decision(&board_after_white_action, Color::Black, 1)?;
+    let ai_move = max_decision(&board_after_white_action, Color::Black, num_plies)?;
 
     let board_after_black_action = board_after_white_action.apply_action(&ai_move)?;
 
