@@ -195,12 +195,12 @@ impl ChessBoard {
         let from_index = cells
             .iter()
             .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y)
-            .expect(&format!("No from index: {:?}", from));
+            .unwrap_or_else(|| panic!("No from index: {:?}", from));
 
         let to_index = cells
             .iter()
             .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y)
-            .expect(&format!("No to index: {:?}", to));
+            .unwrap_or_else(|| panic!("No to index: {:?}", to));
 
         {
             let one = &mut cells[from_index].borrow_mut().space;
@@ -214,11 +214,11 @@ impl ChessBoard {
                 Color::White => cells
                     .iter()
                     .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y - 1)
-                    .expect(&format!("No to index: {:?}", to)),
+                    .unwrap_or_else(|| panic!("No to index: {:?}", to)),
                 Color::Black => cells
                     .iter()
                     .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y + 1)
-                    .expect(&format!("No to index: {:?}", to)),
+                    .unwrap_or_else(|| panic!("No to index: {:?}", to)),
             };
 
             cells[pawn_to_remove_index].borrow_mut().space = None;
@@ -230,12 +230,12 @@ impl ChessBoard {
                 let from_index_for_rook = cells
                     .iter()
                     .position(|c| c.borrow_mut().x == 'h' && c.borrow_mut().y == from.y)
-                    .expect(&format!("No from index: {:?}", from));
+                    .unwrap_or_else(|| panic!("No from index: {:?}", from));
 
                 let to_index_for_rook = cells
                     .iter()
                     .position(|c| c.borrow_mut().x == 'f' && c.borrow_mut().y == to.y)
-                    .expect(&format!("No to index: {:?}", to));
+                    .unwrap_or_else(|| panic!("No to index: {:?}", to));
 
                 {
                     let one = &mut cells[from_index_for_rook].borrow_mut().space;
@@ -249,12 +249,12 @@ impl ChessBoard {
                 let from_index_for_rook = cells
                     .iter()
                     .position(|c| c.borrow_mut().x == 'a' && c.borrow_mut().y == from.y)
-                    .expect(&format!("No from index: {:?}", from));
+                    .unwrap_or_else(|| panic!("No from index: {:?}", from));
 
                 let to_index_for_rook = cells
                     .iter()
                     .position(|c| c.borrow_mut().x == 'd' && c.borrow_mut().y == to.y)
-                    .expect(&format!("No to index: {:?}", to));
+                    .unwrap_or_else(|| panic!("No to index: {:?}", to));
 
                 {
                     let one = &mut cells[from_index_for_rook].borrow_mut().space;
