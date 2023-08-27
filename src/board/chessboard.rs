@@ -8,7 +8,6 @@ use super::piece::bishop::Bishop;
 use super::piece::chesspiece::ChessPiece;
 use super::piece::king::King;
 use super::piece::knight::Knight;
-use super::piece::pawn;
 use super::piece::queen::Queen;
 use super::piece::rook::Rook;
 use super::types::{MoveType, PieceType};
@@ -112,20 +111,6 @@ impl ChessBoard {
         // Ok(target_piece.available_moves(self))
     }
 
-    // pub fn possible_moves(
-    //     &self,
-    //     current_position: Coordinate,
-    //     color: Color,
-    // ) -> ChrustResult<Vec<Coordinate>> {
-    //     let target_piece = self.piece(current_position.x, current_position.y)?;
-
-    //     if target_piece.color() != color {
-    //         return Err(Box::from("Thats not your piece!"));
-    //     }
-
-    //     Ok(target_piece.available_moves(self))
-    // }
-
     pub fn all_possible_moves(&self, color: Color) -> ChrustResult<Vec<PieceMove>> {
         let cells = self.cells_with_pieces_with_color(color);
 
@@ -205,7 +190,7 @@ impl ChessBoard {
             _ => None,
         };
 
-        //actually move the piece
+        //actually move the piece. This is really bad - and i duplidcated this code. And I'm really sorry. But it's 6AM, and I'm super sad cause the swimming part of the triathlon this morning got canceled. So I did all that training for nothing.
         let cells = self.all_cells_mut_refcell();
         let from_index = cells
             .iter()
@@ -239,6 +224,58 @@ impl ChessBoard {
             cells[pawn_to_remove_index].borrow_mut().space = None;
         }
 
+        //assuming we're moving the king currently
+        if action.move_type == MoveType::Castle {
+            if to.x == 'g' {
+                let from_index_for_rook = cells
+                    .iter()
+                    .position(|c| c.borrow_mut().x == 'h' && c.borrow_mut().y == from.y)
+                    .expect(&format!("No from index: {:?}", from));
+
+                let to_index_for_rook = cells
+                    .iter()
+                    .position(|c| c.borrow_mut().x == 'f' && c.borrow_mut().y == to.y)
+                    .expect(&format!("No to index: {:?}", to));
+
+                {
+                    let one = &mut cells[from_index_for_rook].borrow_mut().space;
+                    let two = &mut cells[to_index_for_rook].borrow_mut().space;
+                    std::mem::swap(one, two);
+                    *one = None;
+                }
+            }
+
+            if to.x == 'c' {
+                let from_index_for_rook = cells
+                    .iter()
+                    .position(|c| c.borrow_mut().x == 'a' && c.borrow_mut().y == from.y)
+                    .expect(&format!("No from index: {:?}", from));
+
+                let to_index_for_rook = cells
+                    .iter()
+                    .position(|c| c.borrow_mut().x == 'd' && c.borrow_mut().y == to.y)
+                    .expect(&format!("No to index: {:?}", to));
+
+                {
+                    let one = &mut cells[from_index_for_rook].borrow_mut().space;
+                    let two = &mut cells[to_index_for_rook].borrow_mut().space;
+                    std::mem::swap(one, two);
+                    *one = None;
+                }
+            }
+
+            if action.color_moving == Color::White {
+                self.white_castle_kingside = false;
+                self.white_castle_queenside = false;
+            } else {
+                self.black_castle_kingside = false;
+                self.black_castle_queenside = false;
+            }
+        } else {
+            //check for castling rights
+            self.update_castling_rights(action)?;
+        }
+
         // Update who's turn it is to move
         self.side_to_move = match action.color_moving {
             Color::White => Color::Black,
@@ -252,9 +289,6 @@ impl ChessBoard {
             Color::White => self.full_move_clock,
             Color::Black => self.full_move_clock + 1,
         };
-
-        //check for castling rights
-        self.update_castling_rights(action)?;
 
         Ok(())
     }

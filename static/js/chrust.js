@@ -227,7 +227,7 @@ const resetBoard = () => {
 
 const config = {
     draggable: true,
-    position: '8/8/8/8/2p5/8/1P6/8 w KQkq - 0 1',
+    position: 'r2qk2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1',
     onDrop: onDrop,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,

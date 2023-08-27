@@ -233,9 +233,7 @@ pub fn process_fen(
         .filter(|o| o.0.x == target.x && o.0.y == target.y)
         .map(|o| o.1)
         .collect_vec();
-    let move_type = binding
-        .first()
-        .expect("No move found for that input :(");
+    let move_type = binding.first().expect("No move found for that input :(");
 
     let action = &PieceMove::new(chess_piece, source, target, Color::White, *move_type);
 
@@ -243,7 +241,7 @@ pub fn process_fen(
 
     board_after_white_action.print_to_screen(&board_after_white_action.fen());
 
-    let ai_move = max_decision(&board_after_white_action, Color::Black, num_plies)?;
+    let ai_move = max_decision(&board_after_white_action, Color::Black, 1)?;
 
     let board_after_black_action = board_after_white_action.apply_action(&ai_move)?;
 

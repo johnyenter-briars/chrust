@@ -51,6 +51,78 @@ impl ChessPiece for King {
             }
         }
 
+        if self.color == Color::White {
+            if board.white_castle_kingside
+                && board
+                    .test_cell_at(Coordinate::new('f', 1))
+                    .unwrap()
+                    .space
+                    .is_none()
+                && board
+                    .test_cell_at(Coordinate::new('g', 1))
+                    .unwrap()
+                    .space
+                    .is_none()
+            {
+                possible_coordinates.push((Coordinate::new('g', 1), MoveType::Castle));
+            }
+
+            if board.white_castle_queenside
+                && board
+                    .test_cell_at(Coordinate::new('b', 1))
+                    .unwrap()
+                    .space
+                    .is_none()
+                && board
+                    .test_cell_at(Coordinate::new('c', 1))
+                    .unwrap()
+                    .space
+                    .is_none()
+                && board
+                    .test_cell_at(Coordinate::new('d', 1))
+                    .unwrap()
+                    .space
+                    .is_none()
+            {
+                possible_coordinates.push((Coordinate::new('c', 1), MoveType::Castle));
+            }
+        } else {
+            if board.black_castle_kingside
+                && board
+                    .test_cell_at(Coordinate::new('f', 8))
+                    .unwrap()
+                    .space
+                    .is_none()
+                && board
+                    .test_cell_at(Coordinate::new('g', 8))
+                    .unwrap()
+                    .space
+                    .is_none()
+            {
+                possible_coordinates.push((Coordinate::new('g', 8), MoveType::Castle));
+            }
+
+            if board.white_castle_queenside
+                && board
+                    .test_cell_at(Coordinate::new('b', 8))
+                    .unwrap()
+                    .space
+                    .is_none()
+                && board
+                    .test_cell_at(Coordinate::new('c', 8))
+                    .unwrap()
+                    .space
+                    .is_none()
+                && board
+                    .test_cell_at(Coordinate::new('d', 8))
+                    .unwrap()
+                    .space
+                    .is_none()
+            {
+                possible_coordinates.push((Coordinate::new('c', 8), MoveType::Castle));
+            }
+        }
+
         possible_coordinates
     }
     fn str(&self) -> &str {
