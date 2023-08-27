@@ -64,9 +64,8 @@ impl ChessPiece for Pawn {
                 possible_coordinates.push(coord)
             };
 
-            if let Some(en_passent_target) = board.en_passant_target && 
-            en_passent_target.eq(coord) {
-
+            if board.en_passant_target.is_some() && board.en_passant_target.unwrap().eq(coord) {
+                possible_coordinates.push(coord)
             }
         }
 
