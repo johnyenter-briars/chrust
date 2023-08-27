@@ -8,10 +8,6 @@ pub struct Coordinate {
 
 //NO ERROR HANDLING - call is_valid if you want to test validity of a coordinate
 impl Coordinate {
-    pub fn eq(&self, other: Coordinate) -> bool {
-        self.x == other.x && self.y == other.y
-    }
-
     pub fn new(x: char, y: i32) -> Self {
         Coordinate { x, y }
     }
@@ -52,5 +48,11 @@ impl Coordinate {
 
     pub fn diagonal_down_left_by(&self, ammount: i32) -> Self {
         Coordinate::new((self.x as u8 - ammount as u8) as char, self.y - ammount)
+    }
+}
+
+impl std::cmp::PartialEq for Coordinate {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
     }
 }

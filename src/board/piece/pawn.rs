@@ -64,7 +64,7 @@ impl ChessPiece for Pawn {
                 possible_coordinates.push((coord, MoveType::CaptureOrMove))
             };
 
-            if board.en_passant_target.is_some() && board.en_passant_target.unwrap().eq(coord) {
+            if board.en_passant_target.is_some() && board.en_passant_target.unwrap() == coord {
                 possible_coordinates.push((coord, MoveType::EnPassant))
             }
         }
