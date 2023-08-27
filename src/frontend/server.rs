@@ -5,7 +5,6 @@ use crate::{
     game::chessgame::{is_valid, process_fen, valid_moves},
     state::programstate::ProgramState,
 };
-use actix_files::NamedFile;
 use actix_web::web;
 use actix_web::{get, post, HttpResponse};
 use actix_web::{middleware::Logger, App, HttpServer};
@@ -52,30 +51,11 @@ async fn settings(settings: web::Data<Settings>) -> Result<impl Responder> {
     Ok(web::Json(SettingsResponse { program_state }))
 }
 
-// #[get("/")]
-// async fn index() -> HttpResponse {
-//     HttpResponse::Ok()
-//         .content_type("text/html")
-//         .body(include_str!("../../static/index.html"))
-// }
-
-// #[get("js/chrust.js")]
-// async fn javascript() -> HttpResponse {
-//     HttpResponse::Ok()
-//         .content_type("text/javascript")
-//         .body(include_str!("../../static/js/chrust.js"))
-// }
-
-// #[get("css/chrust.css")]
-// async fn css() -> HttpResponse {
-//     HttpResponse::Ok()
-//         .content_type("text/css")
-//         .body(include_str!("../../static/css/chrust.css"))
-// }
-
 #[get("/")]
-async fn index() -> Result<NamedFile> {
-    Ok(NamedFile::open("./static/index.html")?)
+async fn index() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(include_str!("../../static/index.html"))
 }
 
 #[get("js/chrust.js")]
@@ -86,8 +66,10 @@ async fn javascript() -> HttpResponse {
 }
 
 #[get("css/chrust.css")]
-async fn css() -> Result<NamedFile> {
-    Ok(NamedFile::open("./static/css/chrust.css")?)
+async fn css() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("text/css")
+        .body(include_str!("../../static/css/chrust.css"))
 }
 
 // /img/chesspieces/wikipedia/wB.png

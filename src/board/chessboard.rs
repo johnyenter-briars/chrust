@@ -13,7 +13,6 @@ use super::piece::rook::Rook;
 use super::types::{MoveType, PieceType};
 use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
-use crate::player::humanplayer::HumanPlayer;
 use crate::ChrustResult;
 use core::panic;
 use std::cell::RefCell;
@@ -94,21 +93,6 @@ impl ChessBoard {
         }
 
         Err(Box::from(format!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x, y)))
-    }
-
-    pub fn possible_moves_human(
-        &self,
-        current_position: Coordinate,
-        human_player: &HumanPlayer,
-    ) -> ChrustResult<Vec<Coordinate>> {
-        let target_piece = self.piece(current_position.x, current_position.y)?;
-
-        if target_piece.color() != human_player.color {
-            return Err(Box::from("Thats not your piece!"));
-        }
-
-        todo!("I literally don't care about this functionality");
-        // Ok(target_piece.available_moves(self))
     }
 
     pub fn all_possible_moves(&self, color: Color) -> ChrustResult<Vec<PieceMove>> {

@@ -2,13 +2,8 @@ use clap::{App, Arg};
 
 use crate::ChrustResult;
 
-use super::viztype::VizType;
-
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct ProgramState {
-    pub viz_type: VizType,
-    pub human_plays: bool,
-    pub tick_speed: u64,
     pub num_plies: u32,
 }
 
@@ -17,30 +12,6 @@ pub fn get_args() -> ChrustResult<ProgramState> {
         .version("0.2.0")
         .author("John YB. <jyenterbriars@gmail.com>")
         .about("Simple Chess Engine")
-        .arg(
-            Arg::new("viz")
-                .short('z')
-                .long("visualization_mode")
-                .value_name("TERM|WEB")
-                .takes_value(true)
-                .default_value("WEB"),
-        )
-        .arg(
-            Arg::new("hplay")
-                .short('h')
-                .long("human_plays")
-                .value_name("true|false")
-                .takes_value(true)
-                .default_value("true"),
-        )
-        .arg(
-            Arg::new("tick")
-                .short('t')
-                .long("tick_speed")
-                .value_name("positive integer")
-                .takes_value(true)
-                .default_value("1000"),
-        )
         .arg(
             Arg::new("plies")
                 .short('p')
@@ -51,40 +22,11 @@ pub fn get_args() -> ChrustResult<ProgramState> {
         )
         .get_matches();
 
-    //this is horrible and i'm sorry
-    let viz_type = matches
-        .value_of("viz")
-        .ok_or("unable to parse arguments :(")?;
-    let human_plays = matches
-        .value_of("hplay")
-        .ok_or("unable to parse arguments :(")?;
-    let tick_speed = matches
-        .value_of("tick")
-        .ok_or("unable to parse arguments :(")?;
     let num_plies = matches
         .value_of("plies")
         .ok_or("unable to parse arguments :(")?;
 
     let program_state = ProgramState {
-        viz_type: match viz_type {
-            "TERM" => VizType::Term,
-            "WEB" => VizType::Web,
-            _ => {
-                return Err(Box::from(
-                    "You must pass in a vaid argument for the -v flag!",
-                ));
-            }
-        },
-        human_plays: match human_plays {
-            "true" => true,
-            "false" => false,
-            _ => {
-                return Err(Box::from(
-                    "You must pass in a vaid argument for the -h flag!",
-                ));
-            }
-        },
-        tick_speed: tick_speed.parse()?,
         num_plies: num_plies.parse()?,
     };
 

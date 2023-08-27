@@ -6,7 +6,6 @@ pub mod chessmove;
 pub mod ext;
 pub mod frontend;
 pub mod game;
-pub mod player;
 pub mod state;
 
 #[macro_use]
