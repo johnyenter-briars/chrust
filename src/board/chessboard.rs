@@ -8,9 +8,10 @@ use super::piece::bishop::Bishop;
 use super::piece::chesspiece::ChessPiece;
 use super::piece::king::King;
 use super::piece::knight::Knight;
+use super::piece::pawn;
 use super::piece::queen::Queen;
 use super::piece::rook::Rook;
-use super::piecetype::PieceType;
+use super::types::{MoveType, PieceType};
 use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::humanplayer::HumanPlayer;
@@ -107,7 +108,8 @@ impl ChessBoard {
             return Err(Box::from("Thats not your piece!"));
         }
 
-        Ok(target_piece.available_moves(self))
+        todo!("I literally don't care about this functionality");
+        // Ok(target_piece.available_moves(self))
     }
 
     // pub fn possible_moves(
@@ -137,7 +139,9 @@ impl ChessBoard {
 
             let mut possible_moves_for_piece: Vec<PieceMove> = coord_choices
                 .iter()
-                .map(|coord| PieceMove::new(piece_at_position, current_position, *coord, color))
+                .map(|coord| {
+                    PieceMove::new(piece_at_position, current_position, coord.0, color, coord.1)
+                })
                 .collect();
 
             possible_moves.append(&mut possible_moves_for_piece);
@@ -218,6 +222,21 @@ impl ChessBoard {
             let two = &mut cells[to_index].borrow_mut().space;
             std::mem::swap(one, two);
             *one = None;
+        }
+
+        if action.move_type == MoveType::EnPassant {
+            let pawn_to_remove_index = match action.color_moving {
+                Color::White => cells
+                    .iter()
+                    .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y - 1)
+                    .expect(&format!("No to index: {:?}", to)),
+                Color::Black => cells
+                    .iter()
+                    .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y + 1)
+                    .expect(&format!("No to index: {:?}", to)),
+            };
+
+            cells[pawn_to_remove_index].borrow_mut().space = None;
         }
 
         // Update who's turn it is to move

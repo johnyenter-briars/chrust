@@ -1,5 +1,5 @@
 use crate::board::{
-    chessboard::ChessBoard, color::Color, piece::chesspiece::ChessPiece, piecetype::PieceType,
+    chessboard::ChessBoard, color::Color, piece::chesspiece::ChessPiece, types::PieceType,
 };
 
 //NOTE: this evaluation function assumes that the WHITE is the MIN player and BLACK is the MAX player

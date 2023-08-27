@@ -1,5 +1,8 @@
 use crate::board::{
-    chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType,
+    chessboard::ChessBoard,
+    color::Color,
+    coordinate::Coordinate,
+    types::{MoveType, PieceType},
 };
 
 use super::{
@@ -14,8 +17,8 @@ pub struct Rook {
 }
 
 impl ChessPiece for Rook {
-    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+    fn available_moves(&self, board: &ChessBoard) -> Vec<(Coordinate, MoveType)> {
+        let mut possible_coordinates: Vec<(Coordinate, MoveType)> = Vec::new();
 
         let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> =
             vec![up_by, down_by, left_by, right_by];
@@ -31,10 +34,10 @@ impl ChessPiece for Rook {
                 if friendly_occupied(possible_position, self.color, board) {
                     break;
                 } else if enemy_occupied(possible_position, self.color, board) {
-                    possible_coordinates.push(possible_position);
+                    possible_coordinates.push((possible_position, MoveType::CaptureOrMove));
                     break;
                 } else {
-                    possible_coordinates.push(possible_position);
+                    possible_coordinates.push((possible_position, MoveType::CaptureOrMove));
                 }
             }
         }

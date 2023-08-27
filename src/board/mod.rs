@@ -3,4 +3,4 @@ pub mod chessboard;
 pub mod color;
 pub mod coordinate;
 pub mod piece;
-pub mod piecetype;
+pub mod types;

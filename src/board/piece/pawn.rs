@@ -2,7 +2,7 @@ use crate::board::{
     chessboard::ChessBoard,
     color::{self, Color},
     coordinate::Coordinate,
-    piecetype::PieceType,
+    types::{MoveType, PieceType},
 };
 
 use super::{chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, up_by};
@@ -15,8 +15,8 @@ pub struct Pawn {
 }
 
 impl ChessPiece for Pawn {
-    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+    fn available_moves(&self, board: &ChessBoard) -> Vec<(Coordinate, MoveType)> {
+        let mut possible_coordinates: Vec<(Coordinate, MoveType)> = Vec::new();
 
         let target_direction: fn(Coordinate, i32) -> Coordinate = match self.color {
             Color::White => up_by,
@@ -41,7 +41,7 @@ impl ChessPiece for Pawn {
             } else if enemy_occupied(possible_position, self.color, board) {
                 break;
             } else {
-                possible_coordinates.push(possible_position);
+                possible_coordinates.push((possible_position, MoveType::CaptureOrMove));
             }
         }
         let possible_enemy_positions: Vec<Coordinate> = if self.color == color::Color::White {
@@ -61,11 +61,11 @@ impl ChessPiece for Pawn {
 
         for coord in possible_enemy_positions {
             if enemy_occupied(coord, self.color, board) {
-                possible_coordinates.push(coord)
+                possible_coordinates.push((coord, MoveType::CaptureOrMove))
             };
 
             if board.en_passant_target.is_some() && board.en_passant_target.unwrap().eq(coord) {
-                possible_coordinates.push(coord)
+                possible_coordinates.push((coord, MoveType::EnPassant))
             }
         }
 

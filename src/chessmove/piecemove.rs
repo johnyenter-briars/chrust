@@ -1,4 +1,6 @@
-use crate::board::{color::Color, coordinate::Coordinate, piece::chesspiece::ChessPiece};
+use crate::board::{
+    color::Color, coordinate::Coordinate, piece::chesspiece::ChessPiece, types::MoveType,
+};
 
 #[derive(Clone, Copy)]
 pub struct PieceMove<'a> {
@@ -6,6 +8,7 @@ pub struct PieceMove<'a> {
     pub from: Coordinate,
     pub to: Coordinate,
     pub color_moving: Color,
+    pub move_type: MoveType,
 }
 
 impl<'a> PieceMove<'a> {
@@ -14,12 +17,14 @@ impl<'a> PieceMove<'a> {
         from: Coordinate,
         to: Coordinate,
         color_moving: Color,
+        move_type: MoveType,
     ) -> Self {
         PieceMove {
             chess_piece,
             from,
             to,
             color_moving,
+            move_type,
         }
     }
 }

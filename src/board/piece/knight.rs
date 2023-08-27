@@ -1,5 +1,8 @@
 use crate::board::{
-    chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType,
+    chessboard::ChessBoard,
+    color::Color,
+    coordinate::Coordinate,
+    types::{MoveType, PieceType},
 };
 
 use super::{chesspiece::ChessPiece, friendly_occupied};
@@ -12,8 +15,8 @@ pub struct Knight {
 }
 
 impl ChessPiece for Knight {
-    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+    fn available_moves(&self, board: &ChessBoard) -> Vec<(Coordinate, MoveType)> {
+        let mut possible_coordinates: Vec<(Coordinate, MoveType)> = Vec::new();
 
         let possible_directions = vec![
             self.current_position.up_by(1).left_by(2),
@@ -35,7 +38,7 @@ impl ChessPiece for Knight {
             if friendly_occupied(possible_position, self.color, board) {
                 continue;
             } else {
-                possible_coordinates.push(possible_position);
+                possible_coordinates.push((possible_position, MoveType::CaptureOrMove));
             }
         }
 

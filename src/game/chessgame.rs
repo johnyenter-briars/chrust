@@ -2,7 +2,7 @@ use crate::ai::minimax::funcs::max_decision;
 use crate::board::chessboard::ChessBoard;
 use crate::board::color::Color;
 use crate::board::coordinate::Coordinate;
-use crate::board::piecetype::PieceType;
+use crate::board::types::PieceType;
 use crate::chessmove::piecemove::PieceMove;
 use crate::player::aiplayer::*;
 use crate::player::chessplayer::ChessPlayer;
@@ -11,6 +11,7 @@ use crate::ChrustResult;
 
 extern crate rand;
 
+use itertools::Itertools;
 use rand::seq::SliceRandom;
 
 use std::error::Error;
@@ -225,7 +226,18 @@ pub fn process_fen(
 
     let chess_piece = board_before_white_action.piece(source.x, source.y)?;
 
-    let action = &PieceMove::new(chess_piece, source, target, Color::White);
+    let options = chess_piece.available_moves(&board_before_white_action);
+
+    let binding = options
+        .iter()
+        .filter(|o| o.0.x == target.x && o.0.y == target.y)
+        .map(|o| o.1)
+        .collect_vec();
+    let move_type = binding
+        .first()
+        .expect("No move found for that input :(");
+
+    let action = &PieceMove::new(chess_piece, source, target, Color::White, *move_type);
 
     let board_after_white_action = board_before_white_action.apply_action(action)?;
 
@@ -256,7 +268,7 @@ pub fn is_valid(
 
     let valid_move = possible_moves
         .iter()
-        .any(|coord| coord.x == possible_position.x && coord.y == possible_position.y);
+        .any(|coord| coord.0.x == possible_position.x && coord.0.y == possible_position.y);
 
     Ok(valid_move)
 }
@@ -276,7 +288,11 @@ pub fn valid_moves(fen: String, location: String) -> ChrustResult<Vec<Coordinate
         return Ok(vec![]);
     }
 
-    let coords = piece.available_moves(&board);
+    let coords = piece
+        .available_moves(&board)
+        .iter()
+        .map(|c| c.0)
+        .collect_vec();
 
     Ok(coords)
 }
