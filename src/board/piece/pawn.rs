@@ -36,9 +36,9 @@ impl ChessPiece for Pawn {
                 continue;
             };
 
-            if friendly_occupied(possible_position, self.color, board) {
-                break;
-            } else if enemy_occupied(possible_position, self.color, board) {
+            if friendly_occupied(possible_position, self.color, board)
+                || enemy_occupied(possible_position, self.color, board)
+            {
                 break;
             } else {
                 possible_coordinates.push((possible_position, MoveType::CaptureOrMove));

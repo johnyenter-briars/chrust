@@ -283,7 +283,6 @@ impl ChessBoard {
         };
 
         //TODO implement halfmove clock
-        self.half_move_clock = self.half_move_clock;
 
         self.full_move_clock = match action.color_moving {
             Color::White => self.full_move_clock,
@@ -294,37 +293,37 @@ impl ChessBoard {
     }
 
     pub fn update_castling_rights(&mut self, action: &PieceMove) -> ChrustResult<()> {
-        self.white_castle_kingside = !self.white_castle_kingside
-            && !(action.chess_piece.piece_type() == PieceType::King
+        self.white_castle_kingside = !(self.white_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::King
                 && action.chess_piece.color() == Color::White);
-        self.white_castle_queenside = !self.white_castle_queenside
-            && !(action.chess_piece.piece_type() == PieceType::King
+        self.white_castle_queenside = !(self.white_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::King
                 && action.chess_piece.color() == Color::White);
 
-        self.white_castle_kingside = !self.white_castle_kingside
-            && !(action.chess_piece.piece_type() == PieceType::Rook
+        self.white_castle_kingside = !(self.white_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::Rook
                 && action.chess_piece.color() == Color::White
                 && action.from.x == 'h');
 
-        self.white_castle_queenside = !self.white_castle_queenside
-            && !(action.chess_piece.piece_type() == PieceType::Rook
+        self.white_castle_queenside = !(self.white_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::Rook
                 && action.chess_piece.color() == Color::White
                 && action.from.x == 'a');
 
-        self.black_castle_kingside = !self.black_castle_kingside
-            && !(action.chess_piece.piece_type() == PieceType::King
+        self.black_castle_kingside = !(self.black_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::King
                 && action.chess_piece.color() == Color::Black);
-        self.black_castle_queenside = !self.black_castle_queenside
-            && !(action.chess_piece.piece_type() == PieceType::King
+        self.black_castle_queenside = !(self.black_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::King
                 && action.chess_piece.color() == Color::Black);
 
-        self.black_castle_kingside = !self.black_castle_kingside
-            && !(action.chess_piece.piece_type() == PieceType::Rook
+        self.black_castle_kingside = !(self.black_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::Rook
                 && action.chess_piece.color() == Color::Black
                 && action.from.x == 'h');
 
-        self.black_castle_queenside = !self.black_castle_queenside
-            && !(action.chess_piece.piece_type() == PieceType::Rook
+        self.black_castle_queenside = !(self.black_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::Rook
                 && action.chess_piece.color() == Color::Black
                 && action.from.x == 'a');
 
