@@ -1,15 +1,13 @@
 use crate::ai::minimax::funcs::max_decision;
 use crate::board::chessboard::ChessBoard;
 use crate::board::color::Color;
-use crate::board::coordinate::Coordinate;
+use crate::board::coordinate::{Coordinate, ToCoord};
 use crate::chessmove::piecemove::PieceMove;
 use crate::ChrustResult;
 
 extern crate rand;
 
 use itertools::Itertools;
-
-use crate::ext::stringext::ToCoord;
 
 pub fn process_fen(
     fen: String,

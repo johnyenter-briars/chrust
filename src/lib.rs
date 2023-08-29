@@ -3,7 +3,6 @@ use std::error::Error;
 pub mod ai;
 pub mod board;
 pub mod chessmove;
-pub mod ext;
 pub mod frontend;
 pub mod game;
 pub mod state;
@@ -12,8 +11,6 @@ pub mod state;
 extern crate serde_derive;
 extern crate serde_json;
 
-
 extern crate clap;
 
 type ChrustResult<T> = Result<T, Box<dyn Error>>;
-

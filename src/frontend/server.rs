@@ -1,9 +1,8 @@
-use super::responses::ValidateResponse;
+use super::response::ValidateResponse;
 use crate::{
-    ext::stringext::ToCoord,
-    frontend::responses::{MoveOptionsResponse, SettingsResponse},
+    frontend::response::{MoveOptionsResponse, SettingsResponse},
     game::chessgame::{is_valid, process_fen, valid_moves},
-    state::programstate::ProgramState,
+    state::programstate::ProgramState, board::coordinate::ToCoord,
 };
 use actix_web::web;
 use actix_web::{get, post, HttpResponse};
@@ -80,12 +79,10 @@ async fn chesspiece(piece: web::Path<String>, s: web::Data<Settings>) -> HttpRes
         Some(byte_vec) => byte_vec,
         None => panic!("Unable to find the piece image in the image_map!"),
     };
-    // let idk = include_bytes!("../../static/img/chesspieces/wikipedia/bB.png");
     HttpResponse::Ok()
         .content_type("image/png")
         .body(byte_vec.to_owned())
 
-    // Ok(NamedFile::)
 }
 
 fn init_image_map() -> HashMap<String, Vec<u8>> {

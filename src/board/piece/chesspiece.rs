@@ -4,8 +4,10 @@ use crate::board::{
     chessboard::ChessBoard,
     color::Color,
     coordinate::Coordinate,
-    types::{MoveType, PieceType},
+    movetype::MoveType,
 };
+
+use super::piecetype::PieceType;
 
 pub trait ChessPiece: Debug {
     fn available_moves(&self, board: &ChessBoard) -> Vec<(Coordinate, MoveType)>;

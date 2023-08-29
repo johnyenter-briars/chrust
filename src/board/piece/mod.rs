@@ -7,6 +7,7 @@ pub mod knight;
 pub mod pawn;
 pub mod queen;
 pub mod rook;
+pub mod piecetype;
 
 fn enemy_occupied(coordinate: Coordinate, current_piece_color: Color, board: &ChessBoard) -> bool {
     let cell = board.test_cell_at(coordinate);

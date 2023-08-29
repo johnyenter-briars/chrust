@@ -2,10 +2,10 @@ use crate::board::{
     chessboard::ChessBoard,
     color::{self, Color},
     coordinate::Coordinate,
-    types::{MoveType, PieceType},
+    movetype::MoveType,
 };
 
-use super::{chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, up_by};
+use super::{chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, up_by, piecetype::PieceType};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Pawn {

@@ -2,10 +2,10 @@ use crate::board::{
     chessboard::ChessBoard,
     color::Color,
     coordinate::Coordinate,
-    types::{MoveType, PieceType},
+    movetype::MoveType,
 };
 
-use super::{chesspiece::ChessPiece, friendly_occupied};
+use super::{chesspiece::ChessPiece, friendly_occupied, piecetype::PieceType};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Knight {

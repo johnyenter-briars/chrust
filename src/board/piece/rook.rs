@@ -2,11 +2,11 @@ use crate::board::{
     chessboard::ChessBoard,
     color::Color,
     coordinate::Coordinate,
-    types::{MoveType, PieceType},
+    movetype::MoveType,
 };
 
 use super::{
-    chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, left_by, right_by, up_by,
+    chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, left_by, right_by, up_by, piecetype::PieceType,
 };
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
