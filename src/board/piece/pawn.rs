@@ -5,7 +5,9 @@ use crate::board::{
     movetype::MoveType,
 };
 
-use super::{chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, up_by, piecetype::PieceType};
+use super::{
+    chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, piecetype::PieceType, up_by,
+};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Pawn {
@@ -41,7 +43,13 @@ impl ChessPiece for Pawn {
             {
                 break;
             } else {
-                possible_coordinates.push((possible_position, MoveType::CaptureOrMove));
+                let move_type = match (self.color, self.current_position.y) {
+                    (Color::White, 8) => MoveType::Promotion,
+                    (Color::Black, 1) => MoveType::Promotion,
+                    _ => MoveType::CaptureOrMove,
+                };
+
+                possible_coordinates.push((possible_position, move_type));
             }
         }
         let possible_enemy_positions: Vec<Coordinate> = if self.color == color::Color::White {

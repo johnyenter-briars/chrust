@@ -7,3 +7,20 @@ pub enum PieceType {
     Queen = 5,
     King = 6,
 }
+
+pub trait ToPieceType {
+    fn to_piece_type(&self) -> Option<PieceType>;
+}
+
+impl ToPieceType for std::string::String {
+    fn to_piece_type(&self) -> Option<PieceType> {
+        // match self
+        match self.as_str() {
+            "rook" => Some(PieceType::Rook),
+            "bishop" => Some(PieceType::Bishop),
+            "queen" => Some(PieceType::Queen),
+            "knight" => Some(PieceType::Knight),
+            _ => None,
+        }
+    }
+}

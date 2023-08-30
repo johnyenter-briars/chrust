@@ -1,36 +1,32 @@
 .board {
-  width: 500px;
-  margin: auto
+	width: 500px;
+	margin: auto
 }
 
 h1 {
-  margin: auto;
-  width: 400px;
+	margin: auto;
+	width: 400px;
 }
 
 h3 {
-  margin: auto;
-  width: 400px;
+	margin: auto;
+	width: 400px;
 }
 
-.controls {
-  margin: auto;
-  width: 400px;
-}
 
 .settings .setting {
-  margin-left: 10px;
-  float: left;
+	margin-left: 10px;
+	float: left;
 
 }
 
 .settings {
-  margin: auto;
-  width: 500px;
+	margin: auto;
+	width: 500px;
 }
 
 label {
-  display: block;
+	display: block;
 }
 
 /* .info {
@@ -45,19 +41,19 @@ label {
 
 /* Reset some default styles */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 /* Body styles */
 body {
-  background-color: #1f1f1f;
-  color: #ffffff;
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
+	background-color: #1f1f1f;
+	color: #ffffff;
+	font-family: Arial, sans-serif;
+	line-height: 1.6;
+	margin: 0;
+	padding: 0;
 }
 
 /* Header styles */
@@ -65,133 +61,173 @@ h1,
 h2,
 h3,
 h4 {
-  color: #e0e0e0;
+	color: #e0e0e0;
 }
 
 /* Link styles */
 a {
-  color: #4da6ff;
-  text-decoration: none;
+	color: #4da6ff;
+	text-decoration: none;
 }
 
 /* Chessboard styles */
 .board {
-  background-color: #333333;
-  border: 1px solid #444444;
-  padding: 10px;
+	background-color: #333333;
+	border: 1px solid #444444;
+	padding: 10px;
 }
 
 /* Button styles */
 button {
-  background-color: #4da6ff;
-  color: #ffffff;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+	background-color: #4da6ff;
+	color: #ffffff;
+	border: none;
+	padding: 10px 15px;
+	cursor: pointer;
+	transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #267cc7;
+	background-color: #267cc7;
 }
 
 /* Settings container */
 .settings {
-  background-color: #333333;
-  color: #e0e0e0;
-  padding: 20px;
-  margin-top: 20px;
+	background-color: #333333;
+	color: #e0e0e0;
+	padding: 20px;
+	margin-top: 20px;
 }
 
 /* List styles */
 ul {
-  list-style: disc;
-  margin-left: 20px;
+	list-style: disc;
+	margin-left: 20px;
 }
 
 /* FontAwesome icon color */
 .fa {
-  color: #e0e0e0;
+	color: #e0e0e0;
 }
 
 /* FontAwesome icon hover effect */
 .fa:hover {
-  color: #E0B0FF;
+	color: #E0B0FF;
 }
 
 /* Current Move label styles */
 #current-mover {
-  color: #E0B0FF;
+	color: #E0B0FF;
 }
 
 /* Board title styles */
 h1 {
-  font-size: 24px;
+	font-size: 24px;
 }
 
 /* Responsive styles for small screens */
 @media (max-width: 600px) {
-  .settings {
-    padding: 10px;
-  }
+	.settings {
+		padding: 10px;
+	}
 }
 
-/* Container styles */
 .container {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	/* Three columns */
+	gap: 20px;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
 }
 
 
 /* Chessboard container */
 .board-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 
 /* Chessboard styles */
 .board {
-  background-color: #333333;
-  border: 1px solid #444444;
-  padding: 10px;
-  width: 100%;
+	background-color: #333333;
+	border: 1px solid #444444;
+	padding: 10px;
+	width: 100%;
 }
 
 /* Instructions styles */
 .instructions {
-  background-color: #333333;
-  color: #e0e0e0;
-  padding: 20px;
+	background-color: #333333;
+	color: #e0e0e0;
+	padding: 20px;
 }
 
 .controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 10px;
+	margin: auto;
+	width: 750px;
 }
 
 /* Reset button styles */
 #startBtn {
-  background-color: #5D3FD3;
-  color: #ffffff;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+	background-color: #5D3FD3;
+	color: #ffffff;
+	border: none;
+	padding: 10px 15px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	margin: 10px;
 }
 
 #startBtn:hover {
-  background-color: #BF40BF;
+	background-color: #BF40BF;
 }
 
 /* Current move label styles */
 #current-mover-label {
-  margin-left: 20px;
+	margin: 10px;
+}
+
+.promotion-settings {
+	background-color: #333333;
+	color: #e0e0e0;
+	padding: 0px 20px;
+	margin: 15px 0px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.promotion-options {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+.promotion-options label {
+	margin: 5px;
+	display: inline-block;
+}
+
+.promotion-options input[type="radio"] {
+	margin-right: 5px;
+}
+
+/* Responsive styles for small screens */
+@media (max-width: 768px) {
+	.container {
+		grid-template-columns: 1fr;
+	}
+
+	.promotion-settings {
+		margin-top: 20px;
+	}
 }

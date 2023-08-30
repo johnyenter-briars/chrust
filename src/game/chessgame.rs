@@ -2,6 +2,7 @@ use crate::ai::minimax::funcs::max_decision;
 use crate::board::chessboard::ChessBoard;
 use crate::board::color::Color;
 use crate::board::coordinate::{Coordinate, ToCoord};
+use crate::board::piece::piecetype::PieceType;
 use crate::chessmove::piecemove::PieceMove;
 use crate::ChrustResult;
 
@@ -13,9 +14,11 @@ pub fn process_fen(
     fen: String,
     source: Coordinate,
     target: Coordinate,
+    default_promotion_piece: PieceType,
     num_plies: u32,
 ) -> ChrustResult<String> {
-    let board_before_white_action = ChessBoard::load_from_fen(&fen)?;
+    let mut board_before_white_action = ChessBoard::load_from_fen(&fen)?;
+    board_before_white_action.default_promotion_piece = Some(default_promotion_piece);
 
     board_before_white_action.print_to_screen(&board_before_white_action.fen());
 
@@ -28,11 +31,13 @@ pub fn process_fen(
         .filter(|o| o.0.x == target.x && o.0.y == target.y)
         .map(|o| o.1)
         .collect_vec();
+
     let move_type = binding.first().expect("No move found for that input :(");
 
     let action = &PieceMove::new(chess_piece, source, target, Color::White, *move_type);
 
-    let board_after_white_action = board_before_white_action.apply_action(action)?;
+    let mut board_after_white_action = board_before_white_action.apply_action(action)?;
+    board_after_white_action.default_promotion_piece = Some(default_promotion_piece);
 
     board_after_white_action.print_to_screen(&board_after_white_action.fen());
 

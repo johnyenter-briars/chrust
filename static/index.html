@@ -26,11 +26,20 @@
 			<div id="board" class="board"></div>
 			<div class="controls">
 				<button id="startBtn" onclick="resetBoard()">Reset Board</button>
+				<div class="promotion-settings">
+					<h4>Promotion Settings</h4>
+					<div class="promotion-options">
+						<label><input type="radio" name="promotionPiece" value="queen" checked>Queen</label>
+						<label><input type="radio" name="promotionPiece" value="rook">Rook</label>
+						<label><input type="radio" name="promotionPiece" value="bishop">Bishop</label>
+						<label><input type="radio" name="promotionPiece" value="knight">Knight</label>
+					</div>
+				</div>
 				<label id="current-mover-label">Current Move: <strong id="current-mover">You</strong></label>
 			</div>
 		</div>
 		<div class="instructions">
-			<h2>How to Play</h2>
+			<h3>How to Play</h3>
 			<p>You will always play as white and Rusty will always play as black.</p>
 			<p>Drag and drop your pieces to make moves. After you make a move, Rusty will make his move. Even if he
 				doesn't
@@ -41,7 +50,7 @@
 			<br />
 			<br />
 
-			<h2>Important to Note</h2>
+			<h3>Important to Note</h3>
 			<ul>
 				<li>
 					<strong>Rusty will keep playing even after the game is over! Rusty doesn't know anything about how
@@ -61,11 +70,9 @@
 			<br />
 
 			<div>
-				<h4>Depth of The Move Tree Evaluated</h4>
+				<h3>Depth of The Move Tree</h3>
 				<p id="num_plies"></p>
-
 			</div>
-
 		</div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"

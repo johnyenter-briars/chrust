@@ -1,9 +1,11 @@
 extern crate serde_derive;
 extern crate serde_json;
 
+use itertools::Itertools;
+
 use super::cell::Cell;
 use super::color::Color;
-use super::coordinate::Coordinate;
+use super::coordinate::{self, Coordinate};
 use super::movetype::MoveType;
 use super::piece::bishop::Bishop;
 use super::piece::chesspiece::ChessPiece;
@@ -16,6 +18,7 @@ use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
 use crate::ChrustResult;
 use core::panic;
+use std::borrow::BorrowMut;
 use std::cell::RefCell;
 
 #[derive(Debug)]
@@ -31,6 +34,7 @@ pub struct ChessBoard {
     pub en_passant_target: Option<Coordinate>,
     pub half_move_clock: u32,
     pub full_move_clock: u32,
+    pub default_promotion_piece: Option<PieceType>,
 }
 
 impl ChessBoard {
@@ -50,6 +54,7 @@ impl ChessBoard {
     fn all_cells_mut(&mut self) -> Vec<&mut Cell> {
         self.squares.iter_mut().flatten().collect()
     }
+
     fn all_cells_mut_refcell(&mut self) -> Vec<RefCell<&mut Cell>> {
         self.squares
             .iter_mut()
@@ -57,6 +62,52 @@ impl ChessBoard {
             .map(RefCell::new)
             .collect()
     }
+
+    fn set_space_to_empty(&mut self, coordinate: Coordinate) -> ChrustResult<()> {
+        let cells = self.all_cells_mut_refcell();
+        let pawn_to_remove_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == coordinate.x && c.borrow_mut().y == coordinate.y)
+            .unwrap_or_else(|| panic!("No to index: {:?}", coordinate));
+
+        cells[pawn_to_remove_index].borrow_mut().space = None;
+
+        Ok(())
+    }
+
+    fn mem_swap_two_coordinates(&mut self, from: Coordinate, to: Coordinate) -> ChrustResult<()> {
+        let cells = self.all_cells_mut_refcell();
+
+        let from_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y)
+            .unwrap_or_else(|| panic!("No from index: {:?}", from));
+
+        let to_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y)
+            .unwrap_or_else(|| panic!("No to index: {:?}", to));
+
+        {
+            let one = &mut cells[from_index].borrow_mut().space;
+            let two = &mut cells[to_index].borrow_mut().space;
+            std::mem::swap(one, two);
+            *one = None;
+        }
+
+        Ok(())
+    }
+    // fn square_at_position_mut_refcell(&mut self, x: char, y: i32) -> &RefCell<&mut Cell> {
+    //     let cells = self.all_cells_mut_refcell();
+    //     let from_index = cells
+    //         .iter()
+    //         .position(|c| c.borrow_mut().x == x && c.borrow_mut().y == y)
+    //         .unwrap_or_else(|| panic!("No from index"));
+
+    //     let one = &cells[from_index];
+
+    //     one
+    // }
 
     pub fn print_to_screen(&self, configuration_name: &str) {
         println!("---------------------------{}", configuration_name);
@@ -175,78 +226,29 @@ impl ChessBoard {
             _ => None,
         };
 
-        //actually move the piece. This is really bad - and i duplidcated this code. And I'm really sorry. But it's 6AM, and I'm super sad cause the swimming part of the triathlon this morning got canceled. So I did all that training for nothing.
-        let cells = self.all_cells_mut_refcell();
-        let from_index = cells
-            .iter()
-            .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y)
-            .unwrap_or_else(|| panic!("No from index: {:?}", from));
-
-        let to_index = cells
-            .iter()
-            .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y)
-            .unwrap_or_else(|| panic!("No to index: {:?}", to));
-
-        {
-            let one = &mut cells[from_index].borrow_mut().space;
-            let two = &mut cells[to_index].borrow_mut().space;
-            std::mem::swap(one, two);
-            *one = None;
-        }
+        self.mem_swap_two_coordinates(from, to)?;
 
         if action.move_type == MoveType::EnPassant {
-            let pawn_to_remove_index = match action.color_moving {
-                Color::White => cells
-                    .iter()
-                    .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y - 1)
-                    .unwrap_or_else(|| panic!("No to index: {:?}", to)),
-                Color::Black => cells
-                    .iter()
-                    .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y + 1)
-                    .unwrap_or_else(|| panic!("No to index: {:?}", to)),
+            let coordinate = match action.color_moving {
+                Color::White => Coordinate::new(to.x, to.y - 1),
+                Color::Black => Coordinate::new(to.x, to.y + 1),
             };
 
-            cells[pawn_to_remove_index].borrow_mut().space = None;
+            self.set_space_to_empty(coordinate)?;
         }
 
         //assuming we're moving the king currently
         if action.move_type == MoveType::Castle {
             if to.x == 'g' {
-                let from_index_for_rook = cells
-                    .iter()
-                    .position(|c| c.borrow_mut().x == 'h' && c.borrow_mut().y == from.y)
-                    .unwrap_or_else(|| panic!("No from index: {:?}", from));
-
-                let to_index_for_rook = cells
-                    .iter()
-                    .position(|c| c.borrow_mut().x == 'f' && c.borrow_mut().y == to.y)
-                    .unwrap_or_else(|| panic!("No to index: {:?}", to));
-
-                {
-                    let one = &mut cells[from_index_for_rook].borrow_mut().space;
-                    let two = &mut cells[to_index_for_rook].borrow_mut().space;
-                    std::mem::swap(one, two);
-                    *one = None;
-                }
+                let start = Coordinate::new('h', from.y);
+                let end = Coordinate::new('f', to.y);
+                self.mem_swap_two_coordinates(start, end)?;
             }
 
             if to.x == 'c' {
-                let from_index_for_rook = cells
-                    .iter()
-                    .position(|c| c.borrow_mut().x == 'a' && c.borrow_mut().y == from.y)
-                    .unwrap_or_else(|| panic!("No from index: {:?}", from));
-
-                let to_index_for_rook = cells
-                    .iter()
-                    .position(|c| c.borrow_mut().x == 'd' && c.borrow_mut().y == to.y)
-                    .unwrap_or_else(|| panic!("No to index: {:?}", to));
-
-                {
-                    let one = &mut cells[from_index_for_rook].borrow_mut().space;
-                    let two = &mut cells[to_index_for_rook].borrow_mut().space;
-                    std::mem::swap(one, two);
-                    *one = None;
-                }
+                let start = Coordinate::new('a', from.y);
+                let end = Coordinate::new('d', to.y);
+                self.mem_swap_two_coordinates(start, end)?;
             }
 
             if action.color_moving == Color::White {
@@ -259,6 +261,11 @@ impl ChessBoard {
         } else {
             //check for castling rights
             self.update_castling_rights(action)?;
+        }
+
+        if action.move_type == MoveType::Promotion {
+            let foo = 10;
+            println!("test");
         }
 
         // Update who's turn it is to move
@@ -419,6 +426,7 @@ impl ChessBoard {
             en_passant_target,
             half_move_clock,
             full_move_clock,
+            default_promotion_piece: None,
         };
 
         Ok(board)

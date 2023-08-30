@@ -12,7 +12,8 @@ class ChrustAPI {
 
     processFen(fen, pieceCoord, targetCoord) {
         const fullFen = `${fen} ${this.rightHalfFen}`;
-        const url = `${this.apiUrl}/api/process/${encodeURIComponent(fullFen)}/${pieceCoord}/${targetCoord}`;
+        const defaultPromotionPiece = document.querySelector('input[type = radio]:checked').value;
+        const url = `${this.apiUrl}/api/process/${encodeURIComponent(fullFen)}/${pieceCoord}/${targetCoord}/${defaultPromotionPiece}`;
         notifyMove(true);
         this.currenlyInWebRequest = true;
         fetch(url,
@@ -227,7 +228,7 @@ const resetBoard = () => {
 
 const config = {
     draggable: true,
-    position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    position: '8/4P3/8/8/8/8/3p4/8 w KQkq - 0 1',
     onDrop: onDrop,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,
