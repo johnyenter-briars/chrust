@@ -1,12 +1,7 @@
 use std::fmt::Debug;
 
 use crate::{
-    board::{
-        chessboard::ChessBoard,
-        color::Color,
-        coordinate::{self, Coordinate},
-        movetype::MoveType,
-    },
+    board::{chessboard::ChessBoard, color::Color, coordinate::Coordinate, movetype::MoveType},
     ChrustResult,
 };
 

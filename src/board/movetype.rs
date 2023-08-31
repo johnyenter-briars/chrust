@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum MoveType {
     EnPassant = 1,

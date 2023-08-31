@@ -1,5 +1,5 @@
 use crate::board::{
-    color::Color, coordinate::Coordinate, piece::chesspiece::ChessPiece, movetype::MoveType,
+    color::Color, coordinate::Coordinate, movetype::MoveType, piece::chesspiece::ChessPiece,
 };
 
 #[derive(Clone, Copy)]

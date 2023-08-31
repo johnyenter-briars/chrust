@@ -9,11 +9,11 @@
 
 <p float="left">
   <a href="https://github.com/johnyenter-briars/chrust">
-    <img src="images/chrust4.png" alt="Logo" width="48%">
+    <img src="images/chrust1.jpg" alt="Logo" width="100%">
   </a>
-  <a href="https://github.com/johnyenter-briars/chrust">
+  <!-- <a href="https://github.com/johnyenter-briars/chrust">
     <img src="images/screenshot_old.png" alt="Logo" width="48%">
-  </a>
+  </a> -->
 </p>
 
 ## About Chrust
@@ -30,7 +30,7 @@ I'm by no means a Rust expert, so if you see any issues in the source code pleas
 ### Built With
 
 * [Rust](https://www.rust-lang.org/)
-* [Rocket](https://rocket.rs/)
+* [Actix](https://actix.rs/)
 * [ChessBoard.js](https://chessboardjs.com/)
 
 ## Getting Started
@@ -50,7 +50,7 @@ Clone the source code and navigate to the root directory, and run:
 ```sh
 cargo run -- <args>
 ```
-If running over the Web (default), navigate to a browser and then go to either [localhost:8000](http://localhost:8000) or [127.0.0.1:8000](http://127.0.0.1:8000)
+If running over the Web (default), navigate to a browser and then go to either `http://<your_local_ip>:8083` or `http://0.0.0.0:8083`
 
 ## Usage
 
@@ -62,16 +62,13 @@ The binary currently supports several command line arguments.
 
 | Flag | Name | Description |
 | ----------- | ----------- | ----------- |
-| z | visulization_mode | Sets the visulization mode of the program - either Unicode on the terminal, or graphical in the browser over localhost |
-| t | tick_speed | Sets the interval between moves in milliseconds | 
-| h | human_plays | Sets whether or not the human player will play the game. If false, the human player makes random decisions | 
-| p | num_plies | Sets the number of turns (plies) the AI will look ahead. Becareful on numbers > 4, as the program will become ungodly slow | 
+| p | num_plies | Sets the number of turns (plies) the AI will look ahead. Becareful on numbers >= 4, as the program will become ungodly slow | 
 
 For a complete description on the arguments, run using the `--help` flag.
 
 ## Prerelease
 
-The second Chrust prerelease is completed! Checkout the prerelase here: [0.2.0](https://github.com/johnyenter-briars/chrust/releases/tag/0.2.0)
+The third Chrust prerelease is completed! Checkout the prerelase here: [0.3.0](https://github.com/johnyenter-briars/chrust/releases/tag/0.3.0)
 
 To run the program, unzip the archive pertaining to your operating system, and run the appropriate binary.
 

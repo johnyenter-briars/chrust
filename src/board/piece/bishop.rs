@@ -1,8 +1,5 @@
 use crate::board::{
-    chessboard::ChessBoard,
-    color::Color,
-    coordinate::Coordinate,
-    movetype::MoveType,
+    chessboard::ChessBoard, color::Color, coordinate::Coordinate, movetype::MoveType,
 };
 
 use super::{
