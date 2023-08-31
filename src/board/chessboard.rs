@@ -1,14 +1,12 @@
 extern crate serde_derive;
 extern crate serde_json;
 
-use itertools::Itertools;
-
 use super::cell::Cell;
 use super::color::Color;
-use super::coordinate::{self, Coordinate};
+use super::coordinate::Coordinate;
 use super::movetype::MoveType;
 use super::piece::bishop::Bishop;
-use super::piece::chesspiece::ChessPiece;
+use super::piece::chesspiece::{chess_piece_from_type, ChessPiece};
 use super::piece::king::King;
 use super::piece::knight::Knight;
 use super::piece::piecetype::PieceType;
@@ -18,7 +16,6 @@ use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
 use crate::ChrustResult;
 use core::panic;
-use std::borrow::BorrowMut;
 use std::cell::RefCell;
 
 #[derive(Debug)]
@@ -61,6 +58,22 @@ impl ChessBoard {
             .flatten()
             .map(RefCell::new)
             .collect()
+    }
+
+    fn set_space_to_piece(
+        &mut self,
+        coordinate: Coordinate,
+        piece: Box<dyn ChessPiece>,
+    ) -> ChrustResult<()> {
+        let cells = self.all_cells_mut_refcell();
+        let space_to_add_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == coordinate.x && c.borrow_mut().y == coordinate.y)
+            .unwrap_or_else(|| panic!("No to index: {:?}", coordinate));
+
+        cells[space_to_add_index].borrow_mut().space = Some(piece);
+
+        Ok(())
     }
 
     fn set_space_to_empty(&mut self, coordinate: Coordinate) -> ChrustResult<()> {
@@ -175,6 +188,7 @@ impl ChessBoard {
         let fen = self.fen();
         // self.print_to_screen("request");
         let mut new_board = ChessBoard::load_from_fen(&fen)?;
+        new_board.default_promotion_piece = self.default_promotion_piece;
         new_board.move_piece(action)?;
         // new_board.print_to_screen("response");
         Ok(new_board)
@@ -264,8 +278,13 @@ impl ChessBoard {
         }
 
         if action.move_type == MoveType::Promotion {
-            let foo = 10;
-            println!("test");
+            let piece = chess_piece_from_type(
+                self.default_promotion_piece.unwrap_or(PieceType::Queen),
+                action.color_moving,
+                to,
+            )?;
+
+            self.set_space_to_piece(to, piece)?;
         }
 
         // Update who's turn it is to move

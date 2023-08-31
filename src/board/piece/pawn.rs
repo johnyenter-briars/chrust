@@ -44,8 +44,8 @@ impl ChessPiece for Pawn {
                 break;
             } else {
                 let move_type = match (self.color, self.current_position.y) {
-                    (Color::White, 8) => MoveType::Promotion,
-                    (Color::Black, 1) => MoveType::Promotion,
+                    (Color::White, 7) => MoveType::Promotion,
+                    (Color::Black, 2) => MoveType::Promotion,
                     _ => MoveType::CaptureOrMove,
                 };
 

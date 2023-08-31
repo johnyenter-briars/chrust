@@ -29,6 +29,7 @@ class ChrustAPI {
 
         ).then(async (response) => {
             const responseFen = await response.text()
+            console.log("response fen", responseFen);
             const fenElements = responseFen.split(' ');
             const boardSectionFen = fenElements[0];
             const rightHalfOfFen = fenElements.splice(1, 5).join(" ");

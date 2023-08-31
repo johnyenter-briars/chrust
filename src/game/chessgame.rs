@@ -37,9 +37,9 @@ pub fn process_fen(
     let action = &PieceMove::new(chess_piece, source, target, Color::White, *move_type);
 
     let mut board_after_white_action = board_before_white_action.apply_action(action)?;
-    board_after_white_action.default_promotion_piece = Some(default_promotion_piece);
 
     board_after_white_action.print_to_screen(&board_after_white_action.fen());
+    board_after_white_action.default_promotion_piece = None;
 
     let ai_move = max_decision(&board_after_white_action, Color::Black, num_plies)?;
 
