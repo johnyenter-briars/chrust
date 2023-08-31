@@ -71,14 +71,14 @@ async fn index() -> HttpResponse {
         .body(include_str!("../../static/index.html"))
 }
 
-#[get("js/chrust.js")]
+#[get("/js/chrust.js")]
 async fn javascript() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/javascript")
         .body(include_str!("../../static/js/chrust.js"))
 }
 
-#[get("css/chrust.css")]
+#[get("/css/chrust.css")]
 async fn css() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/css")
@@ -86,7 +86,7 @@ async fn css() -> HttpResponse {
 }
 
 // /img/chesspieces/wikipedia/wB.png
-#[get("img/chesspieces/wikipedia/{piece}")]
+#[get("/img/chesspieces/wikipedia/{piece}")]
 async fn chesspiece(piece: web::Path<String>, s: web::Data<Settings>) -> HttpResponse {
     let image_map = s.image_map.lock().unwrap().clone();
     let byte_vec = match image_map.get(&piece.replace(".png", "")) {
@@ -160,19 +160,21 @@ pub async fn build_and_run_frontend(program_state: ProgramState) -> std::io::Res
     });
 
     HttpServer::new(move || {
-        App::new().service(
-            web::scope("/chrust")
-                .service(possible)
-                .service(process)
-                .service(validate)
-                .service(css)
-                .service(javascript)
-                .service(index)
-                .service(chesspiece)
-                .service(settings)
-                .wrap(Logger::default())
-                .app_data(app_state.clone()),
-        )
+        App::new()
+            .service(
+                web::scope("/chrust")
+                    .service(possible)
+                    .service(process)
+                    .service(validate)
+                    .wrap(Logger::default())
+                    .service(index)
+                    .service(css)
+                    .service(javascript)
+                    .service(settings)
+                    .app_data(app_state.clone()),
+            )
+            .service(chesspiece)
+            .app_data(app_state.clone())
     })
     .bind(("0.0.0.0".to_string(), 8083))?
     .run()
