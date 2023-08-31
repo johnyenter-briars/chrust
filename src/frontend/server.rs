@@ -64,7 +64,7 @@ async fn settings(settings: web::Data<Settings>) -> Result<impl Responder> {
     Ok(web::Json(SettingsResponse { program_state }))
 }
 
-#[get("/")]
+#[get("")]
 async fn index() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html")
