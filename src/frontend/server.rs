@@ -1,6 +1,7 @@
-use super::responses::ValidateResponse;
+use super::response::ValidateResponse;
 use crate::{
-    frontend::responses::{MoveOptionsResponse, SettingsResponse},
+    board::{coordinate::ToCoord, piece::piecetype::ToPieceType},
+    frontend::response::{MoveOptionsResponse, SettingsResponse},
     game::chessgame::{is_valid, process_fen, valid_moves},
     state::programstate::ProgramState,
 };
@@ -15,10 +16,26 @@ pub struct Settings {
     image_map: Mutex<HashMap<String, Vec<u8>>>,
 }
 
-#[post("/api/process/{fen}")]
-pub async fn process(fen: web::Path<String>, s: web::Data<Settings>) -> String {
+#[post("/api/process/{fen}/{piece_coord}/{target_coord}/{default_promotion_piece}")]
+pub async fn process(
+    args: web::Path<(String, String, String, String)>,
+    s: web::Data<Settings>,
+) -> String {
+    let fen = &args.0;
+    let source = args.1.to_coord();
+    let target = args.2.to_coord();
+    let default_promotion_piece = &args
+        .3
+        .to_piece_type()
+        .expect("No valid default promotion piece found");
     let program_state = *s.program_state.lock().unwrap();
-    let returned_fen = match process_fen(fen.to_string(), program_state.num_plies) {
+    let returned_fen = match process_fen(
+        fen.to_string(),
+        source,
+        target,
+        *default_promotion_piece,
+        program_state.num_plies,
+    ) {
         Ok(f) => f,
         Err(e) => panic!("paniced because! {}", e),
     };
@@ -76,12 +93,9 @@ async fn chesspiece(piece: web::Path<String>, s: web::Data<Settings>) -> HttpRes
         Some(byte_vec) => byte_vec,
         None => panic!("Unable to find the piece image in the image_map!"),
     };
-    // let idk = include_bytes!("../../static/img/chesspieces/wikipedia/bB.png");
     HttpResponse::Ok()
         .content_type("image/png")
         .body(byte_vec.to_owned())
-
-    // Ok(NamedFile::)
 }
 
 fn init_image_map() -> HashMap<String, Vec<u8>> {

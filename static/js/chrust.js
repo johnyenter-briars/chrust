@@ -7,14 +7,13 @@ class ChrustAPI {
             `http://${this.hostname}/chrust`;
 
         this.currenlyInWebRequest = false;
+        this.rightHalfFen = "w KQkq - 0 1"; //starting position
     }
 
-    // sends the fen of the current state to the API
-    // API will return a fen with it's move in resposne
-    // if the API says "i can't make that move for whatever reason"..... uhh idk - ill figure that one out
-    sendFen() {
-        var fen = this.chessBoard.fen();
-        var url = `${this.apiUrl}/api/process/${encodeURIComponent(fen)}`;
+    processFen(fen, pieceCoord, targetCoord) {
+        const fullFen = `${fen} ${this.rightHalfFen}`;
+        const defaultPromotionPiece = document.querySelector('input[type = radio]:checked').value;
+        const url = `${this.apiUrl}/api/process/${encodeURIComponent(fullFen)}/${pieceCoord}/${targetCoord}/${defaultPromotionPiece}`;
         notifyMove(true);
         this.currenlyInWebRequest = true;
         fetch(url,
@@ -28,7 +27,16 @@ class ChrustAPI {
                 }
             }
 
-        ).then((response) => { return response.text() }
+        ).then(async (response) => {
+            const responseFen = await response.text()
+            console.log("response fen", responseFen);
+            const fenElements = responseFen.split(' ');
+            const boardSectionFen = fenElements[0];
+            const rightHalfOfFen = fenElements.splice(1, 5).join(" ");
+            this.rightHalfFen = rightHalfOfFen;
+            console.log("new right half of fen", this.rightHalfFen);
+            return responseFen;
+        }
         ).then((fen) => {
             this.chessBoard.position(fen, true);
             notifyMove(false);
@@ -42,8 +50,8 @@ class ChrustAPI {
     //location of form "h2"
     validMoves(location) {
         if (!isValidLocationString(location)) return;
-        var fen = this.chessBoard.fen();
-        var url = `${this.apiUrl}/api/possible/${encodeURIComponent(fen)}/${location}`;
+        const fullFen = `${this.chessBoard.fen()} ${this.rightHalfFen}`;
+        const url = `${this.apiUrl}/api/possible/${encodeURIComponent(fullFen)}/${location}`;
         return fetch(url,
             {
                 method: 'GET',
@@ -57,8 +65,8 @@ class ChrustAPI {
 
         ).then((response) => { return response.text() }
         ).then((text) => {
-            var foo = JSON.parse(text);
-            return foo.options;
+            const validMoves = JSON.parse(text);
+            return validMoves.options;
         })
             .catch((err) => {
                 return false;
@@ -66,7 +74,7 @@ class ChrustAPI {
     }
 
     getCurrentSettings() {
-        var url = `${this.apiUrl}/api/settings`;
+        const url = `${this.apiUrl}/api/settings`;
         return fetch(url,
             {
                 method: 'GET',
@@ -80,7 +88,7 @@ class ChrustAPI {
 
         ).then((response) => { return response.text() }
         ).then((text) => {
-            var foo = JSON.parse(text);
+            const foo = JSON.parse(text);
             return foo.program_state;
         })
             .catch((err) => {
@@ -90,30 +98,59 @@ class ChrustAPI {
 
     isValid(currentLocation, possibleLocation, resolve) {
         if (!isValidLocationString(currentLocation) || !isValidLocationString(possibleLocation)) return;
-        var fen = this.chessBoard.fen();
-        var url = `${this.apiUrl}/api/validate/${encodeURIComponent(fen)}/${currentLocation}/${possibleLocation}`;
+        const fullFen = `${this.chessBoard.fen()} ${this.rightHalfFen}`;
+        const url = `${this.apiUrl}/api/validate/${encodeURIComponent(fullFen)}/${currentLocation}/${possibleLocation}`;
         this.currenlyInWebRequest = true;
-        var request = new XMLHttpRequest();
+        const request = new XMLHttpRequest();
         request.open('GET', url, false);
         request.send(null);
         this.currenlyInWebRequest = false;
 
         if (request.status === 200) {
-            var foo = JSON.parse(request.responseText);
+            const foo = JSON.parse(request.responseText);
             return foo.is_valid;
         }
     }
 }
 
-var board;
+//chat-gpt did this
+function objectToFen(inputObject) {
+    const pieceMap = {
+        wP: 'P', wN: 'N', wB: 'B', wR: 'R', wQ: 'Q', wK: 'K',
+        bP: 'p', bN: 'n', bB: 'b', bR: 'r', bQ: 'q', bK: 'k'
+    };
 
-var squareCache = {};
+    let fen = '';
+    for (let rank = 8; rank >= 1; rank--) {
+        let emptySquares = 0;
+        for (let file = 97; file <= 104; file++) {
+            const square = String.fromCharCode(file) + rank;
+            if (inputObject.hasOwnProperty(square)) {
+                const piece = inputObject[square];
+                if (emptySquares > 0) {
+                    fen += emptySquares;
+                    emptySquares = 0;
+                }
+                fen += pieceMap[piece];
+            } else {
+                emptySquares++;
+            }
+        }
+        if (emptySquares > 0) {
+            fen += emptySquares;
+        }
+        if (rank > 1) {
+            fen += '/';
+        }
+    }
 
-var getMoveAPI = () => {
-    chrustAPI.sendFen();
+
+    return fen;
 }
 
-var onSnapEnd = function () {
+const squareCache = {};
+
+const onSnapEnd = function () {
     // board.position(game.fen());
 };
 
@@ -121,7 +158,7 @@ function notifyMove(aiMove) {
     document.getElementById("current-mover").textContent = aiMove ? "Rusty" : "You";
 }
 
-var onMouseoverSquare = async (square, piece) => {
+const onMouseoverSquare = async (square, piece) => {
     if (chrustAPI.currenlyInWebRequest) return;
     if (!piece) return;
     //moves needs to be in format: ["h3", "h4"]
@@ -142,16 +179,16 @@ var onMouseoverSquare = async (square, piece) => {
     }
 };
 
-var onMouseoutSquare = function (square, piece) {
+const onMouseoutSquare = function (square, piece) {
     removeGreySquares();
 };
 
-var removeGreySquares = function () {
+const removeGreySquares = function () {
     $('#board .square-55d63').css('background', '');
 };
 
-var greySquare = function (square) {
-    var squareEl = $('#board .square-' + square);
+const greySquare = function (square) {
+    const squareEl = $('#board .square-' + square);
 
     var background = '#a9a9a9';
     if (squareEl.hasClass('black-3c85d') === true) {
@@ -161,7 +198,7 @@ var greySquare = function (square) {
     squareEl.css('background', background);
 };
 
-var onDrop = (source, target, piece, newPos, oldPos, orientation) => {
+const onDrop = (source, target, piece, newPos, oldPos, orientation) => {
     if (chrustAPI.currenlyInWebRequest) return;
     if (source === target) {
         return "snapback";
@@ -171,30 +208,39 @@ var onDrop = (source, target, piece, newPos, oldPos, orientation) => {
         return "snapback";
     }
 
-    window.setTimeout(getMoveAPI, 500);
+    const oldPositionFen = objectToFen(oldPos);
+
+    window.setTimeout(() => chrustAPI.processFen(oldPositionFen, source, target), 500);
 }
 
-var config = {
+//https://stackoverflow.com/questions/1431094/how-do-i-replace-a-character-at-a-particular-index-in-javascript
+const setCharAt = (str, index, chr) => {
+    if (index > str.length - 1) return str;
+    return str.substring(0, index) + chr + str.substring(index + 1);
+}
+
+const isValidLocationString = (location) => {
+    return location.length === 2;
+}
+
+const resetBoard = () => {
+    chrustAPI.chessBoard.start(true);
+}
+
+const config = {
     draggable: true,
-    position: 'start',
+    position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     onDrop: onDrop,
     onMouseoverSquare: onMouseoverSquare,
     onMouseoutSquare: onMouseoutSquare,
 }
-var board = Chessboard('board', config)
 
-var chrustAPI = new ChrustAPI(board);
+const board = Chessboard('board', config)
 
-function isValidLocationString(location) {
-    return location.length === 2;
-}
-
-function resetBoard() {
-    chrustAPI.chessBoard.start(true);
-}
+const chrustAPI = new ChrustAPI(board);
 
 const refreshSettings = async () => {
-    var result = await chrustAPI.getCurrentSettings();
+    const result = await chrustAPI.getCurrentSettings();
     for (key in result) {
         document.getElementById(key).textContent = result[key];
     }

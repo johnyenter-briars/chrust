@@ -5,6 +5,7 @@ pub mod chesspiece;
 pub mod king;
 pub mod knight;
 pub mod pawn;
+pub mod piecetype;
 pub mod queen;
 pub mod rook;
 

@@ -2,10 +2,12 @@ use crate::board::{
     chessboard::ChessBoard,
     color::{self, Color},
     coordinate::Coordinate,
-    piecetype::PieceType,
+    movetype::MoveType,
 };
 
-use super::{chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, up_by};
+use super::{
+    chesspiece::ChessPiece, down_by, enemy_occupied, friendly_occupied, piecetype::PieceType, up_by,
+};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Pawn {
@@ -15,8 +17,8 @@ pub struct Pawn {
 }
 
 impl ChessPiece for Pawn {
-    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+    fn available_moves(&self, board: &ChessBoard) -> Vec<(Coordinate, MoveType)> {
+        let mut possible_coordinates: Vec<(Coordinate, MoveType)> = Vec::new();
 
         let target_direction: fn(Coordinate, i32) -> Coordinate = match self.color {
             Color::White => up_by,
@@ -36,13 +38,18 @@ impl ChessPiece for Pawn {
                 continue;
             };
 
-            if friendly_occupied(possible_position, self.color, board) {
-                break;
-            } else if enemy_occupied(possible_position, self.color, board) {
-                possible_coordinates.push(possible_position);
+            if friendly_occupied(possible_position, self.color, board)
+                || enemy_occupied(possible_position, self.color, board)
+            {
                 break;
             } else {
-                possible_coordinates.push(possible_position);
+                let move_type = match (self.color, self.current_position.y) {
+                    (Color::White, 7) => MoveType::Promotion,
+                    (Color::Black, 2) => MoveType::Promotion,
+                    _ => MoveType::CaptureOrMove,
+                };
+
+                possible_coordinates.push((possible_position, move_type));
             }
         }
         let possible_enemy_positions: Vec<Coordinate> = if self.color == color::Color::White {
@@ -62,8 +69,12 @@ impl ChessPiece for Pawn {
 
         for coord in possible_enemy_positions {
             if enemy_occupied(coord, self.color, board) {
-                possible_coordinates.push(coord)
+                possible_coordinates.push((coord, MoveType::CaptureOrMove))
             };
+
+            if board.en_passant_target.is_some() && board.en_passant_target.unwrap() == coord {
+                possible_coordinates.push((coord, MoveType::EnPassant))
+            }
         }
 
         possible_coordinates

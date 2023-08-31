@@ -1,25 +1,37 @@
 extern crate serde_derive;
 extern crate serde_json;
+
 use super::cell::Cell;
 use super::color::Color;
 use super::coordinate::Coordinate;
+use super::movetype::MoveType;
 use super::piece::bishop::Bishop;
-use super::piece::chesspiece::ChessPiece;
+use super::piece::chesspiece::{chess_piece_from_type, ChessPiece};
 use super::piece::king::King;
 use super::piece::knight::Knight;
+use super::piece::piecetype::PieceType;
 use super::piece::queen::Queen;
 use super::piece::rook::Rook;
-use super::piecetype::PieceType;
 use crate::board::piece::pawn::Pawn;
 use crate::chessmove::piecemove::PieceMove;
-use crate::player::humanplayer::HumanPlayer;
 use crate::ChrustResult;
+use core::panic;
 use std::cell::RefCell;
 
 #[derive(Debug)]
 pub struct ChessBoard {
     pub squares: Vec<Vec<Cell>>,
     pub board_size: i32,
+    pub fen: String,
+    pub side_to_move: Color,
+    pub white_castle_kingside: bool,
+    pub white_castle_queenside: bool,
+    pub black_castle_kingside: bool,
+    pub black_castle_queenside: bool,
+    pub en_passant_target: Option<Coordinate>,
+    pub half_move_clock: u32,
+    pub full_move_clock: u32,
+    pub default_promotion_piece: Option<PieceType>,
 }
 
 impl ChessBoard {
@@ -39,6 +51,7 @@ impl ChessBoard {
     fn all_cells_mut(&mut self) -> Vec<&mut Cell> {
         self.squares.iter_mut().flatten().collect()
     }
+
     fn all_cells_mut_refcell(&mut self) -> Vec<RefCell<&mut Cell>> {
         self.squares
             .iter_mut()
@@ -46,6 +59,68 @@ impl ChessBoard {
             .map(RefCell::new)
             .collect()
     }
+
+    fn set_space_to_piece(
+        &mut self,
+        coordinate: Coordinate,
+        piece: Box<dyn ChessPiece>,
+    ) -> ChrustResult<()> {
+        let cells = self.all_cells_mut_refcell();
+        let space_to_add_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == coordinate.x && c.borrow_mut().y == coordinate.y)
+            .unwrap_or_else(|| panic!("No to index: {:?}", coordinate));
+
+        cells[space_to_add_index].borrow_mut().space = Some(piece);
+
+        Ok(())
+    }
+
+    fn set_space_to_empty(&mut self, coordinate: Coordinate) -> ChrustResult<()> {
+        let cells = self.all_cells_mut_refcell();
+        let pawn_to_remove_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == coordinate.x && c.borrow_mut().y == coordinate.y)
+            .unwrap_or_else(|| panic!("No to index: {:?}", coordinate));
+
+        cells[pawn_to_remove_index].borrow_mut().space = None;
+
+        Ok(())
+    }
+
+    fn mem_swap_two_coordinates(&mut self, from: Coordinate, to: Coordinate) -> ChrustResult<()> {
+        let cells = self.all_cells_mut_refcell();
+
+        let from_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y)
+            .unwrap_or_else(|| panic!("No from index: {:?}", from));
+
+        let to_index = cells
+            .iter()
+            .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y)
+            .unwrap_or_else(|| panic!("No to index: {:?}", to));
+
+        {
+            let one = &mut cells[from_index].borrow_mut().space;
+            let two = &mut cells[to_index].borrow_mut().space;
+            std::mem::swap(one, two);
+            *one = None;
+        }
+
+        Ok(())
+    }
+    // fn square_at_position_mut_refcell(&mut self, x: char, y: i32) -> &RefCell<&mut Cell> {
+    //     let cells = self.all_cells_mut_refcell();
+    //     let from_index = cells
+    //         .iter()
+    //         .position(|c| c.borrow_mut().x == x && c.borrow_mut().y == y)
+    //         .unwrap_or_else(|| panic!("No from index"));
+
+    //     let one = &cells[from_index];
+
+    //     one
+    // }
 
     pub fn print_to_screen(&self, configuration_name: &str) {
         println!("---------------------------{}", configuration_name);
@@ -85,34 +160,6 @@ impl ChessBoard {
         Err(Box::from(format!("couldnt find the given pairs of points on the board! Either the board is goofed - or your points are: x:{},y:{}", x, y)))
     }
 
-    pub fn possible_moves_human(
-        &self,
-        current_position: Coordinate,
-        human_player: &HumanPlayer,
-    ) -> ChrustResult<Vec<Coordinate>> {
-        let target_piece = self.piece(current_position.x, current_position.y)?;
-
-        if target_piece.color() != human_player.color {
-            return Err(Box::from("Thats not your piece!"));
-        }
-
-        Ok(target_piece.available_moves(self))
-    }
-
-    pub fn possible_moves(
-        &self,
-        current_position: Coordinate,
-        color: Color,
-    ) -> ChrustResult<Vec<Coordinate>> {
-        let target_piece = self.piece(current_position.x, current_position.y)?;
-
-        if target_piece.color() != color {
-            return Err(Box::from("Thats not your piece!"));
-        }
-
-        Ok(target_piece.available_moves(self))
-    }
-
     pub fn all_possible_moves(&self, color: Color) -> ChrustResult<Vec<PieceMove>> {
         let cells = self.cells_with_pieces_with_color(color);
 
@@ -122,11 +169,13 @@ impl ChessBoard {
             let current_position = Coordinate::new(cell.x, cell.y);
             let piece_at_position = self.piece(current_position.x, current_position.y)?;
 
-            let coord_choices = self.possible_moves(current_position, color)?;
+            let coord_choices = piece_at_position.available_moves(self);
 
             let mut possible_moves_for_piece: Vec<PieceMove> = coord_choices
                 .iter()
-                .map(|coord| PieceMove::new(piece_at_position, current_position, *coord))
+                .map(|coord| {
+                    PieceMove::new(piece_at_position, current_position, coord.0, color, coord.1)
+                })
                 .collect();
 
             possible_moves.append(&mut possible_moves_for_piece);
@@ -136,10 +185,11 @@ impl ChessBoard {
     }
 
     pub fn apply_action(&self, action: &PieceMove) -> ChrustResult<ChessBoard> {
-        let fen = self.board_fen_section();
+        let fen = self.fen();
         // self.print_to_screen("request");
-        let mut new_board = ChessBoard::load_from_fen(fen)?;
-        new_board.move_piece(action.from, action.to);
+        let mut new_board = ChessBoard::load_from_fen(&fen)?;
+        new_board.default_promotion_piece = self.default_promotion_piece;
+        new_board.move_piece(action)?;
         // new_board.print_to_screen("response");
         Ok(new_board)
     }
@@ -174,28 +224,134 @@ impl ChessBoard {
             .find(|x| x.piece_type() == piece_type)
     }
 
-    pub fn move_piece(&mut self, from: Coordinate, to: Coordinate) {
-        // let mut cells: Vec<&mut Cell> = self.all_cells_mut();
-        let cells = self.all_cells_mut_refcell();
-        let from_index = cells
-            .iter()
-            .position(|c| c.borrow_mut().x == from.x && c.borrow_mut().y == from.y);
+    pub fn move_piece(&mut self, action: &PieceMove) -> ChrustResult<()> {
+        let from = action.from;
+        let to = action.to;
 
-        if let Some(from_index) = from_index {
-            let to_index = cells
-                .iter()
-                .position(|c| c.borrow_mut().x == to.x && c.borrow_mut().y == to.y);
+        //check for en passent
+        self.en_passant_target = match (
+            action.chess_piece.piece_type(),
+            action.chess_piece.color(),
+            action.from.y,
+            action.to.y,
+        ) {
+            (PieceType::Pawn, Color::White, 2, 4) => Some(Coordinate::new(action.from.x, 3)),
+            (PieceType::Pawn, Color::Black, 7, 5) => Some(Coordinate::new(action.from.x, 6)),
+            _ => None,
+        };
 
-            if let Some(to_index) = to_index {
-                let one = &mut cells[from_index].borrow_mut().space;
-                let two = &mut cells[to_index].borrow_mut().space;
-                std::mem::swap(one, two);
-                *one = None;
-            }
+        self.mem_swap_two_coordinates(from, to)?;
+
+        if action.move_type == MoveType::EnPassant {
+            let coordinate = match action.color_moving {
+                Color::White => Coordinate::new(to.x, to.y - 1),
+                Color::Black => Coordinate::new(to.x, to.y + 1),
+            };
+
+            self.set_space_to_empty(coordinate)?;
         }
+
+        //assuming we're moving the king currently
+        if action.move_type == MoveType::Castle {
+            if to.x == 'g' {
+                let start = Coordinate::new('h', from.y);
+                let end = Coordinate::new('f', to.y);
+                self.mem_swap_two_coordinates(start, end)?;
+            }
+
+            if to.x == 'c' {
+                let start = Coordinate::new('a', from.y);
+                let end = Coordinate::new('d', to.y);
+                self.mem_swap_two_coordinates(start, end)?;
+            }
+
+            if action.color_moving == Color::White {
+                self.white_castle_kingside = false;
+                self.white_castle_queenside = false;
+            } else {
+                self.black_castle_kingside = false;
+                self.black_castle_queenside = false;
+            }
+        } else {
+            //check for castling rights
+            self.update_castling_rights(action)?;
+        }
+
+        if action.move_type == MoveType::Promotion {
+            let piece = chess_piece_from_type(
+                self.default_promotion_piece.unwrap_or(PieceType::Queen),
+                action.color_moving,
+                to,
+            )?;
+
+            self.set_space_to_piece(to, piece)?;
+        }
+
+        // Update who's turn it is to move
+        self.side_to_move = match action.color_moving {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        };
+
+        //TODO implement halfmove clock
+
+        self.full_move_clock = match action.color_moving {
+            Color::White => self.full_move_clock,
+            Color::Black => self.full_move_clock + 1,
+        };
+
+        Ok(())
     }
 
-    pub fn load_empty_board() -> ChrustResult<ChessBoard> {
+    pub fn update_castling_rights(&mut self, action: &PieceMove) -> ChrustResult<()> {
+        self.white_castle_kingside = !(self.white_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::King
+                && action.chess_piece.color() == Color::White);
+        self.white_castle_queenside = !(self.white_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::King
+                && action.chess_piece.color() == Color::White);
+
+        self.white_castle_kingside = !(self.white_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::Rook
+                && action.chess_piece.color() == Color::White
+                && action.from.x == 'h');
+
+        self.white_castle_queenside = !(self.white_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::Rook
+                && action.chess_piece.color() == Color::White
+                && action.from.x == 'a');
+
+        self.black_castle_kingside = !(self.black_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::King
+                && action.chess_piece.color() == Color::Black);
+        self.black_castle_queenside = !(self.black_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::King
+                && action.chess_piece.color() == Color::Black);
+
+        self.black_castle_kingside = !(self.black_castle_kingside
+            || action.chess_piece.piece_type() == PieceType::Rook
+                && action.chess_piece.color() == Color::Black
+                && action.from.x == 'h');
+
+        self.black_castle_queenside = !(self.black_castle_queenside
+            || action.chess_piece.piece_type() == PieceType::Rook
+                && action.chess_piece.color() == Color::Black
+                && action.from.x == 'a');
+
+        Ok(())
+    }
+
+    pub fn load_empty_board(
+        side_to_move: Color,
+        fen: String,
+        white_castle_queenside: bool,
+        white_castle_kingside: bool,
+        black_castle_queenside: bool,
+        black_castle_kingside: bool,
+        en_passant_target: Option<Coordinate>,
+        half_move_clock: u32,
+        full_move_clock: u32,
+    ) -> ChrustResult<ChessBoard> {
         let board = ChessBoard {
             squares: vec![
                 vec![
@@ -280,6 +436,16 @@ impl ChessBoard {
                 ],
             ],
             board_size: 8,
+            fen,
+            side_to_move,
+            white_castle_queenside,
+            white_castle_kingside,
+            black_castle_queenside,
+            black_castle_kingside,
+            en_passant_target,
+            half_move_clock,
+            full_move_clock,
+            default_promotion_piece: None,
         };
 
         Ok(board)
@@ -292,15 +458,79 @@ impl ChessBoard {
             _ => return Err(Box::from("Invalid option for board_name")),
         };
 
-        let board = ChessBoard::load_from_fen(board_string.to_string())?;
+        let board = ChessBoard::load_from_fen(board_string)?;
 
         Ok(board)
     }
 
-    /// Creates a `Board` object from a Fen string. NOTE: assumes the game section of the fen has been removed
-    pub fn load_from_fen(fen: String) -> ChrustResult<ChessBoard> {
-        let mut board = ChessBoard::load_empty_board()?;
-        let sections: Vec<Vec<char>> = fen
+    pub fn full_fen() -> String {
+        String::new()
+    }
+
+    pub fn load_from_fen(fen: &str) -> ChrustResult<ChessBoard> {
+        let split = fen.split(' ').collect::<Vec<&str>>();
+
+        let turn_to_move = match split
+            .get(1)
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
+        {
+            &"w" => Color::White,
+            &"b" => Color::Black,
+            invalid_option => {
+                return Err(Box::from(format!(
+                    "Invalid option for 'turn to move': {}",
+                    invalid_option
+                )))
+            }
+        };
+
+        let castling_rights = split
+            .get(2)
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen));
+
+        let white_castle_queenside = castling_rights.contains('Q');
+        let white_castle_kingside = castling_rights.contains('K');
+        let black_castle_kingside = castling_rights.contains('k');
+        let black_castle_queenside = castling_rights.contains('q');
+
+        let en_passant_target: Option<Coordinate> = match split
+            .get(3)
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
+        {
+            &"-" => None,
+            s => {
+                let chars: Vec<char> = s.chars().collect();
+                Some(Coordinate::new(chars[0], chars[1] as i32 - '0' as i32)) //sometimes you gotta go maverick
+            }
+        };
+
+        let half_move_clock = split
+            .get(4)
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
+            .parse::<u32>()?;
+
+        let full_move_clock = split
+            .get(5)
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen))
+            .parse::<u32>()?;
+
+        let board_section = split
+            .first()
+            .unwrap_or_else(|| panic!("fen is improperly formatted! {}", fen));
+
+        let mut board = ChessBoard::load_empty_board(
+            turn_to_move,
+            fen.to_string(),
+            white_castle_queenside,
+            white_castle_kingside,
+            black_castle_queenside,
+            black_castle_kingside,
+            en_passant_target,
+            half_move_clock,
+            full_move_clock,
+        )?;
+
+        let sections: Vec<Vec<char>> = board_section
             .split('/')
             .map(|s| s.to_string().chars().collect())
             .collect();
@@ -330,7 +560,7 @@ impl ChessBoard {
         Ok(board)
     }
 
-    pub fn board_fen_section(&self) -> String {
+    pub fn fen(&self) -> String {
         let mut fen = "".to_string();
 
         //construct the piece position portion
@@ -355,7 +585,28 @@ impl ChessBoard {
             fen.push('/');
         }
 
-        fen[0..fen.len() - 1].to_string()
+        let board_section = fen[0..fen.len() - 1].to_string();
+
+        let en_passant_target = match self.en_passant_target {
+            Some(s) => format!("{}{}", s.x, s.y),
+            None => "-".to_string(),
+        };
+
+        format!(
+            "{} {} {}{}{}{} {} {} {}",
+            board_section,
+            match self.side_to_move {
+                Color::Black => "b",
+                Color::White => "w",
+            },
+            if self.white_castle_kingside { "K" } else { "" },
+            if self.white_castle_queenside { "Q" } else { "" },
+            if self.black_castle_kingside { "k" } else { "" },
+            if self.black_castle_queenside { "q" } else { "" },
+            en_passant_target,
+            self.half_move_clock,
+            self.full_move_clock
+        )
     }
 }
 

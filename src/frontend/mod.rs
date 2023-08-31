@@ -1,2 +1,2 @@
-pub mod responses;
+pub mod response;
 pub mod server;

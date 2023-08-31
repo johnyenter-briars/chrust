@@ -1,10 +1,11 @@
 use crate::board::{
-    chessboard::ChessBoard, color::Color, coordinate::Coordinate, piecetype::PieceType,
+    chessboard::ChessBoard, color::Color, coordinate::Coordinate, movetype::MoveType,
 };
 
 use super::{
     chesspiece::ChessPiece, diagonal_down_left_by, diagonal_down_right_by, diagonal_up_left_by,
-    diagonal_up_right_by, down_by, enemy_occupied, friendly_occupied, left_by, right_by, up_by,
+    diagonal_up_right_by, down_by, enemy_occupied, friendly_occupied, left_by,
+    piecetype::PieceType, right_by, up_by,
 };
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -15,8 +16,8 @@ pub struct Queen {
 }
 
 impl ChessPiece for Queen {
-    fn available_moves(&self, board: &ChessBoard) -> Vec<Coordinate> {
-        let mut possible_coordinates: Vec<Coordinate> = Vec::new();
+    fn available_moves(&self, board: &ChessBoard) -> Vec<(Coordinate, MoveType)> {
+        let mut possible_coordinates: Vec<(Coordinate, MoveType)> = Vec::new();
 
         let possible_directions: Vec<fn(Coordinate, i32) -> Coordinate> = vec![
             up_by,
@@ -40,10 +41,10 @@ impl ChessPiece for Queen {
                 if friendly_occupied(possible_position, self.color, board) {
                     break;
                 } else if enemy_occupied(possible_position, self.color, board) {
-                    possible_coordinates.push(possible_position);
+                    possible_coordinates.push((possible_position, MoveType::CaptureOrMove));
                     break;
                 } else {
-                    possible_coordinates.push(possible_position);
+                    possible_coordinates.push((possible_position, MoveType::CaptureOrMove));
                 }
             }
         }
