@@ -20,7 +20,7 @@ pub fn process_fen(
     let mut board_before_white_action = ChessBoard::load_from_fen(&fen)?;
     board_before_white_action.default_promotion_piece = Some(default_promotion_piece);
 
-    board_before_white_action.print_to_screen(&board_before_white_action.fen());
+    // board_before_white_action.print_to_screen(&board_before_white_action.fen());
 
     let chess_piece = board_before_white_action.piece(source.x, source.y)?;
 
@@ -38,14 +38,14 @@ pub fn process_fen(
 
     let mut board_after_white_action = board_before_white_action.apply_action(action)?;
 
-    board_after_white_action.print_to_screen(&board_after_white_action.fen());
+    // board_after_white_action.print_to_screen(&board_after_white_action.fen());
     board_after_white_action.default_promotion_piece = None;
 
     let ai_move = max_decision(&board_after_white_action, Color::Black, num_plies)?;
 
     let board_after_black_action = board_after_white_action.apply_action(&ai_move)?;
 
-    board_after_black_action.print_to_screen("ai move");
+    // board_after_black_action.print_to_screen("ai move");
 
     Ok(board_after_black_action.fen())
 }
