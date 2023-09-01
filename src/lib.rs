@@ -11,6 +11,4 @@ pub mod state;
 extern crate serde_derive;
 extern crate serde_json;
 
-extern crate clap;
-
 type ChrustResult<T> = Result<T, Box<dyn Error>>;
