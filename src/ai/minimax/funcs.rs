@@ -1,6 +1,5 @@
 use core::panic;
 use std::cmp;
-use std::time::Instant;
 
 use crate::{
     ai::minimax::evaluate::evaluate,
