@@ -111,9 +111,6 @@ fn minimax_decision_max(
 }
 
 pub fn max_decision(board: &ChessBoard, color: Color, max_depth: u32) -> ChrustResult<PieceMove> {
-    let start = Instant::now();
     let (max_decision, _) = minimax_decision_max(board, color, max_depth, -1000000, 1000000)?;
-    let duration = start.elapsed();
-    println!("Time to determine move: {:?}", duration);
     Ok(max_decision)
 }
