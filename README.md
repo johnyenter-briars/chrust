@@ -9,7 +9,7 @@
 
 <p float="left">
   <a href="https://github.com/johnyenter-briars/chrust">
-    <img src="images/chrust1.jpg" alt="Logo" width="100%">
+    <img src="images/chrust5.jpg" alt="Logo" width="100%">
   </a>
   <!-- <a href="https://github.com/johnyenter-briars/chrust">
     <img src="images/screenshot_old.png" alt="Logo" width="48%">
