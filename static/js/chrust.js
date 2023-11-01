@@ -4,7 +4,7 @@ class ChrustAPI {
         this.hostname = window.location.hostname;
         this.apiUrl = this.hostname === '127.0.0.1' || this.hostname === '0.0.0.0' || this.hostname === '192.168.0.4' || this.hostname === '192.168.1.111'
             ? `http://${this.hostname}:8083/chrust` :
-            `http://${this.hostname}/chrust`;
+            `https://${this.hostname}/chrust`;
 
         this.currenlyInWebRequest = false;
         this.rightHalfFen = "w KQkq - 0 1"; //starting position
